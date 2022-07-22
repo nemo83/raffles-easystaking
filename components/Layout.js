@@ -2,8 +2,8 @@ import Nav from './Nav'
 import Dashboard from './Dashboard'
 import { useEffect } from 'react';
 
-function Layout({ children }) {
-
+function Layout({ children, stats }) {
+    
     useEffect(() => {
         document.body.classList.add("bg-black-alt");
         document.body.classList.add("font-sans");
@@ -14,7 +14,7 @@ function Layout({ children }) {
     return (
         <>
             <Nav />
-            <Dashboard />
+            <Dashboard stats={stats} />
             <div>
                 <main>
                     {children}
