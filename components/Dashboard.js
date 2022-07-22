@@ -75,10 +75,10 @@ export const Dashboard = () => {
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
                     <div className="w-full p-3 md:w-1/2 xl:w-1/3">
-                        
+
                         <div className="p-2 bg-gray-900 border border-gray-800 rounded shadow">
                             <div className="flex flex-row items-center">
                                 <div className="flex-shrink pr-4">
