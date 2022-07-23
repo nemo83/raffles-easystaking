@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Card from "./Card"
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,31 +10,51 @@ import {
 import Participants from '../constants/Dashboard/participants.json'
 
 
-function Dashboard({ stats }) {
-    console.log(stats)
+function Dashboard() {
+
+    const [data, setData] = useState(null)
+    const [isLoading, setLoading] = useState(false)
+
+    useEffect(() => {
+        setLoading(true)
+        fetch('https://lottery.easystaking.online/raffles/stats')
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data.jackpot[0].amount)
+                setData({
+                    jackpot: data.jackpot[0].amount,
+                    participants: data.jackpot[0].amount,
+                    totalRaffles: data.jackpot[0].amount,
+                    totalWon: data.jackpot[0].amount,
+                })
+                setLoading(false)
+            })
+    }, [])
+
+    if (isLoading) return <p>Loading...</p>
 
     const icons = [
         {
             title: "Jackpot",
-            text: stats.jackpot[0].amount,
+            text: "jackpot",
             icon: faDollarSign,
             iconClassName: "fas fa-2x fa-fw fa-inverse",
             iconBackground: "bg-blue-600"
         }, {
             title: "Participants",
-            text: stats.raffles_participants_total,
+            text: "participants",
             icon: faUsers,
             iconClassName: "fas fa-2x fa-fw fa-inverse",
             iconBackground: "bg-green-600"
         }, {
             title: "Total Raffles",
-            text: stats.raffles_num_total,
+            text: "totalRaffles",
             icon: faDice,
             iconClassName: "fas fa-2x",
             iconBackground: "bg-red-600"
         }, {
             title: "Total Won",
-            text: stats.raffles_jackpot_total[0].amount,
+            text: "totalWon",
             icon: faDollarSign,
             iconClassName: "fas fa-2x",
             iconBackground: "bg-blue-600"
@@ -46,13 +67,13 @@ function Dashboard({ stats }) {
 
 
         <div className="w-full px-4 mb-16 leading-normal text-gray-800 md:px-0 md:mt-8">
-
+            {console.log('data: ' + data)}
             <div className="flex flex-wrap">
                 {icons.map(details => (
                     <Card
                         key={details.title}
                         title={details.title}
-                        text={details.text}
+                        text={data.jackpot}
                         icon={details.icon}
                         iconClassName={details.iconClassName}
                         iconBackground={details.iconBackground}

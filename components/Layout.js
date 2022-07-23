@@ -3,7 +3,7 @@ import Table from './Table'
 import Dashboard from './Dashboard'
 import { useEffect } from 'react';
 
-function Layout({ stats, openRaffles, closedRaffles, recentWinners }) {
+function Layout() {
 
     useEffect(() => {
         document.body.classList.add("bg-black-alt");
@@ -12,43 +12,43 @@ function Layout({ stats, openRaffles, closedRaffles, recentWinners }) {
         document.body.classList.add("tracking-normal");
     });
 
-    const openRafflesRows = openRaffles.map(raffle => [raffle.epoch, `${raffle.prize} ₳`, `${raffle.min_stake} ₳`, raffle.num_participants])
+    // const openRafflesRows = openRaffles.map(raffle => [raffle.epoch, `${raffle.prize} ₳`, `${raffle.min_stake} ₳`, raffle.num_participants])
 
-    const openRafflesData = {
-        title: "Open Raffles",
-        columnNames: ["Epoch", "Prize", "Stake Req.", "Participants"],
-        rows: openRafflesRows
-    }
+    // const openRafflesData = {
+    //     title: "Open Raffles",
+    //     columnNames: ["Epoch", "Prize", "Stake Req.", "Participants"],
+    //     rows: openRafflesRows
+    // }
 
-    const closeRafflesRows = closedRaffles.map(raffle => [raffle.epoch, `${raffle.prize} ₳`, `${raffle.min_stake} ₳`, raffle.num_participants])
+    // const closeRafflesRows = closedRaffles.map(raffle => [raffle.epoch, `${raffle.prize} ₳`, `${raffle.min_stake} ₳`, raffle.num_participants])
 
-    const closedRafflesData = {
-        title: "Closed Raffles",
-        columnNames: ["Epoch", "Prize", "Stake Req.", "Participants"],
-        rows: closeRafflesRows
-    }
+    // const closedRafflesData = {
+    //     title: "Closed Raffles",
+    //     columnNames: ["Epoch", "Prize", "Stake Req.", "Participants"],
+    //     rows: closeRafflesRows
+    // }
 
-    function getWinningAmount(winner) {
-        return winner.asset_name != null ? `${winner.winning_amount} $${winner.asset_name}` : `${winner.winning_amount} ₳`
-    }
+    // function getWinningAmount(winner) {
+    //     return winner.asset_name != null ? `${winner.winning_amount} $${winner.asset_name}` : `${winner.winning_amount} ₳`
+    // }
 
-    const recentWinnersRows = recentWinners.map(winner => [winner.epoch, winner.stake_id, winner.user_friendly_name, getWinningAmount(winner), winner.tx_id])
+    // const recentWinnersRows = recentWinners.map(winner => [winner.epoch, winner.stake_id, winner.user_friendly_name, getWinningAmount(winner), winner.tx_id])
 
-    const recentWinnersData = {
-        title: "Recent Winners",
-        columnNames: ["Epoch", "Stake id", "Name", "Prize", "Tx"],
-        rows: recentWinnersRows
-    }
+    // const recentWinnersData = {
+    //     title: "Recent Winners",
+    //     columnNames: ["Epoch", "Stake id", "Name", "Prize", "Tx"],
+    //     rows: recentWinnersRows
+    // }
 
     return (
         <>
             <Nav />
             <div className="container w-full pt-20 mx-auto">
 
-                <Dashboard stats={stats} />
-                <Table title={openRafflesData.title} columnNames={openRafflesData.columnNames} rows={openRafflesData.rows} />
+                <Dashboard />
+                {/* <Table title={openRafflesData.title} columnNames={openRafflesData.columnNames} rows={openRafflesData.rows} />
                 <Table title={recentWinnersData.title} columnNames={recentWinnersData.columnNames} rows={recentWinnersData.rows} cardanoScanIndex={4} />
-                <Table title={closedRafflesData.title} columnNames={closedRafflesData.columnNames} rows={closedRafflesData.rows} />
+                <Table title={closedRafflesData.title} columnNames={closedRafflesData.columnNames} rows={closedRafflesData.rows} /> */}
             </div>
         </>
     )
