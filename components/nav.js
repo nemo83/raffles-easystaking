@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
-    faHome, faTasks, faEnvelope, faWallet, faChartArea
+    faHome, faDice, faQuestion
 } from "@fortawesome/free-solid-svg-icons";
 
 export const Nav = () => {
@@ -29,39 +29,22 @@ export const Nav = () => {
                         <li className="my-2 mr-6 md:my-0">
                             <a href="#" className="block py-1 pl-1 text-gray-500 no-underline align-middle border-b-2 border-gray-900 md:py-3 hover:text-gray-100 hover:border-pink-400">
                                 <FontAwesomeIcon
-                                    icon={faTasks}
+                                    icon={faDice}
                                     className="mr-3"
                                 />
-                                <span className="pb-1 text-sm md:pb-0">Tasks</span>
+                                <span className="pb-1 text-sm md:pb-0">Raffles</span>
                             </a>
                         </li>
                         <li className="my-2 mr-6 md:my-0">
-                            <a href="#" className="block py-1 pl-1 text-gray-500 no-underline align-middle border-b-2 border-gray-900 md:py-3 hover:text-gray-100 hover:border-purple-400">
+                            <a href="#" className="block py-1 pl-1 text-gray-500 no-underline align-middle border-b-2 border-gray-900 md:py-3 hover:text-gray-100 hover:border-pink-400">
                                 <FontAwesomeIcon
-                                    icon={faEnvelope}
+                                    icon={faQuestion}
                                     className="mr-3"
                                 />
-                                <span className="pb-1 text-sm md:pb-0">Messages</span>
+                                <span className="pb-1 text-sm md:pb-0">F.A.Q.</span>
                             </a>
                         </li>
-                        <li className="my-2 mr-6 md:my-0">
-                            <a href="#" className="block py-1 pl-1 text-gray-500 no-underline align-middle border-b-2 border-gray-900 md:py-3 hover:text-gray-100 hover:border-green-400">
-                                <FontAwesomeIcon
-                                    icon={faChartArea}
-                                    className="mr-3"
-                                />
-                                <span className="pb-1 text-sm md:pb-0">Analytics</span>
-                            </a>
-                        </li>
-                        <li className="my-2 mr-6 md:my-0">
-                            <a href="#" className="block py-1 pl-1 text-gray-500 no-underline align-middle border-b-2 border-gray-900 md:py-3 hover:text-gray-100 hover:border-red-400">
-                                <FontAwesomeIcon
-                                    icon={faWallet}
-                                    className="mr-3"
-                                />
-                                <span className="pb-1 text-sm md:pb-0">Payments</span>
-                            </a>
-                        </li>
+
                     </ul>
 
                 </div>
