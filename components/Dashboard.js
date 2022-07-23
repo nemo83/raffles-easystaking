@@ -44,25 +44,24 @@ function Dashboard({ stats }) {
     return (
         // < !--Container-- >
 
-        <div className="container w-full pt-20 mx-auto">
 
-            <div className="w-full px-4 mb-16 leading-normal text-gray-800 md:px-0 md:mt-8">
+        <div className="w-full px-4 mb-16 leading-normal text-gray-800 md:px-0 md:mt-8">
 
-                <div className="flex flex-wrap">
-                    {icons.map(details => (
-                        <Card
-                            key={details.title}
-                            title={details.title}
-                            text={details.text}
-                            icon={details.icon}
-                            iconClassName={details.iconClassName}
-                            iconBackground={details.iconBackground}
-                        />
-                    ))}
-                </div>
-
+            <div className="flex flex-wrap">
+                {icons.map(details => (
+                    <Card
+                        key={details.title}
+                        title={details.title}
+                        text={details.text}
+                        icon={details.icon}
+                        iconClassName={details.iconClassName}
+                        iconBackground={details.iconBackground}
+                    />
+                ))}
             </div>
+
         </div>
+
 
     )
 }
