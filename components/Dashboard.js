@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import Card from "./Card"
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import {
     faUsers, faDice, faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
@@ -12,26 +10,27 @@ import Participants from '../constants/Dashboard/participants.json'
 
 function Dashboard() {
 
-    const [data, setData] = useState(null)
-    const [isLoading, setLoading] = useState(false)
+    const [data, setData] = useState({
+        jackpot: "",
+        participants: "",
+        totalRaffles: "",
+        totalWon: "",
+    })
 
     useEffect(() => {
-        setLoading(true)
+
         fetch('https://lottery.easystaking.online/raffles/stats')
             .then((res) => res.json())
             .then((data) => {
                 console.log(data.jackpot[0].amount)
                 setData({
                     jackpot: data.jackpot[0].amount,
-                    participants: data.jackpot[0].amount,
-                    totalRaffles: data.jackpot[0].amount,
-                    totalWon: data.jackpot[0].amount,
+                    participants: data.raffles_participants_total,
+                    totalRaffles: data.raffles_num_total,
+                    totalWon: data.raffles_prize_total,
                 })
-                setLoading(false)
             })
     }, [])
-
-    if (isLoading) return <p>Loading...</p>
 
     const icons = [
         {
@@ -67,13 +66,13 @@ function Dashboard() {
 
 
         <div className="w-full px-4 mb-16 leading-normal text-gray-800 md:px-0 md:mt-8">
-            {console.log('data: ' + data)}
+
             <div className="flex flex-wrap">
                 {icons.map(details => (
                     <Card
                         key={details.title}
                         title={details.title}
-                        text={data.jackpot}
+                        text={data[details.text]}
                         icon={details.icon}
                         iconClassName={details.iconClassName}
                         iconBackground={details.iconBackground}
