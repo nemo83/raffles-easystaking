@@ -20,7 +20,7 @@ function Layout() {
     return (
         <>
             <Nav />
-            <div className="container w-full pt-20 mx-auto">
+            <div className="container w-4/6 pt-20 mx-auto">
 
                 <Dashboard />
                 <OpenRaffles />

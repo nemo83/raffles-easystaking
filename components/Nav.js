@@ -49,9 +49,9 @@ export const Nav = () => {
 
         const baseAddress = address.to_bech32();
 
-        console.log('baseAddress: ' + baseAddress)
-
         setBaseAddress(baseAddress)
+
+        toast.success('Wallet correctly connected!')
 
     }
 
