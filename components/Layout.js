@@ -1,9 +1,12 @@
-import Nav from './Nav'
 import Dashboard from './Dashboard'
 import { useEffect } from 'react';
 import OpenRaffles from './OpenRaffles';
 import ClosedRaffles from './ClosedRaffles';
 import RecentWinners from './RecentWinners';
+
+import dynamic from 'next/dynamic';
+
+const Nav = dynamic(() => import('./Nav'), { ssr: false })
 
 function Layout() {
 
