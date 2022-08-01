@@ -10,16 +10,24 @@ import {
 export const Nav = () => {
 
     const WALLET_NAME_KEY = "wallet-name"
+    const FRIENDLY_NAME_KEY = "friendly-name"
 
     const [showWallets, setShowWallets] = useState(false)
     const [availableWallets, setAvailableWallets] = useState([])
     const [wallet, setWallet] = useState(null)
     const [baseAddress, setBaseAddress] = useState(null)
+    const [friendlyName, setFriendlyName] = useState('')
 
     // Modal
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
+        // Friendly Name restore
+        const saveFriendlyName = localStorage.getItem(FRIENDLY_NAME_KEY)
+        if (saveFriendlyName != null) {
+            setFriendlyName(saveFriendlyName)
+        }
+
         const SUPPORTED_WALLETS = ["eternl", "flint", "nami", "yoroi"]
         const aWallets = []
         const savedWalletName = localStorage.getItem(WALLET_NAME_KEY)
@@ -66,10 +74,11 @@ export const Nav = () => {
                 const baseAddress = address.to_bech32();
 
                 setBaseAddress(baseAddress)
-                toast.success('Wallet correctly connected!')
+
                 const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
                 if (!isReconnect) {
                     localStorage.setItem(WALLET_NAME_KEY, walletName)
+                    toast.success('Wallet correctly connected!')
                 }
 
             })
@@ -78,31 +87,56 @@ export const Nav = () => {
 
     async function participate() {
 
-        console.log('wallet? ' + wallet)
         if (wallet == null) return
-        console.log('wallet not null')
-        console.log('baseAddress: ' + baseAddress)
+
+        localStorage.setItem(FRIENDLY_NAME_KEY, friendlyName)
 
         const body = JSON.stringify({ payment_address: baseAddress })
-        console.log('body: (' + body + ')')
 
-        const res = fetch('https://lottery.easystaking.online/raffles', {
+        fetch('https://lottery.easystaking.online/raffles', {
             method: 'POST',
             body: body,
             headers: {
                 'Content-Type': 'application/json'
             },
+        }).then((response) => {
+            return new Promise((resolve) => response.json()
+                .then((json) => resolve({
+                    status: response.status,
+                    ok: response.ok,
+                    json
+                })))
+        }).then(({ status, ok, json }) => {
+            console.log('json: ' + JSON.stringify(json))
+            const message = json
+            switch (status) {
+                case 200:
+                    const numRaffles = json.length
+                    toast.success(`Congrats! You joined ${numRaffles} Raflles!`)
+                    break
+                default:
+                    console.error('Error:', message);
+                    toast.error(`Error: ${message}`)
+            }
         })
-            .then(data => data.json())
-            .then(data => {
-                const numRaffles = data.length
-                toast.success(`Congrats! You joined ${numRaffles} Raflles!`)
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                toast.error(`Error ${error}`)
-            })
 
+
+        // const res = fetch('https://lottery.easystaking.online/raffles', {
+        //     method: 'POST',
+        //     body: body,
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        // })
+        //     .then(data => data.json())
+        //     .then(data => {
+        //         const numRaffles = data.length
+        //         toast.success(`Congrats! You joined ${numRaffles} Raflles!`)
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error:', error);
+        //         toast.error(`Error ${error}`)
+        //     })
 
 
     }
@@ -117,7 +151,7 @@ export const Nav = () => {
                         <div className="relative w-auto max-w-3xl mx-auto my-6">
                             <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none">
                                 <div className="flex items-start justify-between p-5 border-b border-gray-300 border-solid rounded-t ">
-                                    <h3 className="text-3xl font=semibold">General Info</h3>
+                                    <h3 className="text-3xl font=semibold capitalize">Join Raffles</h3>
                                     <button
                                         className="float-right text-black bg-transparent border-0"
                                         onClick={() => setShowModal(false)}
@@ -130,35 +164,35 @@ export const Nav = () => {
                                 <div className="relative flex-auto p-6">
                                     <form className="w-full px-8 pt-6 pb-8 bg-gray-200 rounded shadow-md">
                                         <label className="block mb-1 text-sm font-bold text-black">
-                                            First Name
+                                            Friendly Name
                                         </label>
-                                        <input className="w-full px-1 py-2 text-black border rounded shadow appearance-none" />
-                                        <label className="block mb-1 text-sm font-bold text-black">
-                                            Last Name
-                                        </label>
-                                        <input className="w-full px-1 py-2 text-black border rounded shadow appearance-none" />
+                                        <input
+                                            className="w-full px-1 py-2 text-black border rounded shadow appearance-none"
+                                            onChange={(event) => setFriendlyName(event.target.value)}
+                                            value={friendlyName} />
                                         <label className="block mb-1 text-sm font-bold text-black">
                                             Address
                                         </label>
-                                        <input className="w-full px-1 py-2 text-black border rounded shadow appearance-none" />
-                                        <label className="block mb-1 text-sm font-bold text-black">
-                                            City
-                                        </label>
-                                        <input className="w-full px-1 py-2 text-black border rounded shadow appearance-none" />
+                                        <input
+                                            className="w-full px-1 py-2 text-black border rounded shadow appearance-none"
+                                            disabled
+                                            readOnly
+                                            value={`${baseAddress.slice(0, 12)} ... ${baseAddress.slice(baseAddress.length - 4)}`} />
+
                                     </form>
                                 </div>
                                 <div className="flex items-center justify-end p-6 border-t border-solid rounded-b border-blueGray-200">
                                     <button
-                                        className="px-6 py-2 mb-1 mr-1 text-sm font-bold text-red-500 uppercase outline-none background-transparent focus:outline-none"
+                                        className="px-6 py-2 mb-1 mr-1 text-sm font-bold text-black uppercase outline-none background-transparent focus:outline-none"
                                         type="button"
                                         onClick={() => setShowModal(false)}
                                     >
                                         Close
                                     </button>
                                     <button
-                                        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase bg-yellow-500 rounded shadow outline-none active:bg-yellow-700 hover:shadow-lg focus:outline-none"
+                                        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
                                         type="button"
-                                        onClick={() => setShowModal(false)}
+                                        onClick={() => { participate(); setShowModal(false) }}
                                     >
                                         Submit
                                     </button>
@@ -237,7 +271,7 @@ export const Nav = () => {
                         ) : <></>}
                     </div>
                     <span>
-                        {wallet ? (
+                        {wallet && baseAddress ? (
                             <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
                                 alt="Click to enter all available raffleR"
                                 onClick={() => setShowModal(!showModal)}>Participate</button>
