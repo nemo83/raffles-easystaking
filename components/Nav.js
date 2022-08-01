@@ -67,7 +67,7 @@ export const Nav = () => {
 
                 setBaseAddress(baseAddress)
                 toast.success('Wallet correctly connected!')
-                const isReconnect = localStorage.getItem(WALLET_NAME_KEY)
+                const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
                 if (!isReconnect) {
                     localStorage.setItem(WALLET_NAME_KEY, walletName)
                 }
