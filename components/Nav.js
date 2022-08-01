@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import { BaseAddress, Address } from '@emurgo/cardano-serialization-lib-browser'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast'
 import {
     faHome, faDice, faQuestion
-} from "@fortawesome/free-solid-svg-icons";
+} from "@fortawesome/free-solid-svg-icons"
 
+import Modal from './Modal'
 
 export const Nav = () => {
 
@@ -14,6 +15,9 @@ export const Nav = () => {
     const [availableWallets, setAvailableWallets] = useState([])
     const [wallet, setWallet] = useState(null)
     const [baseAddress, setBaseAddress] = useState(null)
+
+    // Modal
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const SUPPORTED_WALLETS = ["eternl", "flint", "nami", "yoroi"]
@@ -89,6 +93,65 @@ export const Nav = () => {
         <nav id="header" className="fixed top-0 z-10 w-full bg-gray-900 shadow">
 
             <Toaster />
+
+            {showModal ? (
+                <>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
+                        <div className="relative w-auto max-w-3xl mx-auto my-6">
+                            <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none">
+                                <div className="flex items-start justify-between p-5 border-b border-gray-300 border-solid rounded-t ">
+                                    <h3 className="text-3xl font=semibold">General Info</h3>
+                                    <button
+                                        className="float-right text-black bg-transparent border-0"
+                                        onClick={() => setShowModal(false)}
+                                    >
+                                        <span className="block w-6 h-6 py-0 text-xl text-black bg-gray-400 rounded-full opacity-7">
+                                            x
+                                        </span>
+                                    </button>
+                                </div>
+                                <div className="relative flex-auto p-6">
+                                    <form className="w-full px-8 pt-6 pb-8 bg-gray-200 rounded shadow-md">
+                                        <label className="block mb-1 text-sm font-bold text-black">
+                                            First Name
+                                        </label>
+                                        <input className="w-full px-1 py-2 text-black border rounded shadow appearance-none" />
+                                        <label className="block mb-1 text-sm font-bold text-black">
+                                            Last Name
+                                        </label>
+                                        <input className="w-full px-1 py-2 text-black border rounded shadow appearance-none" />
+                                        <label className="block mb-1 text-sm font-bold text-black">
+                                            Address
+                                        </label>
+                                        <input className="w-full px-1 py-2 text-black border rounded shadow appearance-none" />
+                                        <label className="block mb-1 text-sm font-bold text-black">
+                                            City
+                                        </label>
+                                        <input className="w-full px-1 py-2 text-black border rounded shadow appearance-none" />
+                                    </form>
+                                </div>
+                                <div className="flex items-center justify-end p-6 border-t border-solid rounded-b border-blueGray-200">
+                                    <button
+                                        className="px-6 py-2 mb-1 mr-1 text-sm font-bold text-red-500 uppercase outline-none background-transparent focus:outline-none"
+                                        type="button"
+                                        onClick={() => setShowModal(false)}
+                                    >
+                                        Close
+                                    </button>
+                                    <button
+                                        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase bg-yellow-500 rounded shadow outline-none active:bg-yellow-700 hover:shadow-lg focus:outline-none"
+                                        type="button"
+                                        onClick={() => setShowModal(false)}
+                                    >
+                                        Submit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            ) : null}
+
             <div className="container flex flex-wrap items-center w-full pt-3 pb-3 mx-auto mt-0 md:pb-0">
 
                 <div className="z-20 flex-grow hidden w-full mt-2 bg-gray-900 lg:flex lg:items-center lg:w-auto lg:block lg:mt-0" id="nav-content">
@@ -160,7 +223,7 @@ export const Nav = () => {
                         {wallet ? (
                             <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
                                 alt="Click to enter all available raffleR"
-                                onClick={() => participate()}>Participate</button>
+                                onClick={() => setShowModal(!showModal)}>Participate</button>
                         ) : (
                             <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-400'
                                 onClick={() => {
