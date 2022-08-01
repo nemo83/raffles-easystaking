@@ -9,6 +9,8 @@ import {
 
 export const Nav = () => {
 
+    const WALLET_NAME_KEY = "wallet-name"
+
     const [showWallets, setShowWallets] = useState(false)
     const [availableWallets, setAvailableWallets] = useState([])
     const [wallet, setWallet] = useState(null)
@@ -20,8 +22,7 @@ export const Nav = () => {
     useEffect(() => {
         const SUPPORTED_WALLETS = ["eternl", "flint", "nami", "yoroi"]
         const aWallets = []
-        const savedWalletName = localStorage.getItem('wallet-name')
-        console.log('previously connected wallet: ' + savedWalletName)
+        const savedWalletName = localStorage.getItem(WALLET_NAME_KEY)
         SUPPORTED_WALLETS.map(walletName => {
             if (window.cardano[walletName]) {
                 const { apiVersion, icon } = window.cardano[walletName]
@@ -39,21 +40,19 @@ export const Nav = () => {
                     }
                 }
                 if (savedWalletName == walletName) {
-                    console.log('attempting to reconnect: ' + walletName)
                     attemptConnectWallet()
                 }
 
             }
         })
         setAvailableWallets(aWallets)
-        // availableWallets, wallet, baseAddress
+
     }, [])
 
     async function connect(walletName) {
         cardano[walletName]
             .enable()
             .then(wallet => {
-                console.log(wallet);
                 setWallet(wallet)
                 return wallet.getUsedAddresses()
             })
@@ -68,28 +67,12 @@ export const Nav = () => {
 
                 setBaseAddress(baseAddress)
                 toast.success('Wallet correctly connected!')
-                localStorage.setItem('wallet-name', walletName)
+                const isReconnect = localStorage.getItem(WALLET_NAME_KEY)
+                if (!isReconnect) {
+                    localStorage.setItem(WALLET_NAME_KEY, walletName)
+                }
 
             })
-        // const wallet = await cardano[walletName].enable();
-        // console.log(wallet);
-
-        // setWallet(wallet)
-
-        // const addresses = await wallet.getUsedAddresses();
-
-        // const addressHex = Buffer.from(addresses[0], "hex");
-
-        // const address = BaseAddress.from_address(
-        //     Address.from_bytes(addressHex)
-        // ).to_address();
-
-        // const baseAddress = address.to_bech32();
-
-        // setBaseAddress(baseAddress)
-
-        // toast.success('Wallet correctly connected!')
-        // localStorage.setItem('wallet-name', walletName)
 
     }
 
