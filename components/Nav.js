@@ -7,8 +7,6 @@ import {
     faHome, faDice, faQuestion
 } from "@fortawesome/free-solid-svg-icons"
 
-import Modal from './Modal'
-
 export const Nav = () => {
 
     const [showWallets, setShowWallets] = useState(false)
@@ -22,6 +20,8 @@ export const Nav = () => {
     useEffect(() => {
         const SUPPORTED_WALLETS = ["eternl", "flint", "nami", "yoroi"]
         const aWallets = []
+        const savedWalletName = localStorage.getItem('wallet-name')
+        console.log('previously connected wallet: ' + savedWalletName)
         SUPPORTED_WALLETS.map(walletName => {
             if (window.cardano[walletName]) {
                 const { apiVersion, icon } = window.cardano[walletName]
@@ -32,30 +32,64 @@ export const Nav = () => {
                     top
                 })
 
+                const attemptConnectWallet = async () => {
+                    const isEnabled = await window.cardano[walletName].isEnabled
+                    if (isEnabled) {
+                        await connect(walletName)
+                    }
+                }
+                if (savedWalletName == walletName) {
+                    console.log('attempting to reconnect: ' + walletName)
+                    attemptConnectWallet()
+                }
+
             }
         })
         setAvailableWallets(aWallets)
+        // availableWallets, wallet, baseAddress
     }, [])
 
     async function connect(walletName) {
-        const wallet = await cardano[walletName].enable();
-        console.log(wallet);
+        cardano[walletName]
+            .enable()
+            .then(wallet => {
+                console.log(wallet);
+                setWallet(wallet)
+                return wallet.getUsedAddresses()
+            })
+            .then(addresses => {
+                const addressHex = Buffer.from(addresses[0], "hex");
 
-        setWallet(wallet)
+                const address = BaseAddress.from_address(
+                    Address.from_bytes(addressHex)
+                ).to_address();
 
-        const addresses = await wallet.getUsedAddresses();
+                const baseAddress = address.to_bech32();
 
-        const addressHex = Buffer.from(addresses[0], "hex");
+                setBaseAddress(baseAddress)
+                toast.success('Wallet correctly connected!')
+                localStorage.setItem('wallet-name', walletName)
 
-        const address = BaseAddress.from_address(
-            Address.from_bytes(addressHex)
-        ).to_address();
+            })
+        // const wallet = await cardano[walletName].enable();
+        // console.log(wallet);
 
-        const baseAddress = address.to_bech32();
+        // setWallet(wallet)
 
-        setBaseAddress(baseAddress)
+        // const addresses = await wallet.getUsedAddresses();
 
-        toast.success('Wallet correctly connected!')
+        // const addressHex = Buffer.from(addresses[0], "hex");
+
+        // const address = BaseAddress.from_address(
+        //     Address.from_bytes(addressHex)
+        // ).to_address();
+
+        // const baseAddress = address.to_bech32();
+
+        // setBaseAddress(baseAddress)
+
+        // toast.success('Wallet correctly connected!')
+        // localStorage.setItem('wallet-name', walletName)
 
     }
 
