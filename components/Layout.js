@@ -1,6 +1,7 @@
 import Dashboard from './Dashboard'
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import OpenRaffles from './OpenRaffles';
+import MyRaffles from './MyRaffles';
 import ClosedRaffles from './ClosedRaffles';
 import RecentWinners from './RecentWinners';
 
@@ -9,6 +10,8 @@ import dynamic from 'next/dynamic';
 const Nav = dynamic(() => import('./Nav'), { ssr: false })
 
 function Layout() {
+
+    const [baseAddress, setBaseAddress] = useState(null)
 
     useEffect(() => {
         document.body.classList.add("bg-black-alt");
@@ -19,10 +22,13 @@ function Layout() {
 
     return (
         <>
-            <Nav />
+            <Nav exportBaseAddress={setBaseAddress} />
             <div className="container w-4/6 pt-20 mx-auto">
 
                 <Dashboard />
+                {baseAddress ? (
+                    <MyRaffles baseAddress={baseAddress} />
+                ) : null}
                 <OpenRaffles />
                 <RecentWinners />
                 <ClosedRaffles />

@@ -7,7 +7,7 @@ import {
     faHome, faDice, faQuestion
 } from "@fortawesome/free-solid-svg-icons"
 
-export const Nav = () => {
+export const Nav = ({exportBaseAddress}) => {
 
     const WALLET_NAME_KEY = "wallet-name"
     const FRIENDLY_NAME_KEY = "friendly-name"
@@ -74,6 +74,7 @@ export const Nav = () => {
                 const baseAddress = address.to_bech32();
 
                 setBaseAddress(baseAddress)
+                exportBaseAddress(baseAddress)
 
                 const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
                 if (!isReconnect) {
