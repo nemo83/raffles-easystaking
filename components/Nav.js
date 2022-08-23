@@ -32,7 +32,7 @@ export const Nav = ({exportBaseAddress}) => {
         const aWallets = []
         const savedWalletName = localStorage.getItem(WALLET_NAME_KEY)
         SUPPORTED_WALLETS.map(walletName => {
-            if (window.cardano[walletName]) {
+            if (window.cardano && window.cardano[walletName]) {
                 const { apiVersion, icon } = window.cardano[walletName]
                 aWallets.push({
                     name: walletName,
