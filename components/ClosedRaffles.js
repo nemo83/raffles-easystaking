@@ -10,7 +10,16 @@ function ClosedRaffles() {
             .then((res) => res.json())
             .then((data) => data.filter(raffle => raffle.is_closed))
             .then((data) => data.slice(0, 10))
-            .then((openRaffles) => openRaffles.map(raffle => [raffle.epoch, `${raffle.prize} ₳`, `${raffle.min_stake} ₳`, raffle.num_participants]))
+            .then((openRaffles) => openRaffles.map(raffle => {
+                let currency;
+                console.log('raffle: ' + JSON.stringify(raffle))
+                if (raffle.asset_name == null) {
+                    currency = '₳'
+                } else {
+                    currency = `$${raffle.asset_name}`
+                }
+                return [raffle.epoch, `${raffle.prize} ${currency}`, `${raffle.min_stake} ₳`, raffle.num_participants]
+            }))
             .then((data) => setData(data))
     }, [])
 

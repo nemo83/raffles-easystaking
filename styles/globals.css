@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 .bg-black-alt {
-    background: #191919;
+    background: #d9d9d9;
 }
 
 .text-black-alt {
-    color: #191919;
+    color: #d9d9d9;
 }
 
 .border-black-alt {
-    border-color: #191919;
+    border-color: #d9d9d9;
 }

@@ -24,8 +24,8 @@ export const Nav = ({ exportBaseAddress }) => {
     const [baseAddress, setBaseAddress] = useState(null)
     const [friendlyName, setFriendlyName] = useState('')
 
-    const navSelected = 'text-blue-400 border-blue-400 hover:border-blue-400'
-    const navNotSelected = 'text-gray-500 border-gray-900 hover:border-pink-400'
+    const navSelected = 'text-slate-50 border-slate-50 hover:border-white'
+    const navNotSelected = 'text-gray-300 border-gray-300 hover:border-white'
 
     // Modal
     const [showModal, setShowModal] = useState(false);
@@ -151,7 +151,7 @@ export const Nav = ({ exportBaseAddress }) => {
 
     }
     return (
-        <nav id="header" className="fixed top-0 z-10 w-full bg-gray-900 shadow">
+        <nav id="header" className="fixed top-0 z-10 w-full shadow bg-sky-600">
 
             <Toaster />
 
@@ -215,7 +215,7 @@ export const Nav = ({ exportBaseAddress }) => {
 
             <div className="container flex flex-wrap items-center w-full pt-3 pb-3 mx-auto mt-0 md:pb-0">
 
-                <div className="z-20 flex-grow hidden w-full mt-2 bg-gray-900 lg:flex lg:items-center lg:w-auto lg:block lg:mt-0" id="nav-content">
+                <div className="z-20 flex-grow hidden w-full mt-2 bg-sky-600 lg:flex lg:items-center lg:w-auto lg:block lg:mt-0" id="nav-content">
                     <ul className="items-center flex-1 px-4 list-reset lg:flex md:px-0">
                         <li className="my-2 mr-6 md:my-0">
                             <Link href="/" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/' ? navSelected : navNotSelected)}>
@@ -223,7 +223,7 @@ export const Nav = ({ exportBaseAddress }) => {
                                     icon={faHome}
                                     className="mr-3 text-blue-400"
                                 />
-                                <span className="pb-1 text-sm md:pb-0">Home</span>
+                                <span className="pb-1 text-lg md:pb-0">Home</span>
                             </Link>
                         </li>
                         <li className="my-2 mr-6 md:my-0">
@@ -232,7 +232,7 @@ export const Nav = ({ exportBaseAddress }) => {
                                     icon={faDice}
                                     className="mr-3"
                                 />
-                                <span className="pb-1 text-sm md:pb-0">Raffles</span>
+                                <span className="pb-1 text-lg md:pb-0">Raffles</span>
                             </Link>
                         </li>
                         <li className="my-2 mr-6 md:my-0">
@@ -241,7 +241,7 @@ export const Nav = ({ exportBaseAddress }) => {
                                     icon={faQuestion}
                                     className="mr-3"
                                 />
-                                <span className="pb-1 text-sm md:pb-0">F.A.Q.</span>
+                                <span className="pb-1 text-lg md:pb-0">F.A.Q.</span>
                             </Link>
                         </li>
 

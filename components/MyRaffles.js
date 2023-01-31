@@ -9,7 +9,16 @@ function MyRaffles({ baseAddress }) {
         fetch(`https://lottery.easystaking.online/raffles/${baseAddress}?status=joined`)
             .then((res) => res.json())
             .then((data) => data.filter(raffle => !raffle.is_closed))
-            .then((openRaffles) => openRaffles.map(raffle => [raffle.epoch, `${raffle.prize} ₳`, `${raffle.min_stake} ₳`, raffle.num_participants, "Open"]))
+            .then((openRaffles) => openRaffles.map(raffle => {
+                let currency;
+                console.log('raffle: ' + JSON.stringify(raffle))
+                if (raffle.asset_name == null) {
+                    currency = '₳'
+                } else {
+                    currency = `$${raffle.asset_name}`
+                }
+                return [raffle.epoch, `${raffle.prize} ${currency}`, `${raffle.min_stake} ₳`, raffle.num_participants, "Open"]
+            }))
             .then((data) => setJoinedRaffles(data))
 
     }, [])

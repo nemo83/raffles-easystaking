@@ -3,18 +3,18 @@ function Table({ title, columnNames, rows, cardanoScanIndex = -1 }) {
     
     return (
         <div className="w-full p-3">
-            <div className="bg-gray-900 border border-gray-800 rounded shadow">
+            <div className="border border-black rounded shadow bg-sky-600">
 
-                <div className="p-3 border-b border-gray-800">
-                    <h5 className="font-bold text-gray-600 uppercase">{title}</h5>
+                <div className="p-3 border-b border-black">
+                    <h5 className="font-bold text-gray-300 uppercase">{title}</h5>
                 </div>
 
                 <div className="p-5">
-                    <table className="w-full p-5 text-gray-700">
+                    <table className="w-full p-5 text-gray-300">
                         <thead>
                             <tr>
                                 {columnNames.map(columnName => (
-                                    <th key={columnName} className="text-left text-gray-600">{columnName}</th>
+                                    <th key={columnName} className="text-left text-gray-300">{columnName}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -22,7 +22,7 @@ function Table({ title, columnNames, rows, cardanoScanIndex = -1 }) {
                         <tbody>
 
                             {rows.map((row, index) => (
-                                <tr key={`r${index}`}>
+                                <tr key={`r${index}`} className="text-slate-50">
                                     {row.map((col, cIndex) =>
                                         cardanoScanIndex === cIndex ? (
                                             <td key={`rc${cIndex}`}>

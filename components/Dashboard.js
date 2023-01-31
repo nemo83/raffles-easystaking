@@ -65,7 +65,7 @@ function Dashboard() {
         // < !--Container-- >
 
 
-        <div className="w-full px-4 mb-16 leading-normal text-gray-800 md:px-0 md:mt-8">
+        <div className="w-full px-4 mb-16 leading-normal md:px-0 md:mt-8">
 
             <div className="flex flex-wrap">
                 {icons.map(details => (
