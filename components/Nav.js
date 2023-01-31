@@ -7,7 +7,13 @@ import {
     faHome, faDice, faQuestion
 } from "@fortawesome/free-solid-svg-icons"
 
-export const Nav = ({exportBaseAddress}) => {
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+export const Nav = ({ exportBaseAddress }) => {
+
+    const router = useRouter();
+    const currentRoute = router.pathname;
 
     const WALLET_NAME_KEY = "wallet-name"
     const FRIENDLY_NAME_KEY = "friendly-name"
@@ -17,6 +23,9 @@ export const Nav = ({exportBaseAddress}) => {
     const [wallet, setWallet] = useState(null)
     const [baseAddress, setBaseAddress] = useState(null)
     const [friendlyName, setFriendlyName] = useState('')
+
+    const navSelected = 'text-blue-400 border-blue-400 hover:border-blue-400'
+    const navNotSelected = 'text-gray-500 border-gray-900 hover:border-pink-400'
 
     // Modal
     const [showModal, setShowModal] = useState(false);
@@ -209,31 +218,31 @@ export const Nav = ({exportBaseAddress}) => {
                 <div className="z-20 flex-grow hidden w-full mt-2 bg-gray-900 lg:flex lg:items-center lg:w-auto lg:block lg:mt-0" id="nav-content">
                     <ul className="items-center flex-1 px-4 list-reset lg:flex md:px-0">
                         <li className="my-2 mr-6 md:my-0">
-                            <a href="#" className="block py-1 pl-1 text-blue-400 no-underline align-middle border-b-2 border-blue-400 md:py-3 hover:text-gray-100 hover:border-blue-400">
+                            <Link href="/" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/' ? navSelected : navNotSelected)}>
                                 <FontAwesomeIcon
                                     icon={faHome}
                                     className="mr-3 text-blue-400"
                                 />
                                 <span className="pb-1 text-sm md:pb-0">Home</span>
-                            </a>
+                            </Link>
                         </li>
                         <li className="my-2 mr-6 md:my-0">
-                            <a href="#" className="block py-1 pl-1 text-gray-500 no-underline align-middle border-b-2 border-gray-900 md:py-3 hover:text-gray-100 hover:border-pink-400">
+                            <Link href="/raffles" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/raffles' ? navSelected : navNotSelected)}>
                                 <FontAwesomeIcon
                                     icon={faDice}
                                     className="mr-3"
                                 />
                                 <span className="pb-1 text-sm md:pb-0">Raffles</span>
-                            </a>
+                            </Link>
                         </li>
                         <li className="my-2 mr-6 md:my-0">
-                            <a href="#" className="block py-1 pl-1 text-gray-500 no-underline align-middle border-b-2 border-gray-900 md:py-3 hover:text-gray-100 hover:border-pink-400">
+                            <Link href="/faw" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/faq' ? navSelected : navNotSelected)}>
                                 <FontAwesomeIcon
                                     icon={faQuestion}
                                     className="mr-3"
                                 />
                                 <span className="pb-1 text-sm md:pb-0">F.A.Q.</span>
-                            </a>
+                            </Link>
                         </li>
 
                     </ul>
