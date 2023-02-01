@@ -24,10 +24,10 @@ function Dashboard() {
             .then((data) => {
                 console.log(data.jackpot[0].amount)
                 setData({
-                    jackpot: data.jackpot[0].amount,
+                    jackpot: data.jackpot[0].amount + ' ₳',
                     participants: data.raffles_participants_total,
                     totalRaffles: data.raffles_num_total,
-                    totalWon: data.raffles_prize_total,
+                    totalWon: parseFloat(data.raffles_prize_all_token_total).toFixed(2) + ' ₳',
                 })
             })
     }, [])
