@@ -6,22 +6,22 @@ import toast, { Toaster } from 'react-hot-toast'
 import {
     faHome, faDice, faQuestion
 } from "@fortawesome/free-solid-svg-icons"
-
+import { useWalletContext } from "../components/WalletProvider";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-export const Nav = ({ exportBaseAddress }) => {
+export const Nav = () => {
 
     const router = useRouter();
     const currentRoute = router.pathname;
 
     const WALLET_NAME_KEY = "wallet-name"
     const FRIENDLY_NAME_KEY = "friendly-name"
-
+    
     const [showWallets, setShowWallets] = useState(false)
     const [availableWallets, setAvailableWallets] = useState([])
     const [wallet, setWallet] = useState(null)
-    const [baseAddress, setBaseAddress] = useState(null)
+    const [baseAddress, setBaseAddress] = useWalletContext()
     const [friendlyName, setFriendlyName] = useState('')
 
     const navSelected = 'text-slate-50 border-slate-50 hover:border-white'
@@ -83,7 +83,6 @@ export const Nav = ({ exportBaseAddress }) => {
                 const baseAddress = address.to_bech32();
 
                 setBaseAddress(baseAddress)
-                exportBaseAddress(baseAddress)
 
                 const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
                 if (!isReconnect) {
@@ -93,6 +92,12 @@ export const Nav = ({ exportBaseAddress }) => {
 
             })
 
+    }
+
+    async function disconnect() {
+        setWallet(null)
+        setBaseAddress(null)
+        localStorage.removeItem(WALLET_NAME_KEY)
     }
 
     async function participate() {
@@ -280,6 +285,15 @@ export const Nav = ({ exportBaseAddress }) => {
                             </div>
                         ) : <></>}
                     </div>
+
+                    {wallet && baseAddress ? (
+                        <span>
+                            <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
+                                alt="Click to enter all available raffleR"
+                                onClick={() => disconnect()}>Disconnect</button>
+                        </span>
+                    ) : null}
+
                     <span>
                         {wallet && baseAddress ? (
                             <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
@@ -292,7 +306,6 @@ export const Nav = ({ exportBaseAddress }) => {
                                 }}
                             >Participate</button>
                         )}
-
                     </span>
 
                 </div>
