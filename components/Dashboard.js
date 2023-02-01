@@ -22,9 +22,9 @@ function Dashboard() {
         fetch('https://lottery.easystaking.online/raffles/stats')
             .then((res) => res.json())
             .then((data) => {
-                console.log(data.jackpot[0].amount)
+                
                 setData({
-                    jackpot: data.jackpot[0].amount + ' ₳',
+                    jackpot: parseFloat(data.current_jackpot).toFixed(2) + ' ₳',
                     participants: data.raffles_participants_total,
                     totalRaffles: data.raffles_num_total,
                     totalWon: parseFloat(data.raffles_prize_all_token_total).toFixed(2) + ' ₳',
