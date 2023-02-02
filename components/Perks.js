@@ -7,6 +7,12 @@ export default function Perks() {
             <TextTile title="Title">
                 <p> Hello worldasd</p>
             </TextTile>
+            <TextTile title="Title">
+                <p> Hello worldasd</p>
+            </TextTile>
+            <TextTile title="Title">
+                <p> Hello worldasd</p>
+            </TextTile>
         </div>
     )
 
