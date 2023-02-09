@@ -1,10 +1,9 @@
 import Layout from "../components/Layout";
 import { Distributions } from "../components/Distributions";
 import dynamic from 'next/dynamic';
-import EstimateRewards from "../components/EstimateRewards";
 import Link from "next/link";
 
-const StakingAssessment = dynamic(() => import('../components/StakingAssessment'), { ssr: false })
+const EstimateRewards = dynamic(() => import('../components/EstimateRewards'), { ssr: false })
 
 export default function Home() {
 
