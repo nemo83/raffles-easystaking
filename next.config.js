@@ -5,7 +5,10 @@ const nextConfig = {
   webpack: function (config, options) {
     config.experiments = { asyncWebAssembly: true, layers: true };
     return config;
-  }
+  },
+  images: {
+    domains: ['github.com', 'vm.adaseal.eu'],
+  },
 }
 
 module.exports = nextConfig

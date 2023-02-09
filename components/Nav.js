@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import toast, { Toaster } from 'react-hot-toast'
 import {
-    faHome, faDice, faQuestion
+    faHome, faDice, faQuestion, faHeartbeat
 } from "@fortawesome/free-solid-svg-icons"
 import { useWalletContext } from "../components/WalletProvider";
 import Link from 'next/link';
@@ -12,12 +12,15 @@ import { useRouter } from 'next/router';
 
 export const Nav = () => {
 
+    const stakingAnalysis = false
+    const faq = false
+
     const router = useRouter();
     const currentRoute = router.pathname;
 
     const WALLET_NAME_KEY = "wallet-name"
     const FRIENDLY_NAME_KEY = "friendly-name"
-    
+
     const [showWallets, setShowWallets] = useState(false)
     const [availableWallets, setAvailableWallets] = useState([])
     const [wallet, setWallet] = useState(null)
@@ -169,8 +172,7 @@ export const Nav = () => {
                                     <h3 className="text-3xl font=semibold capitalize">Join Raffles</h3>
                                     <button
                                         className="float-right text-black bg-transparent border-0"
-                                        onClick={() => setShowModal(false)}
-                                    >
+                                        onClick={() => setShowModal(false)} >
                                         <span className="block w-6 h-6 py-0 text-xl text-black bg-gray-400 rounded-full opacity-7">
                                             x
                                         </span>
@@ -200,15 +202,13 @@ export const Nav = () => {
                                     <button
                                         className="px-6 py-2 mb-1 mr-1 text-sm font-bold text-black uppercase outline-none background-transparent focus:outline-none"
                                         type="button"
-                                        onClick={() => setShowModal(false)}
-                                    >
+                                        onClick={() => setShowModal(false)} >
                                         Close
                                     </button>
                                     <button
                                         className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
                                         type="button"
-                                        onClick={() => { participate(); setShowModal(false) }}
-                                    >
+                                        onClick={() => { participate(); setShowModal(false) }} >
                                         Submit
                                     </button>
                                 </div>
@@ -240,15 +240,28 @@ export const Nav = () => {
                                 <span className="pb-1 text-lg md:pb-0">Raffles</span>
                             </Link>
                         </li>
-                        <li className="my-2 mr-6 md:my-0">
-                            <Link href="/faw" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/faq' ? navSelected : navNotSelected)}>
-                                <FontAwesomeIcon
-                                    icon={faQuestion}
-                                    className="mr-3"
-                                />
-                                <span className="pb-1 text-lg md:pb-0">F.A.Q.</span>
-                            </Link>
-                        </li>
+                        {stakingAnalysis ? (
+                            <li className="my-2 mr-6 md:my-0">
+                                <Link href="/staking-analysis" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/staking-analysis' ? navSelected : navNotSelected)}>
+                                    <FontAwesomeIcon
+                                        icon={faHeartbeat}
+                                        className="mr-3"
+                                    />
+                                    <span className="pb-1 text-lg md:pb-0">Staking Analysis</span>
+                                </Link>
+                            </li>
+                        ) : null}
+                        {faq ? (
+                            <li className="my-2 mr-6 md:my-0">
+                                <Link href="/faw" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/faq' ? navSelected : navNotSelected)}>
+                                    <FontAwesomeIcon
+                                        icon={faQuestion}
+                                        className="mr-3"
+                                    />
+                                    <span className="pb-1 text-lg md:pb-0">F.A.Q.</span>
+                                </Link>
+                            </li>
+                        ) : null}
 
                     </ul>
 
@@ -294,19 +307,21 @@ export const Nav = () => {
                         </span>
                     ) : null}
 
-                    <span>
-                        {wallet && baseAddress ? (
-                            <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
-                                alt="Click to enter all available raffleR"
-                                onClick={() => setShowModal(!showModal)}>Participate</button>
-                        ) : (
-                            <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-400'
-                                onClick={() => {
-                                    toast.error("Please connect wallet!")
-                                }}
-                            >Participate</button>
-                        )}
-                    </span>
+                    {(currentRoute == '/raffles') ? (
+                        <span>
+                            {wallet && baseAddress ? (
+                                <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
+                                    alt="Click to enter all available raffleR"
+                                    onClick={() => setShowModal(!showModal)}>Participate</button>
+                            ) : (
+                                <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-400'
+                                    onClick={() => {
+                                        toast.error("Please connect wallet!")
+                                    }}
+                                >Participate</button>
+                            )}
+                        </span>
+                    ) : null}
 
                 </div>
 
