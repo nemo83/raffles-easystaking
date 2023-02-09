@@ -12,8 +12,8 @@ export const Distributions = () => {
             .then((data) => {
                 console.log(data)
                 setDistributions(data)
-                const groupedData = Array.from({ length: 2 }, () => data.splice(0, 2))
-                setDistributionGroups(groupedData)
+                // const groupedData = Array.from({ length: 2 }, () => data.splice(0, 2))
+                // setDistributionGroups(groupedData)
             })
     }, [])
 
@@ -27,24 +27,21 @@ export const Distributions = () => {
     }
 
     return (
-        <div className="px-2 m-6">
-            {distributionGroups.map((group, i) =>
-                <div className="flex mt-3 -mx-2" key={`key-` + i}>
-                    {group.map((distribution, k) =>
-                        <div className="flex w-1/2 px-2" key={`key-` + i + '-' + k}>
-                            <TokenCard
-                                name={distribution.title}
-                                imageUrl={distribution.token_image_url}
-                                description={trimLongDescription(distribution.description)}
-                                amount={distribution.amount / Math.pow(10, distribution.decimals)}
-                                symbol={distribution.symbol}
-                                distMode={distribution.distribution_model}
-                                minStakeAmount={distribution.min_stake_required}
-                            >
-                                <ReactMarkdown className="mb-4 text-sm text-gray-700">{trimLongDescription(distribution.description)}</ReactMarkdown>
-                            </TokenCard>
-                        </div>
-                    )}
+        <div className="flex flex-wrap px-1 m-6">
+            {distributions.map((distribution, i) =>
+                <div className="px-2 mt-3 w-fll lg:w-1/2" key={`key-` + i}>
+                    <TokenCard
+                        name={distribution.title}
+                        imageUrl={distribution.token_image_url}
+                        description={trimLongDescription(distribution.description)}
+                        amount={distribution.amount / Math.pow(10, distribution.decimals)}
+                        symbol={distribution.symbol}
+                        distMode={distribution.distribution_model}
+                        minStakeAmount={distribution.min_stake_required}
+                    >
+                        <ReactMarkdown className="mb-4 text-sm text-gray-700">{trimLongDescription(distribution.description)}</ReactMarkdown>
+                    </TokenCard>
+
                 </div>
             )}
         </div>

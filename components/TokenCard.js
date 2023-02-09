@@ -27,7 +27,7 @@ export const TokenCard = ({ children, name, imageUrl, description, amount, symbo
         <div className="flex justify-center">
             <div className="flex flex-col bg-white rounded-lg shadow-lg md:flex-row md:max-w-xl">
                 <img
-                    className="hidden object-cover w-full rounded-t-lg lg:block h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg"
+                    className="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-l-lg"
                     src={imageUrl}
                     alt="" />
                 <div className="flex flex-col justify-start p-6">

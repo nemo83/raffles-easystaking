@@ -124,10 +124,10 @@ export default function EstimateRewards() {
     }
 
     return (
-        <div >
-            <div className='flex m-6'>
+        <div className="my-6">
+            <div className='flex'>
                 <input
-                    className="w-full px-1 py-2 text-black border rounded shadow appearance-none"
+                    className="w-full text-black border rounded shadow appearance-none"
                     placeholder='Wallet Address'
                     disabled={(baseAddress != null)}
                     onChange={(event) => setManualAddress(event.target.value)}
@@ -157,9 +157,9 @@ export default function EstimateRewards() {
                 />
             </div>
             {extraRewards.length > 0 ? (
-                <div className="flex flex-col mb-6">
-                    <div className="overflow-x-auto bg-white rounded-lg shadow-lg sm:-mx-6 lg:-mx-8">
-                        <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+                <div className="flex flex-col my-6">
+                    <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
+                        <div className="inline-block min-w-full">
                             <div className="overflow-hidden">
                                 <table className="min-w-full">
                                     <thead className="border-b">
