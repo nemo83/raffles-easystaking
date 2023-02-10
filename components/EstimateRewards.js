@@ -168,7 +168,7 @@ export default function EstimateRewards() {
                                                 Logo
                                             </th>
                                             <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
-                                                Amount
+                                                Amount (estimated)
                                             </th>
                                             <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
                                                 ₳ value (estimated)
