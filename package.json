@@ -23,6 +23,7 @@
     "react-markdown": "^8.0.5"
   },
   "devDependencies": {
+    "@types/node": "18.14.6",
     "autoprefixer": "^10.4.7",
     "eslint": "8.20.0",
     "eslint-config-next": "^13.1.6",
