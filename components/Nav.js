@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { BaseAddress, Address } from '@emurgo/cardano-serialization-lib-browser'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import toast, { Toaster } from 'react-hot-toast'
@@ -9,6 +8,32 @@ import {
 import { useWalletContext } from "../components/WalletProvider";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import {
+    Assets,
+    Address,
+    ByteArrayData,
+    Cip30Handle,
+    Cip30Wallet,
+    ConstrData,
+    Datum,
+    hexToBytes,
+    IntData,
+    ListData,
+    MintingPolicyHash,
+    NetworkParams,
+    Program,
+    Value,
+    TxOutput,
+    Tx,
+    TxId,
+    UTxO,
+    WalletHelper,
+    ByteArray,
+    PubKeyHash,
+    ValidatorHash,
+    CborData,
+    Int
+} from "@hyperionbt/helios";
 
 export const Nav = () => {
 
@@ -33,7 +58,7 @@ export const Nav = () => {
     // Modal
     const [showModal, setShowModal] = useState(false);
 
-    useEffect(() => {
+    useEffect(async () => {
         // Friendly Name restore
         const saveFriendlyName = localStorage.getItem(FRIENDLY_NAME_KEY)
         if (saveFriendlyName != null) {
@@ -137,25 +162,6 @@ export const Nav = () => {
                     toast.error(`Error: ${message}`)
             }
         })
-
-
-        // const res = fetch('https://lottery.easystaking.online/raffles', {
-        //     method: 'POST',
-        //     body: body,
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        // })
-        //     .then(data => data.json())
-        //     .then(data => {
-        //         const numRaffles = data.length
-        //         toast.success(`Congrats! You joined ${numRaffles} Raflles!`)
-        //     })
-        //     .catch((error) => {
-        //         console.error('Error:', error);
-        //         toast.error(`Error ${error}`)
-        //     })
-
 
     }
     return (
