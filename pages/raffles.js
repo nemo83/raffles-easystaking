@@ -6,7 +6,7 @@ import RecentWinners from '../components/RecentWinners';
 import Layout from '../components/Layout';
 import { useWalletContext } from "../components/WalletProvider";
 import {
-  Address,WalletHelper
+  WalletHelper
 } from "@hyperionbt/helios"
 import { useState, useEffect } from 'react';
 
