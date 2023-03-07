@@ -72,9 +72,7 @@ const calculateWinningIndex = (seed: string, numParticipants: string) => {
   return ((BigInt("1103515245") * BigInt(seed) + BigInt(12345)) % BigInt("2147483648")) % BigInt(numParticipants)
 }
 
-// const networkParamsUrl = 'https://d1t0d7c2nekuk0.cloudfront.net/preprod.json';
-
-const createNftRaffle = async () => {
+const createNftRaffle = async (lockNftScript: string, nftVaultScript: string) => {
 
   const networkParams = new NetworkParams(
     await fetch(networkParamsUrl)

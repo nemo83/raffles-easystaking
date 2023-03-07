@@ -3,9 +3,9 @@ import { createContext, useContext, useState } from "react";
 const Context = createContext();
 
 export function WalletProvider({ children }) {
-    const [baseAddress, setBaseAddress] = useState(null);
+    const [walletApi, setWalletApi] = useState(null);
     return (
-        <Context.Provider value={[baseAddress, setBaseAddress]}>{children}</Context.Provider>
+        <Context.Provider value={[walletApi, setWalletApi]}>{children}</Context.Provider>
     );
 }
 

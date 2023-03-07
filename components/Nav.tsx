@@ -35,10 +35,10 @@ const Nav: NextPage = (props: any) => {
 
     const [showWallets, setShowWallets] = useState(false)
     const [availableWallets, setAvailableWallets] = useState([])
-    const [walletApi, setWalletApi] = useState(null)
-    const [baseAddress, setBaseAddress] = useWalletContext()
+    const [walletApi, setWalletApi] = useWalletContext()
     const [friendlyName, setFriendlyName] = useState('')
 
+    const [baseAddress, setBaseAddress] = useState(null)
     const navSelected = 'text-slate-50 border-slate-50 hover:border-white'
     const navNotSelected = 'text-gray-300 border-gray-300 hover:border-white'
 
@@ -91,7 +91,7 @@ const Nav: NextPage = (props: any) => {
         const walletHelper = new WalletHelper(walletApi)
 
         const baseAddress = await walletHelper.baseAddress
-
+        console.log('baseAddress: ' + baseAddress.toBech32())
         setBaseAddress(baseAddress.toBech32())
 
         const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
