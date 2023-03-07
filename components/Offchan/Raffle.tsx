@@ -282,7 +282,7 @@ const joinRaffle = async (
   // Building redeemer manually
   // const valRedeemer = new ConstrData(1, [bruce.pubKeyHash._toUplcData()]);
   // Using types
-  const valRedeemer = (new (raffleProgram.types.Redeemer.JoinRaffle)(walletBaseAddress.pubKeyHash))._toUplcData()
+  const valRedeemer = (new (raffleProgram.types.Redeemer as any).JoinRaffle(walletBaseAddress.pubKeyHash))._toUplcData()
 
   const tx = new Tx();
   tx.addInput(contractUtxo, valRedeemer)
@@ -358,7 +358,8 @@ const selectWinner = async (
   const winningIndex = calculateWinningIndex(seed, `${numParticipants}`)
   console.log('winningIndex: ' + winningIndex)
   // const valRedeemer = new ConstrData(0, []);
-  const valRedeemer = (new (raffleProgram.types.Redeemer.SelectWinner)(
+
+  const valRedeemer = (new (raffleProgram.types.Redeemer as any).SelectWinner(
     new ByteArray(Array.from(new TextEncoder().encode(seed))),
     new ByteArray(Array.from(new TextEncoder().encode(salt))),
     winningIndex
