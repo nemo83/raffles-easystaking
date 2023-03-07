@@ -75,7 +75,7 @@ const calculateWinningIndex = (seed: string, numParticipants: string) => {
   return ((BigInt("1103515245") * BigInt(seed) + BigInt(12345)) % BigInt("2147483648")) % BigInt(numParticipants)
 }
 
-const createNftRaffle = async (
+export const createNftRaffle = async (
   policyIdHex: string,
   assetNameHex: string,
   numParticipants: number,
@@ -160,7 +160,7 @@ const createNftRaffle = async (
 
 }
 
-const retrieveNft = async (
+export const retrieveNft = async (
   policyIdHex: string,
   assetNameHex: string,
   lockNftScript: string,
@@ -213,7 +213,7 @@ const retrieveNft = async (
 
 }
 
-const joinRaffle = async (
+export const joinRaffle = async (
   policyIdHex: string,
   assetNameHex: string,
   lockNftScript: string,
@@ -307,7 +307,7 @@ const joinRaffle = async (
 
 }
 
-const selectWinner = async (
+export const selectWinner = async (
   numParticipants: number,
   seed: string,
   salt: string,
@@ -415,7 +415,7 @@ const selectWinner = async (
 
 }
 
-const withdrawNft = async (
+export const withdrawNft = async (
   policyIdHex: string,
   assetNameHex: string,
   lockNftScript: string,
@@ -489,8 +489,8 @@ const withdrawNft = async (
 
 }
 
-const mintNftInWallet = async (
-  assetNameHex: string,
+export const mintNftInWallet = async (
+  assetName: string,
   walletApi: Cip30Wallet
 ) => {
 
@@ -526,7 +526,7 @@ const mintNftInWallet = async (
   
       assetclass: AssetClass = AssetClass::new(
           mph, 
-          "My Cool NFT".encode_utf8()
+          "` + assetName + `".encode_utf8()
       );
       value_minted: Value = tx.minted;
   
@@ -539,13 +539,13 @@ const mintNftInWallet = async (
   }`
 
   // Compile the helios minting script
-  const mintProgram = Program.new(mintScript).compile(false);
+  const mintProgram = Program.new(mintScript).compile(true);
 
   // Add the script as a witness to the transaction
   tx.attachScript(mintProgram);
 
   // Construct the NFT that we will want to send as an output
-  const tokens: [number[], bigint][] = [[hexToBytes(assetNameHex), BigInt(1)]];
+  const tokens: [number[], bigint][] = [[hexToBytes(Buffer.from(assetName).toString("hex")), BigInt(1)]];
 
   // Create an empty Redeemer because we must always send a Redeemer with
   // a plutus script transaction even if we don't actually use it.
@@ -573,7 +573,7 @@ const mintNftInWallet = async (
   console.log("tx before final", tx.dump());
 
   // Send any change back to the buyer
-  await tx.finalize(networkParams, changeAddr);
+  await tx.finalize(networkParams, changeAddr, utxos[1]);
   console.log("tx after final", tx.dump());
 
   console.log("Verifying signature...");

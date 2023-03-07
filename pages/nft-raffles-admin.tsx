@@ -2,6 +2,7 @@ import Layout from '../components/Layout';
 import { useWalletContext } from "../components/WalletProvider";
 import type { NextPage } from 'next'
 import React from 'react';
+import { mintNftInWallet } from '../components/Offchan/Raffle'
 
 import path from 'path';
 import fs from 'fs';
@@ -34,10 +35,24 @@ const NftRaffles: NextPage = (props: any) => {
 
   const [walletApi, setWalletApi] = useWalletContext();
 
+  const callMintScript = async () => {
+    mintNftInWallet(
+      "Hello world!",
+      walletApi
+    )
+  }
+
   return (
     <Layout >
 
-    </Layout>
+      <button
+        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+        type="button"
+        onClick={() => callMintScript()} >
+        Submit
+      </button>
+
+    </Layout >
   )
 }
 
