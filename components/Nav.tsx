@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import toast, { Toaster } from 'react-hot-toast'
+import type { NextPage } from 'next'
 import {
     faHome, faDice, faQuestion, faHeartbeat
 } from "@fortawesome/free-solid-svg-icons"
@@ -35,7 +36,14 @@ import {
     Int
 } from "@hyperionbt/helios";
 
-export const Nav = () => {
+declare global {
+    interface Window {
+        cardano: any;
+    }
+}
+
+
+const Nav: NextPage = (props: any) => {
 
     const stakingAnalysis = false
     const faq = false
@@ -48,7 +56,7 @@ export const Nav = () => {
 
     const [showWallets, setShowWallets] = useState(false)
     const [availableWallets, setAvailableWallets] = useState([])
-    const [wallet, setWallet] = useState(null)
+    const [walletApi, setWalletApi] = useState(null)
     const [baseAddress, setBaseAddress] = useWalletContext()
     const [friendlyName, setFriendlyName] = useState('')
 
@@ -58,7 +66,7 @@ export const Nav = () => {
     // Modal
     const [showModal, setShowModal] = useState(false);
 
-    useEffect(async () => {
+    useEffect(() => {
         // Friendly Name restore
         const saveFriendlyName = localStorage.getItem(FRIENDLY_NAME_KEY)
         if (saveFriendlyName != null) {
@@ -94,43 +102,36 @@ export const Nav = () => {
 
     }, [])
 
-    async function connect(walletName) {
-        cardano[walletName]
-            .enable()
-            .then(wallet => {
-                setWallet(wallet)
-                return wallet.getUsedAddresses()
-            })
-            .then(addresses => {
-                const addressHex = Buffer.from(addresses[0], "hex");
+    async function connect(walletName: string) {
 
-                const address = BaseAddress.from_address(
-                    Address.from_bytes(addressHex)
-                ).to_address();
+        const handle: Cip30Handle = await window.cardano[walletName].enable();
+        const walletApi = new Cip30Wallet(handle);
 
-                const baseAddress = address.to_bech32();
+        setWalletApi(walletApi)
 
-                setBaseAddress(baseAddress)
+        const walletHelper = new WalletHelper(walletApi)
 
-                const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
-                if (!isReconnect) {
-                    localStorage.setItem(WALLET_NAME_KEY, walletName)
-                    toast.success('Wallet correctly connected!')
-                }
+        const baseAddress = await walletHelper.baseAddress
 
-            })
+        setBaseAddress(baseAddress.toBech32())
+
+        const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
+        if (!isReconnect) {
+            localStorage.setItem(WALLET_NAME_KEY, walletName)
+            toast.success('Wallet correctly connected!')
+        }
 
     }
 
     async function disconnect() {
-        setWallet(null)
+        setWalletApi(null)
         setBaseAddress(null)
         localStorage.removeItem(WALLET_NAME_KEY)
     }
 
     async function participate() {
 
-        if (wallet == null) return
+        if (walletApi == null) return
 
         localStorage.setItem(FRIENDLY_NAME_KEY, friendlyName)
 
@@ -305,7 +306,7 @@ export const Nav = () => {
                         ) : <></>}
                     </div>
 
-                    {wallet && baseAddress ? (
+                    {walletApi && baseAddress ? (
                         <span>
                             <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
                                 alt="Click to enter all available raffleR"
@@ -315,7 +316,7 @@ export const Nav = () => {
 
                     {(currentRoute == '/raffles') ? (
                         <span>
-                            {wallet && baseAddress ? (
+                            {walletApi && baseAddress ? (
                                 <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
                                     alt="Click to enter all available raffleR"
                                     onClick={() => setShowModal(!showModal)}>Participate</button>

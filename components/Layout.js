@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 
-const Nav = dynamic(() => import('./Nav'), { ssr: false })
+const Nav = dynamic(() => import('./Nav.tsx'), { ssr: false })
 
 function Layout({ children }) {
 
