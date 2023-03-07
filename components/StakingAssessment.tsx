@@ -1,17 +1,22 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Address, BaseAddress, RewardAddress } from "@emurgo/cardano-serialization-lib-browser";
-import { useWalletContext } from "../components/WalletProvider";
+import { useWalletContext } from "./WalletProvider";
 import StakingRewards from './StakingRewards';
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import Card from './Card';
-
+import {
+    Address,
+    StakeAddress,
+    Cip30Handle,
+    WalletHelper
+} from "@hyperionbt/helios";
+import type { NextPage } from 'next'
 import {
     faCoins, faSkull, faHeartPulse
 } from "@fortawesome/free-solid-svg-icons";
 
 
-export default function StakingAssessment() {
+
+const StakingAssessment: NextPage = (props: any) => {
 
     const [baseAddress, setBaseAddress] = useWalletContext()
 
@@ -54,11 +59,11 @@ export default function StakingAssessment() {
             let stake;
             if (walletAddres.startsWith('addr1')) {
                 //https://github.com/Emurgo/cardano-serialization-lib/issues/337
-                const address = Address.from_bech32(walletAddres);
-                const base = BaseAddress.from_address(address);
-                stake = RewardAddress.new(address.network_id(), base.stake_cred()).to_address().to_bech32();
+                const address = Address.fromBech32(walletAddres);
+                const stakeAddress = StakeAddress.fromAddress(address)
+                stake = stakeAddress.toBech32()
             } else if (walletAddres.startsWith('stake1')) {
-                stake = RewardAddress.from_address(Address.from_bech32(walletAddres)).to_address().to_bech32();
+                stake = StakeAddress.fromBech32(walletAddres).toBech32()
             } else {
                 toast.error('Unrecognized address format\nPlease enter either a receiving address (addr1..) or\nreward address (stake1..)')
                 return
@@ -137,3 +142,6 @@ export default function StakingAssessment() {
 
     )
 }
+
+
+export default StakingAssessment

@@ -10,30 +10,9 @@ import { useWalletContext } from "../components/WalletProvider";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
-    Assets,
-    Address,
-    ByteArrayData,
     Cip30Handle,
     Cip30Wallet,
-    ConstrData,
-    Datum,
-    hexToBytes,
-    IntData,
-    ListData,
-    MintingPolicyHash,
-    NetworkParams,
-    Program,
-    Value,
-    TxOutput,
-    Tx,
-    TxId,
-    UTxO,
-    WalletHelper,
-    ByteArray,
-    PubKeyHash,
-    ValidatorHash,
-    CborData,
-    Int
+    WalletHelper
 } from "@hyperionbt/helios";
 
 declare global {
@@ -287,7 +266,7 @@ const Nav: NextPage = (props: any) => {
                             >Connect</button>
                         </div>
                         {showWallets && availableWallets ? (
-                            <div className="absolute right-0 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex="-1">
+                            <div className="absolute right-0 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
                                 <div className="py-1" role="none">
                                     {availableWallets.map(wallet => (
                                         <button key={wallet.name}
@@ -309,7 +288,6 @@ const Nav: NextPage = (props: any) => {
                     {walletApi && baseAddress ? (
                         <span>
                             <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
-                                alt="Click to enter all available raffleR"
                                 onClick={() => disconnect()}>Disconnect</button>
                         </span>
                     ) : null}
@@ -318,7 +296,6 @@ const Nav: NextPage = (props: any) => {
                         <span>
                             {walletApi && baseAddress ? (
                                 <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
-                                    alt="Click to enter all available raffleR"
                                     onClick={() => setShowModal(!showModal)}>Participate</button>
                             ) : (
                                 <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-400'
