@@ -1,0 +1,136 @@
+spending raffle
+
+  struct Datum {
+      admin: PubKeyHash
+      ticketPrice: Value
+      participants: []PubKeyHash
+      numMaxParticipants: Int
+      seedHash: ByteArray
+      vaultPkh: ValidatorHash
+
+      func is_admin(self, tx: Tx) -> Bool { tx.is_signed_by(self.admin) }
+  }
+
+  enum Redeemer {
+    Admin
+    JoinRaffle {
+      pkh: PubKeyHash
+    }
+    SelectWinner {
+      seed: ByteArray
+      salt: ByteArray
+      index: Int
+    }
+  }
+
+  struct VaultDatum {
+    admin: PubKeyHash
+    winner: PubKeyHash
+  }
+
+  func raffle_not_full(datum: Datum) -> Bool {
+    (datum.participants.length < datum.numMaxParticipants)
+  }
+
+  func rafflefull(datum: Datum) -> Bool {
+    !raffle_not_full(datum)
+  }
+
+  func is_signed_by_participant(tx: Tx, participants_pkh: PubKeyHash) -> Bool {
+    tx.is_signed_by(participants_pkh).trace("TRACE_SIGNED_BY_PARTICIPANT: ")
+  }
+
+  func select_winning_index(seed: Int, numParticipants: Int) -> Int {
+    ((1103515245 * seed + 12345) % 2147483648) % numParticipants
+  }
+  
+  func values_sent_to_admin_and_vault(
+    tx: Tx, 
+    totalValueLocked: Value,
+    vaultPkh: ValidatorHash, 
+    adminPkh: PubKeyHash, 
+    winnerPkh: PubKeyHash
+    ) -> Bool {
+    
+    print("totalValueLocked.lovelace: " + totalValueLocked.get_lovelace().show());
+
+    assets: Value = totalValueLocked.get_assets();
+
+    vaultValue: Value = assets + Value::lovelace(2000000);
+    
+    adminValue: Value = totalValueLocked - vaultValue;
+    
+    valueSentToAdmin: Value = tx.value_sent_to(adminPkh);
+    print("valueSentToAdmin.lovelace: " + valueSentToAdmin.get_lovelace().show());
+
+    valueSentToVault: Value = tx.value_locked_by_datum(vaultPkh, VaultDatum{adminPkh, winnerPkh}, true);
+    print("valueSentToVault.lovelace: " + valueSentToVault.get_lovelace().show());
+
+    (valueSentToAdmin >= adminValue).trace("ADMIN_VALUE: ") &&
+    (vaultValue == valueSentToVault).trace("VAULT_VALUE: ")
+  }
+
+  func main(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
+      tx: Tx = context.tx;
+
+      redeemer.switch {
+        Admin => {
+            datum.is_admin(tx).trace("TRACE_IS_ADMIN: ")
+        },
+        joinRaffle: JoinRaffle => {
+
+          // Test 3 things
+          // 1. ticketPrice is paid into the contract (that all that was in the script, + the ticket price , is sent to the datum)
+          // 2. uxto where previous datum leaves to be spent
+          // 3. new datum is like current + participants contains the pkh of current signer.
+          if (is_signed_by_participant(tx, joinRaffle.pkh) && raffle_not_full(datum).trace("RAFFLE_NOT_FULL: ")) {
+            
+            input: TxOutput = context.get_current_input().output;
+
+            new_datum: Datum = Datum { 
+              datum.admin, 
+              datum.ticketPrice, 
+              datum.participants.prepend(joinRaffle.pkh), 
+              datum.numMaxParticipants, 
+              datum.seedHash,
+              datum.vaultPkh
+            };
+
+            actualTargetValue: Value = tx.value_locked_by_datum(context.get_current_validator_hash(), new_datum, true);
+
+            expectedTargetValue: Value = input.value + datum.ticketPrice;
+
+            // check NFT is accounted for
+            (actualTargetValue >= expectedTargetValue).trace("TRACE_ALL_GOOD? ")
+
+          } else {
+            false.trace("OVERALL_CHECK: ")
+          }
+        },
+        selectWinner: SelectWinner => {
+
+          // Build seed/salt hash to verify signature
+          concatSha: ByteArray = (selectWinner.seed + selectWinner.salt).sha2();
+          
+          decodedSeed: String = selectWinner.seed.decode_utf8();
+          seed: Int = Int::parse(decodedSeed);
+
+          // 2 ada + NFT sent to winner address
+          // Reminder of the ada sent to admin wallet.
+
+          // admin or enough participants
+          (datum.is_admin(tx).trace("TRACE_IS_ADMIN: ") || rafflefull(datum).trace("TRACE_RAFFLE_FULL: ")) &&
+          // the seed is valid
+          (datum.seedHash == concatSha).trace("SEED_MATCH: ") &&
+          // The winning index is correct (tmp)
+          (select_winning_index(seed, datum.numMaxParticipants) == selectWinner.index).trace("TRACE_INDEX: ") &&
+          // Check correct values sent to admin and vault
+          values_sent_to_admin_and_vault(tx, 
+            context.get_current_input().output.value,
+            datum.vaultPkh, 
+            datum.admin, 
+            datum.participants.get(selectWinner.index)
+            )
+        }
+    }
+  }

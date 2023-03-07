@@ -1,26 +1,45 @@
-import Dashboard from '../components/Dashboard'
-import OpenRaffles from '../components/OpenRaffles';
-import MyRaffles from '../components/MyRaffles';
-import ClosedRaffles from '../components/ClosedRaffles';
-import RecentWinners from '../components/RecentWinners';
 import Layout from '../components/Layout';
 import { useWalletContext } from "../components/WalletProvider";
 import type { NextPage } from 'next'
 import React from 'react';
 
+import path from 'path';
+import fs from 'fs';
+
+export async function getStaticProps() {
+
+  const contractsDirectory = path.join(process.cwd(), 'components/Contracts/');
+  const raffleContract = fs.readFileSync(contractsDirectory + 'raffle.hl', 'utf8');
+  const vaultContract = fs.readFileSync(contractsDirectory + 'vault.hl', 'utf8');
+  const raffleScript = raffleContract.toString();
+  const vaultScript = vaultContract.toString();
+
+  const scripts = {
+    raffleScript,
+    vaultScript
+  }
+
+  return {
+    props: {
+      scripts
+    }
+  }
+
+}
+
 const NftRaffles: NextPage = (props: any) => {
+
+  const raffleScript = props.scripts.raffleScript
+  const vaultScript = props.scripts.vaultScript
 
   const [baseAddress, setBaseAddress] = useWalletContext();
 
   return (
     <Layout >
-      <Dashboard />
-      {baseAddress ? (
-        <MyRaffles baseAddress={baseAddress} />
-      ) : null}
-      <OpenRaffles />
-      <RecentWinners />
-      <ClosedRaffles />
+      <p>Hello world</p>
+      <p>
+        {vaultScript}
+      </p>
     </Layout>
   )
 }
