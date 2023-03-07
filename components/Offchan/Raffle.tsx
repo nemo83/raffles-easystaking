@@ -6,6 +6,7 @@ import {
   ListData,
   MintingPolicyHash,
   TxId,
+  Int,
   UTxO,
   Value,
   TxOutput,
@@ -16,7 +17,9 @@ import {
   ConstrData,
   PubKeyHash,
   ByteArray,
-  ValidatorHash
+  ValidatorHash,
+  Cip30Wallet,
+  ByteArrayData
 } from "@hyperionbt/helios";
 import {
   blockfrostAPI,
@@ -72,7 +75,15 @@ const calculateWinningIndex = (seed: string, numParticipants: string) => {
   return ((BigInt("1103515245") * BigInt(seed) + BigInt(12345)) % BigInt("2147483648")) % BigInt(numParticipants)
 }
 
-const createNftRaffle = async (lockNftScript: string, nftVaultScript: string) => {
+const createNftRaffle = async (
+  policyIdHex: string,
+  assetNameHex: string,
+  numParticipants: number,
+  ticketPriceInLovelaces: number,
+  saltedSeed: string,
+  lockNftScript: string,
+  nftVaultScript: string,
+  walletApi: Cip30Wallet) => {
 
   const networkParams = new NetworkParams(
     await fetch(networkParamsUrl)
@@ -97,7 +108,7 @@ const createNftRaffle = async (lockNftScript: string, nftVaultScript: string) =>
   console.log('vaultAddress.validatorHash.hex: ' + vaultAddress.validatorHash.hex)
   console.log('vaultAddress.toHex: ' + vaultAddress.toHex())
 
-  const walletHelper = new WalletHelper(walletAPI);
+  const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
 
   // Lock NFT Prize in contract TX
@@ -106,8 +117,8 @@ const createNftRaffle = async (lockNftScript: string, nftVaultScript: string) =>
   const assets = new Assets();
 
   assets.addComponent(
-    nftMph,
-    Array.from(new TextEncoder().encode(nftName)),
+    MintingPolicyHash.fromHex(policyIdHex),
+    hexToBytes(assetNameHex),
     BigInt(1)
   );
 
@@ -117,7 +128,7 @@ const createNftRaffle = async (lockNftScript: string, nftVaultScript: string) =>
   // Datum
   const raffleDatum = new (raffleProgram.types.Datum)(
     walletBaseAddress.pubKeyHash,
-    new Value(BigInt(5000000)),
+    new Value(BigInt(ticketPriceInLovelaces)),
     [],
     numParticipants,
     sha256(new TextEncoder().encode(saltedSeed)),
@@ -137,11 +148,11 @@ const createNftRaffle = async (lockNftScript: string, nftVaultScript: string) =>
   console.log("tx after final", tx.dump());
 
   console.log("Verifying signature...");
-  const signatures = await walletAPI.signTx(tx);
+  const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
   console.log("Submitting transaction...");
-  const txHash = await walletAPI.submitTx(tx);
+  const txHash = await walletApi.submitTx(tx);
   console.log('txHash: ' + txHash.hex)
 
 
@@ -149,7 +160,12 @@ const createNftRaffle = async (lockNftScript: string, nftVaultScript: string) =>
 
 }
 
-const retrieveNft = async () => {
+const retrieveNft = async (
+  policyIdHex: string,
+  assetNameHex: string,
+  lockNftScript: string,
+  walletApi: Cip30Wallet
+) => {
 
   const networkParams = new NetworkParams(
     await fetch(networkParamsUrl)
@@ -164,11 +180,10 @@ const retrieveNft = async () => {
   const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
   console.log('valAddr: ' + raffleAddress.toBech32())
 
-  const walletHelper = new WalletHelper(walletAPI);
+  const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
 
-
-  const contractUtxo = await getKeyUtxo(raffleAddress.toBech32(), nftMph.hex, ByteArrayData.fromString(nftName).toHex())
+  const contractUtxo = await getKeyUtxo(raffleAddress.toBech32(), policyIdHex, assetNameHex)
 
   // const nonEmptyDatumUtxo = contractUtxo.filter(utxo => utxo.origOutput.datum != null)
 
@@ -188,17 +203,22 @@ const retrieveNft = async () => {
   console.log("tx after final", tx.dump());
 
   console.log("Verifying signature...");
-  const signatures = await walletAPI.signTx(tx);
+  const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
   console.log("Submitting transaction...");
-  const txHash = await walletAPI.submitTx(tx);
+  const txHash = await walletApi.submitTx(tx);
   console.log('txHash: ' + txHash.hex)
 
 
 }
 
-const joinRaffle = async () => {
+const joinRaffle = async (
+  policyIdHex: string,
+  assetNameHex: string,
+  lockNftScript: string,
+  walletApi: Cip30Wallet
+) => {
 
   const networkParams = new NetworkParams(
     await fetch(networkParamsUrl)
@@ -216,14 +236,14 @@ const joinRaffle = async () => {
   console.log('valAddr: ' + raffleAddress.toBech32())
   console.log('valAddr.bytes: ' + raffleAddress.toHex())
 
-  const walletHelper = new WalletHelper(walletAPI);
+  const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
 
   // Join raffle by paying 5 $ada
   const nftValue = new Value(BigInt(5_000_000))
   const walletUtxos = await walletHelper.pickUtxos(nftValue)
 
-  const contractUtxo = await getKeyUtxo(raffleAddress.toBech32(), nftMph.hex, ByteArrayData.fromString(nftName).toHex())
+  const contractUtxo = await getKeyUtxo(raffleAddress.toBech32(), policyIdHex, assetNameHex)
 
   const foo = contractUtxo.origOutput.datum.data as ListData
   const adminPkh = PubKeyHash.fromUplcData(foo.list[0])
@@ -259,10 +279,6 @@ const joinRaffle = async () => {
 
   const targetValue = ticketPrice.add(contractUtxo.value)
 
-  const ge = targetValue.ge(contractUtxo.value)
-
-  console.log('ge? ' + ge)
-
   // Building redeemer manually
   // const valRedeemer = new ConstrData(1, [bruce.pubKeyHash._toUplcData()]);
   // Using types
@@ -282,16 +298,25 @@ const joinRaffle = async () => {
   console.log("tx after final", tx.dump());
 
   console.log("Verifying signature...");
-  const signatures = await walletAPI.signTx(tx);
+  const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
   console.log("Submitting transaction...");
-  const txHash = await walletAPI.submitTx(tx);
+  const txHash = await walletApi.submitTx(tx);
   console.log('txHash: ' + txHash.hex)
 
 }
 
-const selectWinner = async () => {
+const selectWinner = async (
+  numParticipants: number,
+  seed: string,
+  salt: string,
+  policyIdHex: string,
+  assetNameHex: string,
+  lockNftScript: string,
+  nftVaultScript: string,
+  walletApi: Cip30Wallet
+) => {
 
   const networkParams = new NetworkParams(
     await fetch(networkParamsUrl)
@@ -316,14 +341,14 @@ const selectWinner = async () => {
   console.log('vaultAddress.validatorHash.hex: ' + vaultAddress.validatorHash.hex)
   console.log('vaultAddress.toHex: ' + vaultAddress.toHex())
 
-  const walletHelper = new WalletHelper(walletAPI);
+  const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
   console.log('walletBaseAddress: ' + walletBaseAddress.toBech32())
   console.log('walletBaseAddress.pubKeyHash: ' + walletBaseAddress.pubKeyHash.hex)
 
 
   console.log('a')
-  const contractUtxo = await getKeyUtxo(raffleAddress.toBech32(), nftMph.hex, ByteArrayData.fromString(nftName).toHex())
+  const contractUtxo = await getKeyUtxo(raffleAddress.toBech32(), policyIdHex, assetNameHex)
   console.log('b')
   // const nonEmptyDatumUtxo = contractUtxo.filter(utxo => utxo.origOutput.datum != null)
 
@@ -379,17 +404,23 @@ const selectWinner = async () => {
   console.log("tx after final", tx.dump());
 
   console.log("Verifying signature...");
-  const signatures = await walletAPI.signTx(tx);
+  const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
   console.log("Submitting transaction...");
-  const txHash = await walletAPI.submitTx(tx);
+  const txHash = await walletApi.submitTx(tx);
   console.log('txHash: ' + txHash.hex)
 
 
 }
 
-const withdrawNft = async () => {
+const withdrawNft = async (
+  policyIdHex: string,
+  assetNameHex: string,
+  lockNftScript: string,
+  nftVaultScript: string,
+  walletApi: Cip30Wallet
+) => {
 
   const networkParams = new NetworkParams(
     await fetch(networkParamsUrl)
@@ -414,14 +445,14 @@ const withdrawNft = async () => {
   console.log('vaultAddress.validatorHash.hex: ' + vaultAddress.validatorHash.hex)
   console.log('vaultAddress.toHex: ' + vaultAddress.toHex())
 
-  const walletHelper = new WalletHelper(walletAPI);
+  const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
   console.log('walletBaseAddress: ' + walletBaseAddress.toBech32())
   console.log('walletBaseAddress.pubKeyHash: ' + walletBaseAddress.pubKeyHash.hex)
 
 
   console.log('a')
-  const contractUtxo = await getKeyUtxo(vaultAddress.toBech32(), nftMph.hex, ByteArrayData.fromString(nftName).toHex())
+  const contractUtxo = await getKeyUtxo(vaultAddress.toBech32(), policyIdHex, assetNameHex)
   console.log('b')
   // const nonEmptyDatumUtxo = contractUtxo.filter(utxo => utxo.origOutput.datum != null)
 
@@ -447,22 +478,25 @@ const withdrawNft = async () => {
   console.log("tx after final", tx.dump());
 
   console.log("Verifying signature...");
-  const signatures = await walletAPI.signTx(tx);
+  const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
   console.log("Submitting transaction...");
-  const txHash = await walletAPI.submitTx(tx);
+  const txHash = await walletApi.submitTx(tx);
   console.log('txHash: ' + txHash.hex)
 
 
 }
 
-const mintNftInWallet = async () => {
+const mintNftInWallet = async (
+  assetNameHex: string,
+  walletApi: Cip30Wallet
+) => {
 
   console.log('mint nft')
 
   // Get wallet UTXOs
-  const walletHelper = new WalletHelper(walletAPI);
+  const walletHelper = new WalletHelper(walletApi);
   const adaAmountVal = new Value(BigInt(1000000));
 
   const utxos = await walletHelper.pickUtxos(adaAmountVal);
@@ -504,14 +538,13 @@ const mintNftInWallet = async () => {
   }`
 
   // Compile the helios minting script
-  const mintProgram = Program.new(mintScript).compile(optimize);
+  const mintProgram = Program.new(mintScript).compile(false);
 
   // Add the script as a witness to the transaction
   tx.attachScript(mintProgram);
 
   // Construct the NFT that we will want to send as an output
-  const nftTokenName = ByteArrayData.fromString(nftName).toHex();
-  const tokens: [number[], bigint][] = [[hexToBytes(nftTokenName), BigInt(1)]];
+  const tokens: [number[], bigint][] = [[hexToBytes(assetNameHex), BigInt(1)]];
 
   // Create an empty Redeemer because we must always send a Redeemer with
   // a plutus script transaction even if we don't actually use it.
@@ -543,11 +576,11 @@ const mintNftInWallet = async () => {
   console.log("tx after final", tx.dump());
 
   console.log("Verifying signature...");
-  const signatures = await walletAPI.signTx(tx);
+  const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
   console.log("Submitting transaction...");
-  const txHash = await walletAPI.submitTx(tx);
+  const txHash = await walletApi.submitTx(tx);
 
   console.log("txHash", txHash.hex);
 

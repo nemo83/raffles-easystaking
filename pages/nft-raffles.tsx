@@ -36,10 +36,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   return (
     <Layout >
-      <p>Hello world</p>
-      <p>
-        {vaultScript}
-      </p>
+
     </Layout>
   )
 }
