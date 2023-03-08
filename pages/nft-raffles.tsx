@@ -1,3 +1,4 @@
+import NftCard from "../components/NftCard"
 import Layout from '../components/Layout';
 import { useWalletContext } from "../components/WalletProvider";
 import type { NextPage } from 'next'
@@ -93,14 +94,14 @@ const NftRaffles: NextPage = (props: any) => {
     const ticketPrice = Value.fromUplcData(datum.list[1])
     const participants = (datum.list[2] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
     const numMaxParticipants = Int.fromUplcData(datum.list[3])
-    
+
     const raffle: Raffle = {
       nftPolicyId: assetId.slice(0, 56),
       nftAssetName: assetId.slice(56),
       ticketPrice: Number(ticketPrice.lovelace),
       numParticipants: Number(numMaxParticipants.value),
       participants: participants.map(participant => participant.hex)
-    } 
+    }
     return raffle
 
   }
@@ -126,7 +127,7 @@ const NftRaffles: NextPage = (props: any) => {
       throw console.error("NFT not found");
     }
 
-  
+
     return parseRaffleDatum(assetId, payload[0].inline_datum)
   }
 
@@ -161,18 +162,23 @@ const NftRaffles: NextPage = (props: any) => {
 
   return (
     <Layout >
-      <button
-        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
-        type="button"
-        onClick={() => createRaffle()} >
-        Create Raffle
-      </button>
-      <button
-        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
-        type="button"
-        onClick={() => inspectAddress()} >
-        Submit
-      </button>
+      <div>
+        <NftCard />
+      </div>
+      <div>
+        <button
+          className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+          type="button"
+          onClick={() => createRaffle()} >
+          Create Raffle
+        </button>
+        <button
+          className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+          type="button"
+          onClick={() => inspectAddress()} >
+          Submit
+        </button>
+      </div>
     </Layout>
   )
 }
