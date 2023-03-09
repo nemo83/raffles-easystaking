@@ -4,22 +4,32 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useState } from 'react';
 import Image from 'next/image';
+import { useWalletContext } from "../components/WalletProvider";
+import { buyRaffleTickets } from './Offchan/Raffle'
 
 interface NftCard {
+    policyIdHex: string,
+    assetNameHex: string,
     ticketPrices: number,
     maxParticipants: number,
     maxNumTicketsPerWallet: number,
     numPurchasedTickets: number,
-    numWalletPurchasedTickets: number,
+    numWalletPurchasedTickets: number | undefined,
+    raffleScript: string
 }
 
 const TokenCard = ({
+    policyIdHex,
+    assetNameHex,
     ticketPrices,
     maxParticipants,
     maxNumTicketsPerWallet,
     numPurchasedTickets,
-    numWalletPurchasedTickets
+    numWalletPurchasedTickets,
+    raffleScript
 }: NftCard) => {
+
+    const [walletApi, setWalletApi] = useWalletContext();
 
     const [showModal, setShowModal] = useState(false)
 
@@ -27,6 +37,18 @@ const TokenCard = ({
 
     // Form values
     const [numTickets, setNumTickets] = useState(1)
+
+
+    const buyTicket = async () => {
+        console.log('WTF')
+        buyRaffleTickets(
+            policyIdHex,
+            assetNameHex,
+            raffleScript,
+            walletApi
+        )
+    }
+
 
     return (
         <>
@@ -76,8 +98,8 @@ const TokenCard = ({
                             <button
                                 className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
                                 type="button"
-                                onClick={() => { setShowModal(false) }} >
-                                Submit
+                                onClick={() => { buyTicket().then(() => setShowModal(false)) }} >
+                                Buy Ticket
                             </button>
                         </div>
                     </div>
@@ -130,7 +152,7 @@ const TokenCard = ({
 
                             <div className="flex items-center justify-center gap-1">
                                 <span className="text-sm text-gray-900">
-                                    <FontAwesomeIcon icon={faStar} size="sm" /> My Entries: {numWalletPurchasedTickets}
+                                    <FontAwesomeIcon icon={faStar} size="sm" /> My Entries: {numWalletPurchasedTickets != undefined ? numWalletPurchasedTickets : "N/A"}
                                 </span>
 
                             </div>

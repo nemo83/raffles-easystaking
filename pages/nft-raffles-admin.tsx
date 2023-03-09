@@ -4,7 +4,7 @@ import type { NextPage } from 'next'
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { mintNftInWallet, createNftRaffle } from "../components/Offchan/Raffle"
-
+import { sha256, sha224 } from 'js-sha256';
 import path from 'path';
 import fs from 'fs';
 import { WalletHelper } from '@hyperionbt/helios';
@@ -35,12 +35,13 @@ const NftRaffles: NextPage = (props: any) => {
   const raffleScript = props.scripts.raffleScript
   const vaultScript = props.scripts.vaultScript
 
-  const [policyId, setPolicyId] = useState(null);
-  const [assetName, setAssetName] = useState(null);
-  const [numMaxParticipants, setNumMaxParticipants] = useState(null);
-  const [numMaxTicketsPerPerson, setNumMaxTicketsPerPerson] = useState(null);
-  const [seed, setSeed] = useState(null);
-  const [salt, setSalt] = useState(null);
+  const [policyId, setPolicyId] = useState('');
+  const [assetName, setAssetName] = useState('');
+  const [ticketPrice, setTicketPrice] = useState(5_000_000);
+  const [numMaxParticipants, setNumMaxParticipants] = useState(15);
+  const [numMaxTicketsPerPerson, setNumMaxTicketsPerPerson] = useState(3);
+  const [seed, setSeed] = useState('');
+  const [salt, setSalt] = useState('');
 
   const [walletApi, setWalletApi] = useWalletContext();
 
@@ -52,12 +53,17 @@ const NftRaffles: NextPage = (props: any) => {
   }
 
   const createRaffle = async () => {
+
+    const saltedSeed = `${salt}${seed}`
+
+    const hashedSaltedSeed = sha256(saltedSeed)
+
     createNftRaffle(
-      "7dd80d5b5d7d94b56eac097e271a710ca9ebbe28ba9a7d98018b7df4",
-      Buffer.from("My Cool NFT").toString("hex"),
-      1,
-      5_000_000,
-      saltedSeed,
+      policyId,
+      Buffer.from(assetName).toString("hex"),
+      numMaxParticipants,
+      ticketPrice,
+      hashedSaltedSeed,
       raffleScript,
       vaultScript,
       walletApi
@@ -74,7 +80,7 @@ const NftRaffles: NextPage = (props: any) => {
         onClick={() => callMintScript()} >
         Mint NFT
       </button>
-      <div className="block max-w-sm p-6 rounded-lg shadow-lg">
+      <div className="block w-full max-w-sm p-6 rounded-lg shadow-lg ">
         <form>
           <div className="relative mb-12">
             <label className="block mb-1 text-sm font-bold text-black">
@@ -85,6 +91,10 @@ const NftRaffles: NextPage = (props: any) => {
               Asset Name
             </label>
             <input type={'text'} value={assetName} onChange={(event) => setAssetName(event.target.value)}></input>
+            <label className="block mb-1 text-sm font-bold text-black">
+              Ticket Price (in lovelace)
+            </label>
+            <input type={'number'} value={ticketPrice} onChange={(event) => setTicketPrice(event.target.value)}></input>
             <label className="block mb-1 text-sm font-bold text-black">
               Max number of Participants
             </label>
@@ -103,7 +113,7 @@ const NftRaffles: NextPage = (props: any) => {
             <input type={'text'} value={salt} onChange={(event) => setSalt(event.target.value)}></input>
             <button
               className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
-              type="submit"
+              type="button"
               onClick={() => createRaffle()} >
               Create Raffle
             </button>

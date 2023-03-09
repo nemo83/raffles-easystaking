@@ -18,7 +18,8 @@ import {
   ByteArray,
   PubKeyHash,
   Int,
-  Program
+  Program,
+  WalletHelper
 } from "@hyperionbt/helios"
 import path from 'path';
 import fs from 'fs';
@@ -68,17 +69,11 @@ const NftRaffles: NextPage = (props: any) => {
     nftAssetName: string,
     ticketPrice: number,
     numParticipants: number,
-    participants: string[]
+    participants: string[],
+    numTickets: number | undefined
   }
 
-  // useEffect(() => {
-  //   const fetchRaffles = async () => {
-  //     inspectAddress()
-  //   }
-  //   fetchRaffles()
-  // }, [])
-
-  const parseRaffleDatum = (assetId: string, inlineDatum: string) => {
+  const parseRaffleDatum = async (assetId: string, inlineDatum: string) => {
 
     const datum = ListData.fromCbor(hexToBytes(inlineDatum))
 
@@ -86,12 +81,32 @@ const NftRaffles: NextPage = (props: any) => {
     const participants = (datum.list[2] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
     const numMaxParticipants = Int.fromUplcData(datum.list[3])
 
+    let numTickets = undefined
+    if (walletApi) {
+      console.log('wallet api ok!')
+      const baseAddress = await new WalletHelper(walletApi).baseAddress
+      const walletPkh = baseAddress.pubKeyHash
+      numTickets = participants.reduce((acc, curr) => {
+        console.log('walletPkh.hex: ' + walletPkh.hex)
+        console.log('curr.hex: ' + curr.hex)
+        if (walletPkh.hex == curr.hex) {
+          return acc + 1
+        } else {
+          return acc
+        }
+      }, 0)
+      console.log('numTickets: ' + numTickets)
+    } else {
+      console.log('no wallet api')
+    }
+
     const raffle: Raffle = {
       nftPolicyId: assetId.slice(0, 56),
       nftAssetName: assetId.slice(56),
       ticketPrice: Number(ticketPrice.lovelace),
       numParticipants: Number(numMaxParticipants.value),
-      participants: participants.map(participant => participant.hex)
+      participants: participants.map(participant => participant.hex),
+      numTickets: numTickets
     }
     return raffle
 
@@ -128,48 +143,29 @@ const NftRaffles: NextPage = (props: any) => {
     const address = Address.fromValidatorHash(program.validatorHash);
     console.log('address: ' + address.toBech32())
 
-    // const blockfrostUrl: string = blockfrostAPI + "/addresses/" + address.toBech32() + "/utxos";
+    const blockfrostUrl: string = blockfrostAPI + "/addresses/" + address.toBech32() + "/utxos";
 
-    // let resp = await fetch(blockfrostUrl, {
-    //   method: "GET",
-    //   headers: {
-    //     accept: "application/json",
-    //     project_id: apiKey,
-    //   },
-    // });
+    let resp = await fetch(blockfrostUrl, {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        project_id: apiKey,
+      },
+    });
 
-    // const response = await resp.json() as [any]
+    const response = await resp.json() as [any]
 
-    // if (resp.status == 200) {
-    //   const raffles = await Promise.all(response
-    //     .flatMap(utxo => utxo.amount)
-    //     .filter(amount => amount.unit != 'lovelace')
-    //     .map(nft => getKeyUtxo(address.toBech32(), nft.unit)))
-    //   setRaffles(raffles)
-    // }
-
-    // console.log(response)
-
-    const myRaffles = raffles.slice()
-
-    myRaffles.push({
-      nftPolicyId: "string",
-      nftAssetName: "string",
-      ticketPrice: 5000000,
-      numParticipants: 15,
-      participants: []
-    })
-    myRaffles.push({
-      nftPolicyId: "string1",
-      nftAssetName: "string1",
-      ticketPrice: 15000000,
-      numParticipants: 25,
-      participants: ["a", "b"]
-    })
+    const myRaffles: Raffle[] = []
+    if (resp.status == 200) {
+      const bfRaffles = await Promise.all(response
+        .flatMap(utxo => utxo.amount)
+        .filter(amount => amount.unit != 'lovelace')
+        .map(nft => getKeyUtxo(address.toBech32(), nft.unit)))
+      bfRaffles.forEach(raffle => myRaffles.push(raffle))
+    }
 
     setRaffles(myRaffles)
 
-    console.log('raffles: ' + JSON.stringify(raffles))
   }
 
 
@@ -179,11 +175,14 @@ const NftRaffles: NextPage = (props: any) => {
         {raffles.map((raffle, i) => (
           <NftCard
             key={i}
+            policyIdHex={raffle.nftPolicyId}
+            assetNameHex={raffle.nftAssetName}
             maxParticipants={raffle.numParticipants}
             numPurchasedTickets={raffle.participants.length}
             ticketPrices={raffle.ticketPrice}
-            numWalletPurchasedTickets={1}
-            maxNumTicketsPerWallet={3} />
+            numWalletPurchasedTickets={raffle.numTickets}
+            maxNumTicketsPerWallet={3}
+            raffleScript={raffleScript} />
         ))}
       </div>
       <div>
