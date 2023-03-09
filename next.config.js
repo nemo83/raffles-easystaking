@@ -7,7 +7,7 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ['github.com', 'vm.adaseal.eu'],
+    domains: ['github.com', 'vm.adaseal.eu', 'ipfs.io'],
   },
 }
 

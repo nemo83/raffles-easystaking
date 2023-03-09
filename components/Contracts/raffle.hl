@@ -70,6 +70,19 @@ spending raffle
     (vaultValue == valueSentToVault).trace("VAULT_VALUE: ")
   }
 
+  func print_value(value: Value, valueName: String) -> () {
+    print(valueName + ", lovelace: " + value.get_lovelace().show());
+    value
+      .get_assets()
+      .to_map()
+      .for_each( (mph: MintingPolicyHash, tokens: Map[ByteArray]Int) -> {
+        tokens
+          .for_each((tokenName: ByteArray, amount: Int) -> {
+            print(valueName + ", policy: " + mph.show() + ", tokenName: " + tokenName.decode_utf8() + ", amount: " + amount.show())
+          })
+      })
+  }
+
   func main(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
       tx: Tx = context.tx;
 

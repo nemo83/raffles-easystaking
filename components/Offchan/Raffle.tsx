@@ -213,10 +213,10 @@ export const retrieveNft = async (
 
 }
 
-export const joinRaffle = async (
+export const buyRaffleTickets = async (
   policyIdHex: string,
   assetNameHex: string,
-  lockNftScript: string,
+  raffleScript: string,
   walletApi: Cip30Wallet
 ) => {
 
@@ -226,7 +226,7 @@ export const joinRaffle = async (
   )
 
   // Compile the helios minting script
-  const raffleProgram = Program.new(lockNftScript);
+  const raffleProgram = Program.new(raffleScript);
   const raffleUplcProgram = raffleProgram.compile(false);
   console.log('raffleUplcProgram.validatorHash ' + raffleUplcProgram.validatorHash.hex)
 
@@ -415,7 +415,7 @@ export const selectWinner = async (
 
 }
 
-export const withdrawNft = async (
+export const collectPrize = async (
   policyIdHex: string,
   assetNameHex: string,
   lockNftScript: string,

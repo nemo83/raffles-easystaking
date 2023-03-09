@@ -2,6 +2,7 @@ import NftCard from "../components/NftCard"
 import Layout from '../components/Layout';
 import { useWalletContext } from "../components/WalletProvider";
 import type { NextPage } from 'next'
+import { useEffect, useState } from "react"
 import React from 'react';
 import {
   MintingPolicyHash,
@@ -21,8 +22,8 @@ import {
 } from "@hyperionbt/helios"
 import path from 'path';
 import fs from 'fs';
+import { buyRaffleTickets } from "../components/Offchan/Raffle"
 
-import { mintNftInWallet, createNftRaffle, withdrawNft } from "../components/Offchan/Raffle"
 import { blockfrostAPI, apiKey } from "../constants/blockfrost"
 
 export async function getStaticProps() {
@@ -49,6 +50,7 @@ export async function getStaticProps() {
 const NftRaffles: NextPage = (props: any) => {
 
   const raffleScript = props.scripts.raffleScript
+
   const vaultScript = props.scripts.vaultScript
 
   const seed = "18062016"
@@ -59,6 +61,8 @@ const NftRaffles: NextPage = (props: any) => {
 
   const [walletApi, setWalletApi] = useWalletContext();
 
+  const [raffles, setRaffles] = useState<Raffle[]>([])
+
   interface Raffle {
     nftPolicyId: string,
     nftAssetName: string,
@@ -67,25 +71,12 @@ const NftRaffles: NextPage = (props: any) => {
     participants: string[]
   }
 
-  const callMintScript = async () => {
-    mintNftInWallet(
-      "Hello world!",
-      walletApi
-    )
-  }
-
-  const createRaffle = async () => {
-    createNftRaffle(
-      "7dd80d5b5d7d94b56eac097e271a710ca9ebbe28ba9a7d98018b7df4",
-      Buffer.from("My Cool NFT").toString("hex"),
-      1,
-      5_000_000,
-      saltedSeed,
-      raffleScript,
-      vaultScript,
-      walletApi
-    )
-  }
+  // useEffect(() => {
+  //   const fetchRaffles = async () => {
+  //     inspectAddress()
+  //   }
+  //   fetchRaffles()
+  // }, [])
 
   const parseRaffleDatum = (assetId: string, inlineDatum: string) => {
 
@@ -127,8 +118,8 @@ const NftRaffles: NextPage = (props: any) => {
       throw console.error("NFT not found");
     }
 
+    return parseRaffleDatum(assetId, payload[0].inline_datum);
 
-    return parseRaffleDatum(assetId, payload[0].inline_datum)
   }
 
   const inspectAddress = async () => {
@@ -137,41 +128,65 @@ const NftRaffles: NextPage = (props: any) => {
     const address = Address.fromValidatorHash(program.validatorHash);
     console.log('address: ' + address.toBech32())
 
-    const blockfrostUrl: string = blockfrostAPI + "/addresses/" + address.toBech32() + "/utxos";
+    // const blockfrostUrl: string = blockfrostAPI + "/addresses/" + address.toBech32() + "/utxos";
 
-    let resp = await fetch(blockfrostUrl, {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        project_id: apiKey,
-      },
-    });
+    // let resp = await fetch(blockfrostUrl, {
+    //   method: "GET",
+    //   headers: {
+    //     accept: "application/json",
+    //     project_id: apiKey,
+    //   },
+    // });
 
-    const response = await resp.json() as [any]
+    // const response = await resp.json() as [any]
 
-    console.log(response)
+    // if (resp.status == 200) {
+    //   const raffles = await Promise.all(response
+    //     .flatMap(utxo => utxo.amount)
+    //     .filter(amount => amount.unit != 'lovelace')
+    //     .map(nft => getKeyUtxo(address.toBech32(), nft.unit)))
+    //   setRaffles(raffles)
+    // }
 
-    const nfts = await Promise.all(response
-      .flatMap(utxo => utxo.amount)
-      .filter(amount => amount.unit != 'lovelace')
-      .map(nft => getKeyUtxo(address.toBech32(), nft.unit)))
+    // console.log(response)
 
-    console.log('nfts: ' + JSON.stringify(nfts))
+    const myRaffles = raffles.slice()
+
+    myRaffles.push({
+      nftPolicyId: "string",
+      nftAssetName: "string",
+      ticketPrice: 5000000,
+      numParticipants: 15,
+      participants: []
+    })
+    myRaffles.push({
+      nftPolicyId: "string1",
+      nftAssetName: "string1",
+      ticketPrice: 15000000,
+      numParticipants: 25,
+      participants: ["a", "b"]
+    })
+
+    setRaffles(myRaffles)
+
+    console.log('raffles: ' + JSON.stringify(raffles))
   }
 
 
   return (
     <Layout >
-      <div>
-        <NftCard />
+      <div className="flex flex-row w-full">
+        {raffles.map((raffle, i) => (
+          <NftCard
+            key={i}
+            maxParticipants={raffle.numParticipants}
+            numPurchasedTickets={raffle.participants.length}
+            ticketPrices={raffle.ticketPrice}
+            numWalletPurchasedTickets={1}
+            maxNumTicketsPerWallet={3} />
+        ))}
       </div>
       <div>
-        <button
-          className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
-          type="button"
-          onClick={() => createRaffle()} >
-          Create Raffle
-        </button>
         <button
           className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
           type="button"
