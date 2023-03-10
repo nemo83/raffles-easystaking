@@ -16,6 +16,7 @@ spending raffle
     Admin
     JoinRaffle {
       pkh: PubKeyHash
+      numTickets: Int
     }
     SelectWinner {
       seed: ByteArray
@@ -84,8 +85,12 @@ spending raffle
       })
   }
 
-  func valid_num_of_purchased_tickets(datum: Datum, participantPkh: PubKeyHash, numTicketsPurchased: Int) -> Bool {
-    datum.participants.filter((pkh) -> { pkh == participantPkh}).length < datum.numMaxTicketsPerWallet
+  func add_participants(participants: []PubKeyHash, participantPkh: PubKeyHash, numTickets: Int) -> []PubKeyHash {
+    if (numTickets <= 0) {
+      participants
+    } else {
+      add_participants(participants.prepend(participantPkh), participantPkh, numTickets - 1)
+    }
   }
 
   func main(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
@@ -110,7 +115,7 @@ spending raffle
               datum.admin, 
               datum.ticketPrice, 
               datum.numMaxTicketsPerWallet, 
-              datum.participants.prepend(joinRaffle.pkh), 
+              add_participants(datum.participants, joinRaffle.pkh, joinRaffle.numTickets), 
               datum.numMaxParticipants, 
               datum.seedHash,
               datum.vaultPkh
@@ -118,20 +123,13 @@ spending raffle
 
             // The total amount sent to the utxo: what was in the script + what the participant is paying
             actualTargetValue: Value = tx.value_locked_by_datum(context.get_current_validator_hash(), new_datum, true);
-            print_value(actualTargetValue, "actualTargetValue")
-
-            // Whatever is sento to the new utxo, minus what was in the script => amount paid in by user / participant
-            amountPaidIn: Value = actualTargetValue.get_lovelace() - input.value.get_lovelace()
-            print_value(amountPaidIn, "amountPaidIn")
-
-            numTicketsPurchased: Int = amountPaidIn.get_lovelace() / datum.ticketPrice
+            print_value(actualTargetValue, "actualTargetValue");
 
             // Buy at least 1 ticket
-            expectedMinTargetValue: Value = input.value + datum.ticketPrice;
+            expectedTargetValue: Value = input.value + datum.ticketPrice * joinRaffle.numTickets;
 
             // User/Participant is actually paying for at least 1 ticket
-            (actualTargetValue >= expectedMinTargetValue).trace("TRACE_ALL_GOOD? ") &&
-            valid_num_of_purchased_tickets(datum, joinRaffle.pkh, numTicketsPurchased).trace("TOO_MANY_TICKETS: ")
+            (actualTargetValue >= expectedTargetValue).trace("TRACE_ALL_GOOD? ")
 
           } else {
             false.trace("OVERALL_CHECK: ")

@@ -218,6 +218,7 @@ export const retrieveNft = async (
 export const buyRaffleTickets = async (
   policyIdHex: string,
   assetNameHex: string,
+  numTicketsToBuy: number,
   raffleScript: string,
   walletApi: Cip30Wallet
 ) => {
@@ -240,10 +241,6 @@ export const buyRaffleTickets = async (
 
   const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
-
-  // Join raffle by paying 5 $ada
-  const nftValue = new Value(BigInt(5_000_000))
-  const walletUtxos = await walletHelper.pickUtxos(nftValue)
 
   const contractUtxo = await getKeyUtxo(raffleAddress.toBech32(), policyIdHex, assetNameHex)
 
@@ -270,8 +267,14 @@ export const buyRaffleTickets = async (
   console.log('vaultPkh: ' + vaultPkh.hex)
 
   const newParticipants = participants.slice()
-  newParticipants.unshift(walletBaseAddress.pubKeyHash)
+  for (var i = 0; i < numTicketsToBuy; i++) {
+    newParticipants.unshift(walletBaseAddress.pubKeyHash)
+  }
   console.log('newParticipants: ' + newParticipants)
+
+  // Join raffle by paying 5 $ada
+  const ticketsPrice = new Value(BigInt(numTicketsToBuy) * ticketPrice.lovelace)
+  const walletUtxos = await walletHelper.pickUtxos(ticketsPrice)
 
   const newDatum = new (raffleProgram.types.Datum)(
     adminPkh,
@@ -283,12 +286,15 @@ export const buyRaffleTickets = async (
     vaultPkh
   )
 
-  const targetValue = ticketPrice.add(contractUtxo.value)
+  const targetValue = ticketsPrice.add(contractUtxo.value)
 
   // Building redeemer manually
   // const valRedeemer = new ConstrData(1, [bruce.pubKeyHash._toUplcData()]);
   // Using types
-  const valRedeemer = (new (raffleProgram.types.Redeemer as any).JoinRaffle(walletBaseAddress.pubKeyHash))._toUplcData()
+  const valRedeemer = (new (raffleProgram.types.Redeemer as any).JoinRaffle(
+    walletBaseAddress.pubKeyHash,
+    numTicketsToBuy
+  ))._toUplcData()
 
   const tx = new Tx();
   tx.addInput(contractUtxo, valRedeemer)

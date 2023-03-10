@@ -68,6 +68,7 @@ const NftRaffles: NextPage = (props: any) => {
     nftPolicyId: string,
     nftAssetName: string,
     ticketPrice: number,
+    numMaxTicketPerWallet: number,
     numParticipants: number,
     participants: string[],
     numTickets: number | undefined
@@ -78,8 +79,9 @@ const NftRaffles: NextPage = (props: any) => {
     const datum = ListData.fromCbor(hexToBytes(inlineDatum))
 
     const ticketPrice = Value.fromUplcData(datum.list[1])
-    const participants = (datum.list[2] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
-    const numMaxParticipants = Int.fromUplcData(datum.list[3])
+    const numMaxTicketPerWallet = Int.fromUplcData(datum.list[2])
+    const participants = (datum.list[3] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
+    const numMaxParticipants = Int.fromUplcData(datum.list[4])
 
     let numTickets = undefined
     if (walletApi) {
@@ -104,6 +106,7 @@ const NftRaffles: NextPage = (props: any) => {
       nftPolicyId: assetId.slice(0, 56),
       nftAssetName: assetId.slice(56),
       ticketPrice: Number(ticketPrice.lovelace),
+      numMaxTicketPerWallet: Number(numMaxTicketPerWallet),
       numParticipants: Number(numMaxParticipants.value),
       participants: participants.map(participant => participant.hex),
       numTickets: numTickets

@@ -70,8 +70,8 @@ const NftRaffles: NextPage = (props: any) => {
     createNftRaffle(
       policyId,
       Buffer.from(assetName).toString("hex"),
-      numMaxTicketsPerPerson,
       numMaxParticipants,
+      numMaxTicketsPerPerson,
       ticketPrice,
       hashedSaltedSeed,
       raffleScript,
@@ -125,15 +125,15 @@ const NftRaffles: NextPage = (props: any) => {
             <label className="block mb-1 text-sm font-bold text-black">
               Ticket Price (in lovelace)
             </label>
-            <input type={'number'} value={ticketPrice} onChange={(event) => setTicketPrice(event.target.value)}></input>
+            <input type={'number'} value={ticketPrice} onChange={(event) => setTicketPrice(Number(event.target.value))}></input>
             <label className="block mb-1 text-sm font-bold text-black">
               Max number of Participants
             </label>
-            <input type={'number'} value={numMaxParticipants} onChange={(event) => setNumMaxParticipants(event.target.value)}></input>
+            <input type={'number'} value={numMaxParticipants} onChange={(event) => setNumMaxParticipants(Number(event.target.value))}></input>
             <label className="block mb-1 text-sm font-bold text-black">
               Max tickets per Wallet
             </label>
-            <input type={'number'} value={numMaxTicketsPerPerson} onChange={(event) => setNumMaxTicketsPerPerson(event.target.value)}></input>
+            <input type={'number'} value={numMaxTicketsPerPerson} onChange={(event) => setNumMaxTicketsPerPerson(Number(event.target.value))}></input>
             <label className="block mb-1 text-sm font-bold text-black">
               Seed
             </label>

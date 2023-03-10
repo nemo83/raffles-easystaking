@@ -44,6 +44,7 @@ const TokenCard = ({
         buyRaffleTickets(
             policyIdHex,
             assetNameHex,
+            numTickets,
             raffleScript,
             walletApi
         )
@@ -74,7 +75,7 @@ const TokenCard = ({
                                 </label>
                                 <div className="flex justify-center">
                                     <div className="mb-3 xl:w-96">
-                                        <select className='w-full'>
+                                        <select className='w-full' value={numTickets} onChange={(event) => setNumTickets(Number(event.target.value))}>
                                             <option value="1">One</option>
                                             <option value="2">Two</option>
                                             <option value="3">Three</option>
