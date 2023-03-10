@@ -3,6 +3,7 @@ spending raffle
   struct Datum {
       admin: PubKeyHash
       ticketPrice: Value
+      numMaxTicketsPerWallet: Int
       participants: []PubKeyHash
       numMaxParticipants: Int
       seedHash: ByteArray
@@ -83,6 +84,10 @@ spending raffle
       })
   }
 
+  func valid_num_of_purchased_tickets(datum: Datum, participantPkh: PubKeyHash, numTicketsPurchased: Int) -> Bool {
+    datum.participants.filter((pkh) -> { pkh == participantPkh}).length < datum.numMaxTicketsPerWallet
+  }
+
   func main(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
       tx: Tx = context.tx;
 
@@ -96,25 +101,37 @@ spending raffle
           // 1. ticketPrice is paid into the contract (that all that was in the script, + the ticket price , is sent to the datum)
           // 2. uxto where previous datum leaves to be spent
           // 3. new datum is like current + participants contains the pkh of current signer.
-          if (is_signed_by_participant(tx, joinRaffle.pkh) && raffle_not_full(datum).trace("RAFFLE_NOT_FULL: ")) {
+          if (is_signed_by_participant(tx, joinRaffle.pkh) && 
+              raffle_not_full(datum).trace("RAFFLE_NOT_FULL: ")) {
             
             input: TxOutput = context.get_current_input().output;
 
             new_datum: Datum = Datum { 
               datum.admin, 
               datum.ticketPrice, 
+              datum.numMaxTicketsPerWallet, 
               datum.participants.prepend(joinRaffle.pkh), 
               datum.numMaxParticipants, 
               datum.seedHash,
               datum.vaultPkh
             };
 
+            // The total amount sent to the utxo: what was in the script + what the participant is paying
             actualTargetValue: Value = tx.value_locked_by_datum(context.get_current_validator_hash(), new_datum, true);
+            print_value(actualTargetValue, "actualTargetValue")
 
-            expectedTargetValue: Value = input.value + datum.ticketPrice;
+            // Whatever is sento to the new utxo, minus what was in the script => amount paid in by user / participant
+            amountPaidIn: Value = actualTargetValue.get_lovelace() - input.value.get_lovelace()
+            print_value(amountPaidIn, "amountPaidIn")
 
-            // check NFT is accounted for
-            (actualTargetValue >= expectedTargetValue).trace("TRACE_ALL_GOOD? ")
+            numTicketsPurchased: Int = amountPaidIn.get_lovelace() / datum.ticketPrice
+
+            // Buy at least 1 ticket
+            expectedMinTargetValue: Value = input.value + datum.ticketPrice;
+
+            // User/Participant is actually paying for at least 1 ticket
+            (actualTargetValue >= expectedMinTargetValue).trace("TRACE_ALL_GOOD? ") &&
+            valid_num_of_purchased_tickets(datum, joinRaffle.pkh, numTicketsPurchased).trace("TOO_MANY_TICKETS: ")
 
           } else {
             false.trace("OVERALL_CHECK: ")

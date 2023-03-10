@@ -7,7 +7,7 @@ import { mintNftInWallet, createNftRaffle, retrieveNft } from "../components/Off
 import { sha256, sha224 } from 'js-sha256';
 import path from 'path';
 import fs from 'fs';
-import { WalletHelper } from '@hyperionbt/helios';
+import { Program, WalletHelper } from '@hyperionbt/helios';
 
 export async function getStaticProps() {
 
@@ -45,6 +45,15 @@ const NftRaffles: NextPage = (props: any) => {
 
   const [walletApi, setWalletApi] = useWalletContext();
 
+
+  const buildScripts = () => {
+    const raffleProgram = Program.new(raffleScript).compile(false)
+    console.log('raffle script built')
+
+    const vaultProgram = Program.new(vaultScript).compile(false)
+    console.log('vault script built')
+  }
+
   const callMintScript = async () => {
     mintNftInWallet(
       "Hello world!",
@@ -61,6 +70,7 @@ const NftRaffles: NextPage = (props: any) => {
     createNftRaffle(
       policyId,
       Buffer.from(assetName).toString("hex"),
+      numMaxTicketsPerPerson,
       numMaxParticipants,
       ticketPrice,
       hashedSaltedSeed,
@@ -83,6 +93,12 @@ const NftRaffles: NextPage = (props: any) => {
   return (
     <Layout >
 
+      <button
+        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+        type="button"
+        onClick={() => buildScripts()} >
+        Build Scripts
+      </button>
       <button
         className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
         type="button"

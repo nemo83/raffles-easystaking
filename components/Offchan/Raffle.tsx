@@ -79,6 +79,7 @@ export const createNftRaffle = async (
   policyIdHex: string,
   assetNameHex: string,
   numParticipants: number,
+  numMaxTicketsPerWallet: number,
   ticketPriceInLovelaces: number,
   saltedSeed: string,
   lockNftScript: string,
@@ -129,6 +130,7 @@ export const createNftRaffle = async (
   const raffleDatum = new (raffleProgram.types.Datum)(
     walletBaseAddress.pubKeyHash,
     new Value(BigInt(ticketPriceInLovelaces)),
+    numMaxTicketsPerWallet,
     [],
     numParticipants,
     sha256(new TextEncoder().encode(saltedSeed)),
@@ -252,16 +254,19 @@ export const buyRaffleTickets = async (
   const ticketPrice = Value.fromUplcData(foo.list[1])
   console.log('ticketPrice: ' + ticketPrice.toSchemaJson())
 
-  const participants = (foo.list[2] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
+  const numMaxTicketsPerWallet = Int.fromUplcData(foo.list[2])
+  console.log('numMaxTicketsPerWallet: ' + numMaxTicketsPerWallet)
+
+  const participants = (foo.list[3] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
   console.log('participants: ' + participants)
 
-  const numMaxParticipants = Int.fromUplcData(foo.list[3])
+  const numMaxParticipants = Int.fromUplcData(foo.list[4])
   console.log('numMaxParticipants: ' + numMaxParticipants)
 
-  const seedHash = ByteArray.fromUplcData(foo.list[4])
+  const seedHash = ByteArray.fromUplcData(foo.list[5])
   console.log('seedHash: ' + seedHash)
 
-  const vaultPkh = ValidatorHash.fromUplcData(foo.list[5])
+  const vaultPkh = ValidatorHash.fromUplcData(foo.list[6])
   console.log('vaultPkh: ' + vaultPkh.hex)
 
   const newParticipants = participants.slice()
@@ -271,6 +276,7 @@ export const buyRaffleTickets = async (
   const newDatum = new (raffleProgram.types.Datum)(
     adminPkh,
     ticketPrice,
+    numMaxTicketsPerWallet,
     newParticipants,
     numMaxParticipants,
     seedHash,
