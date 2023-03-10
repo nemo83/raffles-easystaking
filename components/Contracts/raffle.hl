@@ -93,6 +93,10 @@ spending raffle
     }
   }
 
+  func valid_num_tickets(datum: Datum, participantPkh: PubKeyHash, numTickets: Int) -> Bool {
+    datum.participants.filter((pkh: PubKeyHash) -> { pkh == participantPkh }).length + numTickets <= datum.numMaxParticipants
+  }
+
   func main(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
       tx: Tx = context.tx;
 
@@ -129,7 +133,8 @@ spending raffle
             expectedTargetValue: Value = input.value + datum.ticketPrice * joinRaffle.numTickets;
 
             // User/Participant is actually paying for at least 1 ticket
-            (actualTargetValue >= expectedTargetValue).trace("TRACE_ALL_GOOD? ")
+            (actualTargetValue >= expectedTargetValue).trace("TRACE_ALL_GOOD? ") &&
+            valid_num_tickets(datum, joinRaffle.pkh, joinRaffle.numTickets)
 
           } else {
             false.trace("OVERALL_CHECK: ")
