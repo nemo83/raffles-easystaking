@@ -94,7 +94,10 @@ spending raffle
   }
 
   func valid_num_tickets(datum: Datum, participantPkh: PubKeyHash, numTickets: Int) -> Bool {
-    datum.participants.filter((pkh: PubKeyHash) -> { pkh == participantPkh }).length + numTickets <= datum.numMaxParticipants
+    // User buying up to max num ticket per wallet
+    datum.participants.filter((pkh: PubKeyHash) -> { pkh == participantPkh }).length + numTickets <= datum.numMaxTicketsPerWallet &&
+    // Not exceeding max num total tickets
+    datum.participants.length + numTickets <= datum.numMaxParticipants
   }
 
   func main(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {

@@ -3,7 +3,7 @@ import { useWalletContext } from "../components/WalletProvider";
 import type { NextPage } from 'next'
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { mintNftInWallet, createNftRaffle, retrieveNft } from "../components/Offchan/Raffle"
+import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner } from "../components/Offchan/Raffle"
 import { sha256, sha224 } from 'js-sha256';
 import path from 'path';
 import fs from 'fs';
@@ -38,7 +38,7 @@ const NftRaffles: NextPage = (props: any) => {
   const [policyId, setPolicyId] = useState('');
   const [assetName, setAssetName] = useState('');
   const [ticketPrice, setTicketPrice] = useState(5_000_000);
-  const [numMaxParticipants, setNumMaxParticipants] = useState(15);
+  const [numMaxParticipants, setNumMaxParticipants] = useState(10);
   const [numMaxTicketsPerPerson, setNumMaxTicketsPerPerson] = useState(3);
   const [seed, setSeed] = useState('');
   const [salt, setSalt] = useState('');
@@ -63,9 +63,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   const createRaffle = async () => {
 
-    const saltedSeed = `${salt}${seed}`
-
-    const hashedSaltedSeed = sha256(saltedSeed)
+    const saltedSeed = `${seed}${salt}`
 
     createNftRaffle(
       policyId,
@@ -73,7 +71,7 @@ const NftRaffles: NextPage = (props: any) => {
       numMaxParticipants,
       numMaxTicketsPerPerson,
       ticketPrice,
-      hashedSaltedSeed,
+      saltedSeed,
       raffleScript,
       vaultScript,
       walletApi
@@ -89,6 +87,17 @@ const NftRaffles: NextPage = (props: any) => {
     )
   }
 
+  const selectRaffleWinner = async () => {
+    selectWinner(
+      seed,
+      salt,
+      policyId,
+      Buffer.from(assetName).toString("hex"),
+      raffleScript,
+      vaultScript,
+      walletApi
+    )
+  }
 
   return (
     <Layout >
@@ -147,6 +156,12 @@ const NftRaffles: NextPage = (props: any) => {
               type="button"
               onClick={() => createRaffle()} >
               Create Raffle
+            </button>
+            <button
+              className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+              type="button"
+              onClick={() => selectRaffleWinner()} >
+              Select Winner
             </button>
           </div>
         </form>

@@ -320,7 +320,6 @@ export const buyRaffleTickets = async (
 }
 
 export const selectWinner = async (
-  numParticipants: number,
   seed: string,
   salt: string,
   policyIdHex: string,
@@ -367,26 +366,14 @@ export const selectWinner = async (
   const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(5_000_000)))
   console.log('c')
 
-  const winningIndex = calculateWinningIndex(seed, `${numParticipants}`)
-  console.log('winningIndex: ' + winningIndex)
-  // const valRedeemer = new ConstrData(0, []);
-
-  const valRedeemer = (new (raffleProgram.types.Redeemer as any).SelectWinner(
-    new ByteArray(Array.from(new TextEncoder().encode(seed))),
-    new ByteArray(Array.from(new TextEncoder().encode(salt))),
-    winningIndex
-  ))._toUplcData()
-
-  console.log('d')
-
   const foo = contractUtxo.origOutput.datum.data as ListData
   const adminPkh = PubKeyHash.fromUplcData(foo.list[0])
   console.log('adminPkh: ' + adminPkh.hex)
 
-  const participants = (foo.list[2] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
+  const participants = (foo.list[3] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
   console.log('participants: ' + participants)
 
-  const vaultPkh = PubKeyHash.fromUplcData(foo.list[5])
+  const vaultPkh = PubKeyHash.fromUplcData(foo.list[6])
   console.log('vaultPkh: ' + vaultPkh.hex)
 
   const totalValueLocked = contractUtxo.value
@@ -396,6 +383,17 @@ export const selectWinner = async (
 
   const adminValue = totalValueLocked.sub(vaultValue)
   console.log('adminValue: ' + adminValue.toSchemaJson())
+
+  const winningIndex = calculateWinningIndex(seed, `${participants.length}`)
+  console.log('winningIndex: ' + winningIndex)
+  // const valRedeemer = new ConstrData(0, []);
+
+  const valRedeemer = (new (raffleProgram.types.Redeemer as any).SelectWinner(
+    new ByteArray(Array.from(new TextEncoder().encode(seed))),
+    new ByteArray(Array.from(new TextEncoder().encode(salt))),
+    winningIndex
+  ))._toUplcData()
+
 
   const vaultDatum = new (vaultProgram.types.Datum)(
     adminPkh,
