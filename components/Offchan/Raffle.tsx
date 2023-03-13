@@ -159,8 +159,7 @@ export const createNftRaffle = async (
   const txHash = await walletApi.submitTx(tx);
   console.log('txHash: ' + txHash.hex)
 
-
-  raffleDatum
+  return txHash
 
 }
 
@@ -445,14 +444,14 @@ export const collectPrize = async (
 
   // Extract the validator script address
   const vaultAddress = Address.fromValidatorHash(vaultUplcProgram.validatorHash);
-  
+
   const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
-  
+
   const contractUtxo = await getKeyUtxo(vaultAddress.toBech32(), policyIdHex, assetNameHex)
-  
+
   const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(1_000_000)))
-  
+
   const valRedeemer = new ConstrData(1, []);
 
   const tx = new Tx();

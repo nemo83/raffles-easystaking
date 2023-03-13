@@ -8,6 +8,7 @@ import { sha256, sha224 } from 'js-sha256';
 import path from 'path';
 import fs from 'fs';
 import { Program, Address } from '@hyperionbt/helios';
+import { network } from '../constants/blockfrost'
 
 export async function getStaticProps() {
 
@@ -42,6 +43,8 @@ const NftRaffles: NextPage = (props: any) => {
   const [numMaxTicketsPerPerson, setNumMaxTicketsPerPerson] = useState(3);
   const [seed, setSeed] = useState('');
   const [salt, setSalt] = useState('');
+
+  const [mainImgUrl, setMainImgUrl] = useState('https://ipfs.io/ipfs/QmdHiHmWdt2gonmViGwJcvp4gfZiuVyrtub7H7iCc5QSmf');
 
   const [walletApi, setWalletApi] = useWalletContext();
 
@@ -82,7 +85,45 @@ const NftRaffles: NextPage = (props: any) => {
       raffleScript,
       vaultScript,
       walletApi
-    )
+    ).then(async (result) => {
+
+    const lotteryApi: string = "https://lottery.easystaking.online/nft_raffles"
+
+    const body = JSON.stringify({
+      policy_id: policyId,
+      asset_name: Buffer.from(assetName).toString("hex"),
+      main_img_url: mainImgUrl,
+      network,
+      admin_pkh: "asd",
+      ticket_price: ticketPrice,
+      num_max_tickets_per_wallet: numMaxTicketsPerPerson,
+      num_max_participants: numMaxParticipants,
+      seed_hash: "asd",
+      vault_pkh: "asd"
+    })
+
+    console.log('body: ' + body)
+
+    let resp = await fetch(lotteryApi, {
+      method: "POST",
+      headers: {
+        'content-type': "application/json",
+        accept: "application/json"
+      },
+      body
+    });
+
+    if (resp?.status > 299) {
+      throw console.error("NFT not found", resp);
+    }
+    const payload = await resp.json();
+
+    if (payload.length == 0) {
+      throw console.error("NFT not found");
+    }
+
+    })
+
   }
 
   const withdrawAll = async () => {
@@ -138,6 +179,10 @@ const NftRaffles: NextPage = (props: any) => {
               Asset Name
             </label>
             <input type={'text'} value={assetName} onChange={(event) => setAssetName(event.target.value)}></input>
+            <label className="block mb-1 text-sm font-bold text-black">
+              Nft URL Image
+            </label>
+            <input type={'text'} value={mainImgUrl} onChange={(event) => setMainImgUrl(event.target.value)}></input>
             <label className="block mb-1 text-sm font-bold text-black">
               Ticket Price (in lovelace)
             </label>
