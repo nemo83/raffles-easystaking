@@ -6,7 +6,7 @@ import {
   ListData,
   MintingPolicyHash,
   TxId,
-  Int,
+  IntData,
   UTxO,
   Value,
   TxOutput,
@@ -251,13 +251,13 @@ export const buyRaffleTickets = async (
   const ticketPrice = Value.fromUplcData(foo.list[1])
   console.log('ticketPrice: ' + ticketPrice.toSchemaJson())
 
-  const numMaxTicketsPerWallet = Int.fromUplcData(foo.list[2])
+  const numMaxTicketsPerWallet = foo.list[2] as IntData
   console.log('numMaxTicketsPerWallet: ' + numMaxTicketsPerWallet)
 
   const participants = (foo.list[3] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
   console.log('participants: ' + participants)
 
-  const numMaxParticipants = Int.fromUplcData(foo.list[4])
+  const numMaxParticipants = foo.list[4] as IntData
   console.log('numMaxParticipants: ' + numMaxParticipants)
 
   const seedHash = ByteArray.fromUplcData(foo.list[5])
@@ -530,9 +530,9 @@ export const mintNftInWallet = async (
   const txId: TxId = TxId::new(TX_ID)
   const outputId: TxOutputId = TxOutputId::new(txId, ` + utxos[0][0].utxoIdx + `)
   
-  func main(ctx: ScriptContext) -> Bool {
-      tx: Tx = ctx.tx;
-      mph: MintingPolicyHash = ctx.get_current_minting_policy_hash();
+  func main(context: ScriptContext) -> Bool {
+      tx: Tx = context.tx;
+      mph: MintingPolicyHash = context.get_current_minting_policy_hash();
   
       assetclass: AssetClass = AssetClass::new(
           mph, 

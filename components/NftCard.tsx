@@ -15,6 +15,7 @@ interface NftCard {
     maxNumTicketsPerWallet: number,
     numPurchasedTickets: number,
     numWalletPurchasedTickets: number | undefined,
+    userWon: boolean,
     raffleScript: string
 }
 
@@ -26,6 +27,7 @@ const TokenCard = ({
     maxNumTicketsPerWallet,
     numPurchasedTickets,
     numWalletPurchasedTickets,
+    userWon: boolean,
     raffleScript
 }: NftCard) => {
 

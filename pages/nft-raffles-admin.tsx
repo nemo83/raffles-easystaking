@@ -7,7 +7,7 @@ import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner } from "../
 import { sha256, sha224 } from 'js-sha256';
 import path from 'path';
 import fs from 'fs';
-import { Program, WalletHelper } from '@hyperionbt/helios';
+import { Program, Address } from '@hyperionbt/helios';
 
 export async function getStaticProps() {
 
@@ -50,8 +50,15 @@ const NftRaffles: NextPage = (props: any) => {
     const raffleProgram = Program.new(raffleScript).compile(false)
     console.log('raffle script built')
 
+    const raffleAddress = Address.fromValidatorHash(raffleProgram.validatorHash);
+    console.log('raffleAddress: ' + raffleAddress.toBech32())
+
     const vaultProgram = Program.new(vaultScript).compile(false)
     console.log('vault script built')
+
+    const vaultAddress = Address.fromValidatorHash(vaultProgram.validatorHash);
+    console.log('vaultAddress: ' + vaultAddress.toBech32())
+
   }
 
   const callMintScript = async () => {
