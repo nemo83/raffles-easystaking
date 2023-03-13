@@ -23,7 +23,7 @@ import {
 } from "@hyperionbt/helios"
 import path from 'path';
 import fs from 'fs';
-import { buyRaffleTickets } from "../components/Offchan/Raffle"
+import { collectPrize } from "../components/Offchan/Raffle"
 
 import { blockfrostAPI, apiKey } from "../constants/blockfrost"
 
@@ -112,7 +112,7 @@ const NftRaffles: NextPage = (props: any) => {
       nftPolicyId: assetId.slice(0, 56),
       nftAssetName: assetId.slice(56),
       ticketPrice: Number(ticketPrice.lovelace),
-      numMaxTicketPerWallet: Number(numMaxTicketPerWallet),
+      numMaxTicketPerWallet: Number(numMaxTicketPerWallet.value),
       numParticipants: Number(numMaxParticipants.value),
       participants: participants.map(participant => participant.hex),
       numTickets: numTickets
@@ -148,6 +148,9 @@ const NftRaffles: NextPage = (props: any) => {
 
   const getWinningTickets = async (scriptAddress: string, assetId: string) => {
 
+    console.log('scriptAddress: ' + scriptAddress)
+    console.log('assetId: ' + assetId)
+
     const blockfrostUrl: string = blockfrostAPI + "/addresses/" + scriptAddress + "/utxos/" + assetId;
 
     let resp = await fetch(blockfrostUrl, {
@@ -167,16 +170,16 @@ const NftRaffles: NextPage = (props: any) => {
       throw console.error("NFT not found");
     }
 
-
     const datum = ListData.fromCbor(hexToBytes(payload[0].inline_datum))
 
+    const adminPkh = PubKeyHash.fromUplcData(datum.list[0])
     const winningPkh = PubKeyHash.fromUplcData(datum.list[1])
 
     if (walletApi) {
       console.log('wallet api ok!')
       const baseAddress = await new WalletHelper(walletApi).baseAddress
       const walletPkh = baseAddress.pubKeyHash
-      if (walletPkh.hex == winningPkh.hex) {
+      if (walletPkh.hex == winningPkh.hex || walletPkh.hex == adminPkh.hex) {
         const nft: WonNft = {
           nftPolicyId: assetId.slice(0, 56),
           nftAssetName: assetId.slice(56),
@@ -239,6 +242,7 @@ const NftRaffles: NextPage = (props: any) => {
     });
 
     const response = await resp.json() as [any]
+    console.log('response: ' + JSON.stringify(response))
 
     const myWonNfts: WonNft[] = []
     if (resp.status == 200) {
@@ -247,6 +251,7 @@ const NftRaffles: NextPage = (props: any) => {
         .filter(amount => amount.unit != 'lovelace')
         .map(nft => getWinningTickets(address.toBech32(), nft.unit)))
       nfts.forEach(nft => {
+        console.log('nft: ' + nft)
         if (nft) {
           myWonNfts.push(nft)
         }
@@ -280,6 +285,19 @@ const NftRaffles: NextPage = (props: any) => {
             userWon={userWon(raffle)} />
         ))}
       </div>
+      {wonNfts ? (
+        <div>
+          {wonNfts.map((nft, i) => (
+            <button
+              key={i}
+              className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+              type="button"
+              onClick={() => collectPrize(nft.nftPolicyId, nft.nftAssetName, vaultScript, walletApi)} >
+              Withdraw NFT
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div>
         <button
           className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
