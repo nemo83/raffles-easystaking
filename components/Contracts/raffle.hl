@@ -54,9 +54,10 @@ spending raffle
     winnerPkh: PubKeyHash
     ) -> Bool {
     
-    print("totalValueLocked.lovelace: " + totalValueLocked.get_lovelace().show());
+    print("totalValueLockedlovelace: " + totalValueLocked.show());
 
     assets: Value = totalValueLocked.get_assets();
+    print("assets: " + assets.show());
 
     vaultValue: Value = assets + Value::lovelace(2000000);
     
@@ -70,19 +71,6 @@ spending raffle
 
     (valueSentToAdmin >= adminValue).trace("ADMIN_VALUE: ") &&
     (vaultValue == valueSentToVault).trace("VAULT_VALUE: ")
-  }
-
-  func print_value(value: Value, valueName: String) -> () {
-    print(valueName + ", lovelace: " + value.get_lovelace().show());
-    value
-      .get_assets()
-      .to_map()
-      .for_each( (mph: MintingPolicyHash, tokens: Map[ByteArray]Int) -> {
-        tokens
-          .for_each((tokenName: ByteArray, amount: Int) -> {
-            print(valueName + ", policy: " + mph.show() + ", tokenName: " + tokenName.decode_utf8() + ", amount: " + amount.show())
-          })
-      })
   }
 
   func add_participants(participants: []PubKeyHash, participantPkh: PubKeyHash, numTickets: Int) -> []PubKeyHash {
@@ -118,19 +106,11 @@ spending raffle
             
             input: TxOutput = context.get_current_input().output;
 
-            new_datum: Datum = Datum { 
-              datum.admin, 
-              datum.ticketPrice, 
-              datum.numMaxTicketsPerWallet, 
-              add_participants(datum.participants, joinRaffle.pkh, joinRaffle.numTickets), 
-              datum.numMaxParticipants, 
-              datum.seedHash,
-              datum.vaultPkh
-            };
+            new_datum: Datum = datum.copy(participants: add_participants(datum.participants, joinRaffle.pkh, joinRaffle.numTickets));
 
             // The total amount sent to the utxo: what was in the script + what the participant is paying
             actualTargetValue: Value = tx.value_locked_by_datum(context.get_current_validator_hash(), new_datum, true);
-            print_value(actualTargetValue, "actualTargetValue");
+            print("actualTargetValue: " + actualTargetValue.show());
 
             // Buy at least 1 ticket
             expectedTargetValue: Value = input.value + datum.ticketPrice * joinRaffle.numTickets;
