@@ -2,10 +2,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faTicket, faStar,
 } from "@fortawesome/free-solid-svg-icons";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useWalletContext } from "../components/WalletProvider";
 import { buyRaffleTickets, collectPrize } from './Offchan/Raffle'
+import { toast } from 'react-hot-toast';
 
 interface NftCard {
     policyIdHex: string,
@@ -60,6 +61,9 @@ const TokenCard = ({
         )
     }
 
+    useEffect(() => {
+        console.log('walletApi: ' + walletApi)
+    }, [walletApi])
 
     return (
         <>
@@ -174,8 +178,16 @@ const TokenCard = ({
                             <button
                                 type='button'
                                 className='w-full bg-blue-500 rounded'
-                                onClick={() => setShowModal(true)}
-                                disabled={numWalletPurchasedTickets >= maxNumTicketsPerWallet}>
+                                onClick={() => {
+                                    if (!walletApi) {
+                                        toast.error("Wallet not connected")
+                                    } else if (numWalletPurchasedTickets >= maxNumTicketsPerWallet) {
+                                        toast.error("Max num tickets purchased")
+                                    } else {
+                                        setShowModal(true)
+                                    }
+                                }
+                                }>
                                 Buy Ticket (5 ₳)
                             </button>
                         </div>

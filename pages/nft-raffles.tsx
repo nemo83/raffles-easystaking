@@ -23,7 +23,6 @@ import {
 } from "@hyperionbt/helios"
 import path from 'path';
 import fs from 'fs';
-import { collectPrize } from "../components/Offchan/Raffle"
 
 import { blockfrostAPI, apiKey } from "../constants/blockfrost"
 import { lotteryApi } from "../constants/lottery"
@@ -57,13 +56,14 @@ const NftRaffles: NextPage = (props: any) => {
 
   const [walletApi, setWalletApi] = useWalletContext();
 
-  const [walletPkh, setWalletPkh] = useState(null);
+  const [walletPkh, setWalletPkh] = useState('');
+  
   useEffect(() => {
     (async () => {
       const walletPkh = await new WalletHelper(walletApi).baseAddress
       console.log('setting wallet PKH')
       setWalletPkh(walletPkh.pubKeyHash.hex)
-    })
+    })()
   }, [walletApi])
 
   const [raffles, setRaffles] = useState<Raffle[]>([])
@@ -75,11 +75,19 @@ const NftRaffles: NextPage = (props: any) => {
   useEffect(() => {
     const raffles = onChainRaffles.map(onChainRaffle => {
       const beRaffle = backendRaffles.find(raffle => raffle.status == "open" && raffle.policy_id == onChainRaffle.nftPolicyId && raffle.asset_name == onChainRaffle.nftAssetName)
+      const numTickets = onChainRaffle.participants.reduce((acc, curr) => {
+        if (walletPkh == curr) {
+          return acc + 1
+        } else {
+          return acc
+        }
+      }, 0)
       const raffle: Raffle = {
         ...onChainRaffle,
         collectionName: beRaffle.collection_name,
         nftName: beRaffle.nft_name,
-        mainImgUrl: beRaffle.main_img_url
+        mainImgUrl: beRaffle.main_img_url,
+        numTickets: numTickets
       }
       return raffle
     })
@@ -102,7 +110,7 @@ const NftRaffles: NextPage = (props: any) => {
 
     setRaffles(wonRaffles.concat(raffles))
 
-  }, [onChainRaffles, backendRaffles, wonNfts])
+  }, [onChainRaffles, backendRaffles, wonNfts, walletPkh])
 
   interface OnChainRaffle {
     nftPolicyId: string,
