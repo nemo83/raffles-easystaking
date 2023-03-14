@@ -49,9 +49,17 @@ const TokenCard = ({
     // Form values
     const [numTickets, setNumTickets] = useState(1)
 
+    const [options, setOptions] = useState([])
+
+    useEffect(() => {
+        const options = []
+        for (let index = 0; index < (maxNumTicketsPerWallet - numPurchasedTickets); index++) {
+            options.push(<option value={index + 1}>{index + 1}</option>)
+        }
+        setOptions(options)
+    }, [])
 
     const buyTicket = async () => {
-        console.log('WTF')
         buyRaffleTickets(
             policyIdHex,
             assetNameHex,
@@ -86,14 +94,7 @@ const TokenCard = ({
                                 <div className="flex justify-center">
                                     <div className="mb-3 xl:w-96">
                                         <select className='w-full' value={numTickets} onChange={(event) => setNumTickets(Number(event.target.value))}>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                            <option value="4">Four</option>
-                                            <option value="5">Five</option>
-                                            <option value="6">Six</option>
-                                            <option value="7">Seven</option>
-                                            <option value="8">Eight</option>
+                                            {options}
                                         </select>
                                     </div>
                                 </div>
@@ -107,7 +108,7 @@ const TokenCard = ({
                                 Close
                             </button>
                             <button
-                                className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+                                className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase bg-blue-400 rounded shadow outline-none hover:bg-blue-500 focus:outline-none"
                                 type="button"
                                 onClick={() => { buyTicket().then(() => setShowModal(false)) }} >
                                 Buy Ticket
@@ -136,8 +137,6 @@ const TokenCard = ({
                             </svg>
                         </div>
 
-
-
                         <div className="flex items-center justify-between gap-1 mb-2">
                             <span className="grid font-bold text-gray-900 rounded-sm place-content-center">
                                 {nftName}
@@ -147,7 +146,11 @@ const TokenCard = ({
                                 <span className="font-bold text-gray-900"
                                     onMouseEnter={() => setHoverCard(true)}
                                     onMouseLeave={() => setHoverCard(false)}>
-                                    {ticketPrices / 1_000_000} ADA
+                                    <a href="#"
+                                        className="transition duration-150 ease-in-out transititext-primary text-primary hover:text-primary-600 focus:text-primary-600 active:text-primary-700 dark:text-primary-400 dark:hover:text-primary-500 dark:focus:text-primary-500 dark:active:text-primary-600"
+                                        // data-te-toggle="tooltip"
+                                        title="Floor price">
+                                        100 ADA </a>
                                 </span>
                                 <img src="cardano-blue.png" alt="cardano Logo" className="w-[22px] h-[21.85px] object-contain" />
                             </div>
@@ -184,7 +187,7 @@ const TokenCard = ({
                                     }
                                 }
                                 }>
-                                Buy Ticket (5 ₳)
+                                Buy Ticket ({ticketPrices / 1_000_000} ADA ₳)
                             </button>
                         </div>
                         {userWon ? (<div className='w-full my-1'>

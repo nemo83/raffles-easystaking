@@ -217,7 +217,7 @@ const NftRaffles: NextPage = (props: any) => {
     const adminPkh = PubKeyHash.fromUplcData(datum.list[0])
     const winningPkh = PubKeyHash.fromUplcData(datum.list[1])
 
-    if (walletPkh.hex == winningPkh.hex || walletPkh.hex == adminPkh.hex) {
+    if (walletPkh == winningPkh.hex || walletPkh == adminPkh.hex) {
       const nft: WonNft = {
         nftPolicyId: assetId.slice(0, 56),
         nftAssetName: assetId.slice(56),
@@ -332,7 +332,7 @@ const NftRaffles: NextPage = (props: any) => {
 
 
   return (
-    <Layout >
+    <Layout>
       <div className="flex flex-row w-full">
         {raffles.map((raffle, i) => (
           <NftCard
