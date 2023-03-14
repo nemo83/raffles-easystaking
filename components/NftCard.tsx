@@ -53,11 +53,11 @@ const TokenCard = ({
 
     useEffect(() => {
         const options = []
-        for (let index = 0; index < (maxNumTicketsPerWallet - numPurchasedTickets); index++) {
+        for (let index = 0; index < (maxNumTicketsPerWallet - numWalletPurchasedTickets); index++) {
             options.push(<option value={index + 1}>{index + 1}</option>)
         }
         setOptions(options)
-    }, [])
+    }, [maxNumTicketsPerWallet, numWalletPurchasedTickets])
 
     const buyTicket = async () => {
         buyRaffleTickets(
