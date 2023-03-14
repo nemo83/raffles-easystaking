@@ -75,19 +75,11 @@ const NftRaffles: NextPage = (props: any) => {
   useEffect(() => {
     const raffles = onChainRaffles.map(onChainRaffle => {
       const beRaffle = backendRaffles.find(raffle => raffle.status == "open" && raffle.policy_id == onChainRaffle.nftPolicyId && raffle.asset_name == onChainRaffle.nftAssetName)
-      const numTickets = onChainRaffle.participants.reduce((acc, curr) => {
-        if (walletPkh == curr) {
-          return acc + 1
-        } else {
-          return acc
-        }
-      }, 0)
       const raffle: Raffle = {
         ...onChainRaffle,
         collectionName: beRaffle.collection_name,
         nftName: beRaffle.nft_name,
-        mainImgUrl: beRaffle.main_img_url,
-        numTickets: numTickets
+        mainImgUrl: beRaffle.main_img_url
       }
       return raffle
     })

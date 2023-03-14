@@ -61,10 +61,6 @@ const TokenCard = ({
         )
     }
 
-    useEffect(() => {
-        console.log('walletApi: ' + walletApi)
-    }, [walletApi])
-
     return (
         <>
             {/* Modal */}
