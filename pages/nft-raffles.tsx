@@ -60,9 +60,13 @@ const NftRaffles: NextPage = (props: any) => {
   
   useEffect(() => {
     (async () => {
-      const walletPkh = await new WalletHelper(walletApi).baseAddress
-      console.log('setting wallet PKH')
-      setWalletPkh(walletPkh.pubKeyHash.hex)
+      if (walletApi) {
+        const walletPkh = await new WalletHelper(walletApi).baseAddress
+        console.log('setting wallet PKH')
+        setWalletPkh(walletPkh.pubKeyHash.hex)
+      } else {
+        setWalletPkh(null)
+      }
     })()
   }, [walletApi])
 
