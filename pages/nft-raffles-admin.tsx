@@ -40,6 +40,8 @@ const NftRaffles: NextPage = (props: any) => {
 
   const [policyId, setPolicyId] = useState('');
   const [assetName, setAssetName] = useState('');
+  const [collectionName, setCollectionName] = useState('');
+  const [nftName, setNftName] = useState('');
   const [ticketPrice, setTicketPrice] = useState(5_000_000);
   const [numMaxParticipants, setNumMaxParticipants] = useState(10);
   const [numMaxTicketsPerPerson, setNumMaxTicketsPerPerson] = useState(3);
@@ -92,6 +94,8 @@ const NftRaffles: NextPage = (props: any) => {
       const body = JSON.stringify({
         policy_id: policyId,
         asset_name: Buffer.from(assetName).toString("hex"),
+        collection_name: collectionName,
+        nft_name: nftName,
         main_img_url: mainImgUrl,
         network,
         admin_pkh: createRaffle.adminPkh,
@@ -113,10 +117,10 @@ const NftRaffles: NextPage = (props: any) => {
         body
       });
 
-      if (resp?.status == 0) {
+      if (resp?.status == 200) {
         toast.success('NFT Raffle successfully created!')
       } else {
-        toast.error()
+        toast.error('Error while creating NFT Raffle')
       }
 
     })
@@ -141,8 +145,65 @@ const NftRaffles: NextPage = (props: any) => {
       raffleScript,
       vaultScript,
       walletApi
-    )
+    ).then(async (winner) => {
+
+      const body = JSON.stringify({
+        policy_id: policyId,
+        asset_name: assetName,
+        network,
+        winner_pkh: winner.winnerPkh,
+        participants: winner.participants
+      })
+
+      console.log('body: ' + body)
+
+      let resp = await fetch(`${lotteryApi}/nft_raffles/close`, {
+        method: "POST",
+        headers: {
+          'content-type': "application/json",
+          accept: "application/json"
+        },
+        body
+      });
+
+      if (resp?.status == 200) {
+        toast.success('NFT Raffle successfully created!')
+      } else {
+        toast.error('Error while creating NFT Raffle')
+      }
+
+    })
   }
+
+  const getNftDetails = async (policyId: string, assetName: string) => {
+
+    const body = JSON.stringify({
+      policy_id: policyId,
+      asset_names: [assetName]
+    })
+
+    let resp = await fetch("https://hilltop-api.mainnet.dandelion.blockwarelabs.io/native_assets/native_assets_details", {
+      method: "POST",
+      headers: {
+        'content-type': "application/json",
+        accept: "application/json"
+      },
+      body
+    });
+
+    if (resp?.status > 299) {
+      throw console.error("NFT not found", resp);
+    }
+    const payload = await resp.json();
+    console.log("nft details: " + JSON.stringify(payload))
+
+    if (payload.length == 0) {
+      throw console.error("NFT not found");
+    }
+
+
+  }
+
 
   return (
     <Layout >
@@ -152,6 +213,12 @@ const NftRaffles: NextPage = (props: any) => {
         type="button"
         onClick={() => buildScripts()} >
         Build Scripts
+      </button>
+      <button
+        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+        type="button"
+        onClick={() => getNftDetails(policyId, assetName)} >
+        Get NFT Details
       </button>
       <button
         className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
@@ -176,6 +243,14 @@ const NftRaffles: NextPage = (props: any) => {
               Asset Name
             </label>
             <input type={'text'} value={assetName} onChange={(event) => setAssetName(event.target.value)}></input>
+            <label className="block mb-1 text-sm font-bold text-black">
+              Collection Name
+            </label>
+            <input type={'text'} value={collectionName} onChange={(event) => setCollectionName(event.target.value)}></input>
+            <label className="block mb-1 text-sm font-bold text-black">
+              Nft Name
+            </label>
+            <input type={'text'} value={nftName} onChange={(event) => setNftName(event.target.value)}></input>
             <label className="block mb-1 text-sm font-bold text-black">
               Nft URL Image
             </label>

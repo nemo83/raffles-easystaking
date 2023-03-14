@@ -331,6 +331,11 @@ export const buyRaffleTickets = async (
 
 }
 
+interface Winner {
+  winnerPkh: string,
+  participants: string[]
+}
+
 export const selectWinner = async (
   seed: string,
   salt: string,
@@ -434,7 +439,12 @@ export const selectWinner = async (
   const txHash = await walletApi.submitTx(tx);
   console.log('txHash: ' + txHash.hex)
 
+  const winner: Winner =  {
+    winnerPkh: participants.at(Number(winningIndex)).hex,
+    participants: participants.map(participant => participant.hex)
+  }
 
+  return winner
 }
 
 export const collectPrize = async (
