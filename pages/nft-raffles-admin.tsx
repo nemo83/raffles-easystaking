@@ -149,7 +149,7 @@ const NftRaffles: NextPage = (props: any) => {
 
       const body = JSON.stringify({
         policy_id: policyId,
-        asset_name: assetName,
+        asset_name: Buffer.from(assetName).toString("hex"),
         network,
         winner_pkh: winner.winnerPkh,
         participants: winner.participants

@@ -57,7 +57,7 @@ const NftRaffles: NextPage = (props: any) => {
   const [walletApi, setWalletApi] = useWalletContext();
 
   const [walletPkh, setWalletPkh] = useState('');
-  
+
   useEffect(() => {
     (async () => {
       if (walletApi) {
@@ -77,34 +77,50 @@ const NftRaffles: NextPage = (props: any) => {
   const [backendRaffles, setBackendRaffles] = useState([])
 
   useEffect(() => {
-    const raffles = onChainRaffles.map(onChainRaffle => {
-      const beRaffle = backendRaffles.find(raffle => raffle.status == "open" && raffle.policy_id == onChainRaffle.nftPolicyId && raffle.asset_name == onChainRaffle.nftAssetName)
-      const raffle: Raffle = {
-        ...onChainRaffle,
-        collectionName: beRaffle.collection_name,
-        nftName: beRaffle.nft_name,
-        mainImgUrl: beRaffle.main_img_url
-      }
-      return raffle
-    })
+    if (backendRaffles) {
+      const raffles = onChainRaffles.map(onChainRaffle => {
+        const beRaffle = backendRaffles.find(raffle => raffle.status == "open" && raffle.policy_id == onChainRaffle.nftPolicyId && raffle.asset_name == onChainRaffle.nftAssetName)
+        const raffle: Raffle = {
+          ...onChainRaffle,
+          collectionName: beRaffle.collection_name,
+          nftName: beRaffle.nft_name,
+          mainImgUrl: beRaffle.main_img_url
+        }
+        return raffle
+      })
 
-    const wonRaffles = wonNfts.map(wonNft => {
-      const beRaffle = backendRaffles.find(raffle => raffle.status == "open" && raffle.policy_id == wonNft.nftPolicyId && raffle.asset_name == wonNft.nftAssetName)
-      const raffle: Raffle = {
-        ...wonNft,
-        collectionName: beRaffle.collection_name,
-        nftName: beRaffle.nft_name,
-        mainImgUrl: beRaffle.main_img_url,
-        ticketPrice: beRaffle.ticket_price,
-        numMaxTicketPerWallet: beRaffle.num_max_tickets_per_wallet,
-        numParticipants: beRaffle.num_max_participants,
-        participants: beRaffle.participants.split(","),
-        numTickets: beRaffle.participants.length
-      }
-      return raffle
-    })
+      const wonRaffles = wonNfts.map(wonNft => {
+        const beRaffle = backendRaffles.find(raffle => raffle.status == "closed" && raffle.policy_id == wonNft.nftPolicyId && raffle.asset_name == wonNft.nftAssetName)
+        let participants: string[] = []
+        if (beRaffle.participants) {
+          participants = beRaffle.participants.split(",")
+        }
+        const numTickets = participants.reduce((acc, curr) => {
+          if (walletPkh == curr) {
+            return acc + 1
+          } else {
+            return acc
+          }
+        }, 0)
+        const raffle: Raffle = {
+          ...wonNft,
+          collectionName: beRaffle.collection_name,
+          nftName: beRaffle.nft_name,
+          mainImgUrl: beRaffle.main_img_url,
+          ticketPrice: beRaffle.ticket_price,
+          numMaxTicketPerWallet: beRaffle.num_max_tickets_per_wallet,
+          numParticipants: beRaffle.num_max_participants,
+          participants: participants,
+          numTickets: numTickets
+        }
+        return raffle
+      })
 
-    setRaffles(wonRaffles.concat(raffles))
+      setRaffles(wonRaffles.concat(raffles))
+    } else {
+      setRaffles([])
+    }
+
 
   }, [onChainRaffles, backendRaffles, wonNfts, walletPkh])
 
@@ -166,6 +182,7 @@ const NftRaffles: NextPage = (props: any) => {
       participants: participants.map(participant => participant.hex),
       numTickets: numTickets
     }
+    console.log('raffle: ' + JSON.stringify(raffle))
     return raffle
 
   }
@@ -221,7 +238,7 @@ const NftRaffles: NextPage = (props: any) => {
     const adminPkh = PubKeyHash.fromUplcData(datum.list[0])
     const winningPkh = PubKeyHash.fromUplcData(datum.list[1])
 
-    if (walletPkh == winningPkh.hex || walletPkh == adminPkh.hex) {
+    if (walletPkh == winningPkh.hex) {
       const nft: WonNft = {
         nftPolicyId: assetId.slice(0, 56),
         nftAssetName: assetId.slice(56),
@@ -294,13 +311,14 @@ const NftRaffles: NextPage = (props: any) => {
     const response = await resp.json() as [any]
 
     const myWonNfts: WonNft[] = []
-    const wonRaffles: WonNft[] = []
     if (resp.status == 200) {
 
       const nfts = await Promise.all(response
         .flatMap(utxo => utxo.amount)
         .filter(amount => amount.unit != 'lovelace')
         .map(nft => getWinningTickets(address.toBech32(), nft.unit)))
+
+      console.log('nfts: ' + JSON.stringify(nfts))
 
       nfts.forEach(nft => {
         if (nft) {
@@ -309,7 +327,9 @@ const NftRaffles: NextPage = (props: any) => {
       })
     }
 
-    return wonRaffles
+    console.log('myWonNfts: ' + JSON.stringify(myWonNfts))
+
+    return myWonNfts
   }
 
   const userWon = (raffle: Raffle) => {
@@ -350,7 +370,7 @@ const NftRaffles: NextPage = (props: any) => {
             numPurchasedTickets={raffle.participants.length}
             ticketPrices={raffle.ticketPrice}
             numWalletPurchasedTickets={raffle.numTickets}
-            maxNumTicketsPerWallet={3}
+            maxNumTicketsPerWallet={raffle.numMaxTicketPerWallet}
             raffleScript={raffleScript}
             vaultScript={vaultScript}
             userWon={userWon(raffle)} />
