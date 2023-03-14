@@ -4,7 +4,7 @@ import Image from 'next/image'
 import toast, { Toaster } from 'react-hot-toast'
 import type { NextPage } from 'next'
 import {
-    faHome, faDice, faQuestion, faHeartbeat
+    faHome, faDice, faQuestion, faHeartbeat, faFileImage
 } from "@fortawesome/free-solid-svg-icons"
 import { useWalletContext } from "../components/WalletProvider";
 import Link from 'next/link';
@@ -224,6 +224,15 @@ const Nav: NextPage = (props: any) => {
                                     className="mr-3"
                                 />
                                 <span className="pb-1 text-lg md:pb-0">Raffles</span>
+                            </Link>
+                        </li>
+                        <li className="my-2 mr-6 md:my-0">
+                            <Link href="/nft-raffles" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/nft-raffles' ? navSelected : navNotSelected)}>
+                                <FontAwesomeIcon
+                                    icon={faFileImage}
+                                    className="mr-3"
+                                />
+                                <span className="pb-1 text-lg md:pb-0">NFT Raffles</span>
                             </Link>
                         </li>
                         {stakingAnalysis ? (
