@@ -26,6 +26,7 @@ import fs from 'fs';
 import { collectPrize } from "../components/Offchan/Raffle"
 
 import { blockfrostAPI, apiKey } from "../constants/blockfrost"
+import { lotteryApi } from "../constants/lottery"
 
 export async function getStaticProps() {
 
@@ -191,6 +192,27 @@ const NftRaffles: NextPage = (props: any) => {
       console.log('no wallet api')
     }
     return undefined
+  }
+
+  const fetchRaffles = async () => {
+
+    let resp = await fetch(`${lotteryApi}/nft_raffles`, {
+      method: "GET",
+      headers: {
+        'content-type': "application/json",
+        accept: "application/json"
+      }
+    });
+
+    if (resp?.status > 299) {
+      throw console.error("NFT not found", resp);
+    }
+    const payload = await resp.json();
+
+    if (payload.length == 0) {
+      throw console.error("NFT not found");
+    }
+    
   }
 
   const inspectAddress = async () => {

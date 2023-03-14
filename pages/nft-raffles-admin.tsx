@@ -9,6 +9,8 @@ import path from 'path';
 import fs from 'fs';
 import { Program, Address } from '@hyperionbt/helios';
 import { network } from '../constants/blockfrost'
+import { lotteryApi } from '../constants/lottery'
+import toast from 'react-hot-toast'
 
 export async function getStaticProps() {
 
@@ -85,42 +87,37 @@ const NftRaffles: NextPage = (props: any) => {
       raffleScript,
       vaultScript,
       walletApi
-    ).then(async (result) => {
+    ).then(async (createRaffle) => {
 
-    const lotteryApi: string = "https://lottery.easystaking.online/nft_raffles"
+      const body = JSON.stringify({
+        policy_id: policyId,
+        asset_name: Buffer.from(assetName).toString("hex"),
+        main_img_url: mainImgUrl,
+        network,
+        admin_pkh: createRaffle.adminPkh,
+        ticket_price: ticketPrice,
+        num_max_tickets_per_wallet: numMaxTicketsPerPerson,
+        num_max_participants: numMaxParticipants,
+        seed_hash: createRaffle.seedHash,
+        vault_pkh: createRaffle.vaultPkh
+      })
 
-    const body = JSON.stringify({
-      policy_id: policyId,
-      asset_name: Buffer.from(assetName).toString("hex"),
-      main_img_url: mainImgUrl,
-      network,
-      admin_pkh: "asd",
-      ticket_price: ticketPrice,
-      num_max_tickets_per_wallet: numMaxTicketsPerPerson,
-      num_max_participants: numMaxParticipants,
-      seed_hash: "asd",
-      vault_pkh: "asd"
-    })
+      console.log('body: ' + body)
 
-    console.log('body: ' + body)
+      let resp = await fetch(`${lotteryApi}/nft_raffles`, {
+        method: "POST",
+        headers: {
+          'content-type': "application/json",
+          accept: "application/json"
+        },
+        body
+      });
 
-    let resp = await fetch(lotteryApi, {
-      method: "POST",
-      headers: {
-        'content-type': "application/json",
-        accept: "application/json"
-      },
-      body
-    });
-
-    if (resp?.status > 299) {
-      throw console.error("NFT not found", resp);
-    }
-    const payload = await resp.json();
-
-    if (payload.length == 0) {
-      throw console.error("NFT not found");
-    }
+      if (resp?.status == 0) {
+        toast.success('NFT Raffle successfully created!')
+      } else {
+        toast.error()
+      }
 
     })
 

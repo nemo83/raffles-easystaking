@@ -77,6 +77,12 @@ const calculateWinningIndex = (seed: string, numParticipants: string) => {
   return ((BigInt("1103515245") * BigInt(seed) + BigInt(12345)) % BigInt("2147483648")) % BigInt(numParticipants)
 }
 
+interface CreateRaffle {
+  adminPkh: string,
+  seedHash: string,
+  vaultPkh: string
+}
+
 export const createNftRaffle = async (
   policyIdHex: string,
   assetNameHex: string,
@@ -128,6 +134,8 @@ export const createNftRaffle = async (
   // NFT and 2 $ada to send to SC
   const nftValue = new Value(BigInt(2_000_000), assets)
 
+  const seedHash = sha256(new TextEncoder().encode(saltedSeed))
+
   // Datum
   const raffleDatum = new (raffleProgram.types.Datum)(
     walletBaseAddress.pubKeyHash,
@@ -135,12 +143,9 @@ export const createNftRaffle = async (
     numMaxTicketsPerWallet,
     [],
     numParticipants,
-    sha256(new TextEncoder().encode(saltedSeed)),
+    seedHash,
     vaultUplcProgram.validatorHash
   )
-
-  console.log('DATUM 1: ' + raffleDatum)
-  console.log('DATUM 1: ' + raffleDatum.toSchemaJson())
 
   const walletUtxos = await walletHelper.pickUtxos(nftValue)
 
@@ -159,7 +164,13 @@ export const createNftRaffle = async (
   const txHash = await walletApi.submitTx(tx);
   console.log('txHash: ' + txHash.hex)
 
-  return txHash
+  const newRaffle: CreateRaffle = {
+    adminPkh: walletBaseAddress.pubKeyHash.hex,
+    seedHash,
+    vaultPkh: vaultUplcProgram.validatorHash.hex
+  }
+
+  return newRaffle
 
 }
 
