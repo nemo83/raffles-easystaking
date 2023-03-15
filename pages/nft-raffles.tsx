@@ -2,7 +2,7 @@ import NftCard from "../components/NftCard"
 import Layout from '../components/Layout';
 import { useWalletContext } from "../components/WalletProvider";
 import type { NextPage } from 'next'
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import React from 'react';
 import {
   MintingPolicyHash,
@@ -284,7 +284,9 @@ const NftRaffles: NextPage = (props: any) => {
 
   }
 
-  const inspectAddress = async () => {
+  const inspectAddress = useCallback(async () => {
+
+    console.log('Running inspectAddress')
 
     const program = Program.new(raffleScript).compile(false)
     const address = Address.fromValidatorHash(program.validatorHash);
@@ -310,7 +312,7 @@ const NftRaffles: NextPage = (props: any) => {
       return []
     }
 
-  }
+  }, [walletPkh])
 
   const findWinningTickets = async () => {
 
@@ -373,6 +375,10 @@ const NftRaffles: NextPage = (props: any) => {
     console.log('inspectAddress')
   }, [walletPkh])
 
+
+  useEffect(() => {
+    setInterval(inspectAddress, 20000);
+  }, [inspectAddress]);
 
   return (
     <Layout>
