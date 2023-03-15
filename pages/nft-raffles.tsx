@@ -24,6 +24,7 @@ import {
 import path from 'path';
 import fs from 'fs';
 
+import Table from "../components/Table"
 import { blockfrostAPI, apiKey, network } from "../constants/blockfrost"
 import { lotteryApi } from "../constants/lottery"
 
@@ -76,8 +77,12 @@ const NftRaffles: NextPage = (props: any) => {
   const [wonNfts, setWonNfts] = useState<WonNft[]>([])
   const [backendRaffles, setBackendRaffles] = useState([])
 
+  const [tableData, setTableData] = useState([])
+
   useEffect(() => {
     if (backendRaffles) {
+
+      // OnChain Raffles
       const raffles = onChainRaffles.map(onChainRaffle => {
         const beRaffle = backendRaffles.find(raffle => raffle.status == "open" && raffle.policy_id == onChainRaffle.nftPolicyId && raffle.asset_name == onChainRaffle.nftAssetName)
         if (beRaffle) {
@@ -93,6 +98,7 @@ const NftRaffles: NextPage = (props: any) => {
         }
       }).map(raffle => raffle) // filters undefined out
 
+      // Won Raffles
       const wonRaffles = wonNfts.map(wonNft => {
         const beRaffle = backendRaffles.find(raffle => raffle.status == "closed" && raffle.policy_id == wonNft.nftPolicyId && raffle.asset_name == wonNft.nftAssetName)
         if (beRaffle) {
@@ -124,10 +130,17 @@ const NftRaffles: NextPage = (props: any) => {
         }
       }).map(raffle => raffle) // filters undefined out
       setRaffles(wonRaffles.concat(raffles))
+
+      const myTableData = backendRaffles
+        .slice()
+        .filter(raffle => raffle.status == 'closed')
+        .map(raffle => [raffle.main_img_url, raffle.nft_name, raffle.collection_name, raffle.winner_pkh])
+      setTableData(myTableData)
+
     } else {
       setRaffles([])
+      setTableData([])
     }
-
 
   }, [onChainRaffles, backendRaffles, wonNfts, walletPkh])
 
@@ -371,7 +384,7 @@ const NftRaffles: NextPage = (props: any) => {
       <div className="mb-6 text-4xl font-bold text-slate-600">
         Open Raffles
       </div>
-      <hr className="my-6 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+      <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
       <div className="flex flex-row justify-around w-full">
         {raffles.map((raffle, i) => (
           <NftCard
@@ -391,14 +404,8 @@ const NftRaffles: NextPage = (props: any) => {
             userWon={userWon(raffle)} />
         ))}
       </div>
-      {/* <div>
-        <button
-          className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
-          type="button"
-          onClick={() => initRaffles()} >
-          Init Raffles
-        </button>
-      </div> */}
+      <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+      <Table title="Closed Raffles" columnNames={["Image", "Name", "Collection", "Winner"]} cardanoScanIndex={3} rows={tableData} />
     </Layout>
   )
 }

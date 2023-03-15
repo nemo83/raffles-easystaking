@@ -1,6 +1,8 @@
+import Image from "next/image"
+
 
 function Table({ title, columnNames, rows, cardanoScanIndex = -1 }) {
-    
+
     return (
         <div className="w-full p-3">
             <div className="border border-black rounded shadow bg-sky-600">
@@ -27,11 +29,23 @@ function Table({ title, columnNames, rows, cardanoScanIndex = -1 }) {
                                         cardanoScanIndex === cIndex ? (
                                             <td key={`rc${cIndex}`}>
                                                 <a href={`https://cardanoscan.io/transaction/${col}`}>
-                                                    {`${col.slice(0, 6)}...${col.slice(col.length - 3)}`}
+                                                    {col ? `${col.slice(0, 6)}...${col.slice(col.length - 3)}` : ""}
                                                 </a>
                                             </td>
                                         ) : (
-                                            <td key={`rc${cIndex}`}>{col}</td>
+                                            <td key={`rc${cIndex}`}>
+                                                {col && col.toString().startsWith('https') ? (
+                                                    <div className="relative justify-center w-2/3 h-20 text-center">
+                                                        <Image
+                                                            src={col}
+                                                            alt="Nft Image"
+                                                            fill={true}
+                                                            className="object-cover rounded-xl"
+                                                        />
+                                                    </div>
+
+                                                ) : col}
+                                            </td>
                                         )
                                     )}
                                 </tr>
