@@ -393,7 +393,7 @@ const NftRaffles: NextPage = (props: any) => {
         </span>
       </div>
       <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-      <div className="flex flex-wrap justify-around w-full">
+      <div className="flex flex-wrap md:justify-around">
         {raffles.map((raffle, i) => (
           <NftCard
             key={i}

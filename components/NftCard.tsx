@@ -139,13 +139,14 @@ const NftCard = ({
                     </div>
                 </div>
             </div >
-            <div className="flex justify-center">
+            <div className="flex my-6 md:justify-center">
 
-                <div className="flex flex-col bg-white rounded-lg shadow-lg">
+                <div className="flex bg-white rounded-lg shadow-lg md:flex-col">
+
                     <div className="relative w-full h-60">
                         <Image
                             fill={true}
-                            className="object-cover w-full rounded-t-lg h-96"
+                            className="object-cover w-full rounded-l-lg md:rounded-none md:rounded-t-lg h-96"
                             src={mainImgUrl}
                             alt="" />
                     </div>
