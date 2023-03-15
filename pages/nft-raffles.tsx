@@ -339,16 +339,12 @@ const NftRaffles: NextPage = (props: any) => {
         .filter(amount => amount.unit != 'lovelace')
         .map(nft => getWinningTickets(address.toBech32(), nft.unit)))
 
-      console.log('nfts: ' + JSON.stringify(nfts))
-
       nfts.forEach(nft => {
         if (nft) {
           myWonNfts.push(nft)
         }
       })
     }
-
-    console.log('myWonNfts: ' + JSON.stringify(myWonNfts))
 
     return myWonNfts
   }
@@ -374,11 +370,6 @@ const NftRaffles: NextPage = (props: any) => {
       .then(onChainRaffles => setOnChainRaffles(onChainRaffles))
     console.log('inspectAddress')
   }, [walletPkh])
-
-
-  useEffect(() => {
-    setInterval(inspectAddress, 20000);
-  }, [inspectAddress]);
 
   return (
     <Layout>
