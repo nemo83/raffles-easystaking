@@ -23,7 +23,10 @@ import {
 } from "@hyperionbt/helios"
 import path from 'path';
 import fs from 'fs';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faRotate
+} from "@fortawesome/free-solid-svg-icons";
 import Table from "../components/Table"
 import { blockfrostAPI, apiKey, network } from "../constants/blockfrost"
 import { lotteryApi } from "../constants/lottery"
@@ -284,7 +287,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   }
 
-  const inspectAddress = useCallback(async () => {
+  const inspectAddress = async () => {
 
     console.log('Running inspectAddress')
 
@@ -304,15 +307,16 @@ const NftRaffles: NextPage = (props: any) => {
     const response = await resp.json() as [any]
 
     if (resp.status == 200) {
-      return await Promise.all(response
+      const raffles = await Promise.all(response
         .flatMap(utxo => utxo.amount)
         .filter(amount => amount.unit != 'lovelace')
         .map(nft => getRaffles(address.toBech32(), nft.unit)))
+      setOnChainRaffles(raffles)
     } else {
-      return []
+      setOnChainRaffles([])
     }
 
-  }, [walletPkh])
+  }
 
   const findWinningTickets = async () => {
 
@@ -346,7 +350,8 @@ const NftRaffles: NextPage = (props: any) => {
       })
     }
 
-    return myWonNfts
+    setWonNfts(myWonNfts)
+  
   }
 
   const userWon = (raffle: Raffle) => {
@@ -361,13 +366,11 @@ const NftRaffles: NextPage = (props: any) => {
 
   useEffect(() => {
     (async () => findWinningTickets())()
-      .then(wonRaffles => setWonNfts(wonRaffles))
     console.log('findWinningTickets')
   }, [walletPkh])
 
   useEffect(() => {
     (async () => inspectAddress())()
-      .then(onChainRaffles => setOnChainRaffles(onChainRaffles))
     console.log('inspectAddress')
   }, [walletPkh])
 
@@ -380,6 +383,9 @@ const NftRaffles: NextPage = (props: any) => {
       </div>
       <div className="mb-6 text-4xl font-bold text-slate-600">
         Open Raffles
+        <span className="float-right">
+          <FontAwesomeIcon icon={faRotate} onClick={() => inspectAddress().then(() => findWinningTickets)} />
+        </span>
       </div>
       <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
       <div className="flex flex-row justify-around w-full">
@@ -398,6 +404,7 @@ const NftRaffles: NextPage = (props: any) => {
             maxNumTicketsPerWallet={raffle.numMaxTicketPerWallet}
             raffleScript={raffleScript}
             vaultScript={vaultScript}
+            callback={inspectAddress}
             userWon={userWon(raffle)} />
         ))}
       </div>

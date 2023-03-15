@@ -22,6 +22,7 @@ interface NftCard {
     userWon: boolean,
     raffleScript: string,
     vaultScript: string,
+    callback: () => void
 }
 
 const NftCard = ({
@@ -37,7 +38,8 @@ const NftCard = ({
     numWalletPurchasedTickets,
     userWon,
     raffleScript,
-    vaultScript
+    vaultScript,
+    callback
 }: NftCard) => {
 
     const [walletApi, setWalletApi] = useWalletContext();
@@ -61,13 +63,26 @@ const NftCard = ({
     }, [maxNumTicketsPerWallet, numWalletPurchasedTickets, numPurchasedTickets, maxParticipants])
 
     const buyTicket = async () => {
-        buyRaffleTickets(
+        return buyRaffleTickets(
             policyIdHex,
             assetNameHex,
             numTickets,
             raffleScript,
             walletApi
         )
+    }
+
+    const setInterval = async (fn: () => void, delay: number, times: number) => {
+        var x = 0;
+        var intervalID = window.setInterval(function () {
+    
+           callback();
+    
+           if (++x === times) {
+               window.clearInterval(intervalID);
+           }
+        }, delay);
+        
     }
 
     return (
@@ -111,7 +126,13 @@ const NftCard = ({
                             <button
                                 className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase bg-blue-400 rounded shadow outline-none hover:bg-blue-500 focus:outline-none"
                                 type="button"
-                                onClick={() => { buyTicket().then(() => setShowModal(false)) }} >
+                                onClick={() => {
+                                    buyTicket().then(() => {
+                                        toast.success('Transaction successfully submited!')
+                                        setShowModal(false)
+                                        setInterval(callback, 20000, 6)
+                                    })
+                                }} >
                                 Buy Ticket
                             </button>
                         </div>
