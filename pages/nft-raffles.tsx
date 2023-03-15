@@ -30,6 +30,7 @@ import {
 import Table from "../components/Table"
 import { blockfrostAPI, apiKey, network } from "../constants/blockfrost"
 import { lotteryApi } from "../constants/lottery"
+import Link from "next/link";
 
 export async function getStaticProps() {
 
@@ -61,6 +62,8 @@ const NftRaffles: NextPage = (props: any) => {
   const [walletApi, setWalletApi] = useWalletContext();
 
   const [walletPkh, setWalletPkh] = useState('');
+
+  const [updating, setUpdating] = useState(false);
 
   const updatePkh = async () => {
     if (walletApi) {
@@ -389,7 +392,16 @@ const NftRaffles: NextPage = (props: any) => {
       <div className="mb-6 text-4xl font-bold text-slate-600">
         Open Raffles
         <span className="float-right">
-          <FontAwesomeIcon icon={faRotate} onClick={() => updatePkh().then(() => inspectAddress()).then(() => findWinningTickets)} />
+          <Link href="#"
+            onClick={() => {
+              setUpdating(true)
+              updatePkh()
+                .then(() => inspectAddress())
+                .then(() => findWinningTickets)
+                .finally(() => setUpdating(false))
+            }}>
+            <FontAwesomeIcon icon={faRotate} className={updating ? 'animate-spin' : ''} />
+          </Link>
         </span>
       </div>
       <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
