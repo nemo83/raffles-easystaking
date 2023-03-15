@@ -139,11 +139,11 @@ const NftCard = ({
                     </div>
                 </div>
             </div >
-            <div className="flex my-6 md:justify-center">
+            <div className="flex w-full my-6 md:mx-2 md:justify-center md:w-auto">
 
-                <div className="flex bg-white rounded-lg shadow-lg md:flex-col">
+                <div className="flex w-full bg-white rounded-lg shadow-lg md:flex-col md:w-auto">
 
-                    <div className="relative w-full h-60">
+                    <div className="relative w-1/2 md:w-auto h-60">
                         <Image
                             fill={true}
                             className="object-cover w-full rounded-l-lg md:rounded-none md:rounded-t-lg h-96"
@@ -151,7 +151,7 @@ const NftCard = ({
                             alt="" />
                     </div>
 
-                    <div className="flex flex-col justify-start p-6">
+                    <div className="flex flex-col w-auto p-6">
                         <div className='flex'>
                             <h5 className="mb-2 text-xs font-bold text-gray-900">{collectionName}&nbsp;</h5>
                             <svg viewBox="0 0 20 22" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-blue-600 text-text-link">
