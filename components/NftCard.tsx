@@ -139,7 +139,7 @@ const NftCard = ({
                     </div>
                 </div>
             </div >
-            <div className="flex justify-center w-1/3">
+            <div className="flex justify-center">
 
                 <div className="flex flex-col bg-white rounded-lg shadow-lg">
                     <div className="relative w-full h-60">
