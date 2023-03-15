@@ -363,7 +363,16 @@ const NftRaffles: NextPage = (props: any) => {
 
   return (
     <Layout>
-      <div className="flex flex-row w-full">
+      <div
+        className="px-6 py-5 mb-4 text-base text-blue-600 bg-blue-300 rounded-lg"
+        role="alert">
+        Raffles are currently running on the Cardano <span className="font-bold">PREVIEW</span> testnet
+      </div>
+      <div className="mb-6 text-4xl font-bold text-slate-600">
+        Open Raffles
+      </div>
+      <hr className="my-6 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+      <div className="flex flex-row justify-around w-full">
         {raffles.map((raffle, i) => (
           <NftCard
             key={i}
