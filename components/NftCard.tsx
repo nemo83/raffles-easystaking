@@ -75,14 +75,14 @@ const NftCard = ({
     const setInterval = async (fn: () => void, delay: number, times: number) => {
         var x = 0;
         var intervalID = window.setInterval(function () {
-    
-           callback();
-    
-           if (++x === times) {
-               window.clearInterval(intervalID);
-           }
+
+            callback();
+
+            if (++x === times) {
+                window.clearInterval(intervalID);
+            }
         }, delay);
-        
+
     }
 
     return (
@@ -198,7 +198,8 @@ const NftCard = ({
                         <div className='w-full my-1'>
                             <button
                                 type='button'
-                                className='w-full bg-blue-500 rounded'
+                                className={`w-full rounded ` + (numPurchasedTickets < maxParticipants ? 'bg-blue-500' : 'bg-gray-500')}
+                                disabled={numPurchasedTickets >= maxParticipants}
                                 onClick={() => {
                                     if (!walletApi) {
                                         toast.error("Wallet not connected")
@@ -209,7 +210,9 @@ const NftCard = ({
                                     }
                                 }
                                 }>
-                                Buy Ticket ({ticketPrices / 1_000_000} ₳)
+                                {numPurchasedTickets < maxParticipants ? (
+                                    <span>Buy Ticket ({ticketPrices / 1_000_000} ₳)</span>
+                                ) : "Drawing winner"}
                             </button>
                         </div>
                         {userWon ? (<div className='w-full my-1'>
