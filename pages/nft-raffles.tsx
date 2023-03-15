@@ -29,7 +29,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Table from "../components/Table"
 import { blockfrostAPI, apiKey, network } from "../constants/blockfrost"
-import { lotteryApi } from "../constants/lottery"
+import { lotteryApi, optimizeSmartContracts } from "../constants/lottery"
 import Link from "next/link";
 
 export async function getStaticProps() {
@@ -299,7 +299,7 @@ const NftRaffles: NextPage = (props: any) => {
 
     console.log('Running inspectAddress')
 
-    const program = Program.new(raffleScript).compile(false)
+    const program = Program.new(raffleScript).compile(optimizeSmartContracts)
     const address = Address.fromValidatorHash(program.validatorHash);
 
     const blockfrostUrl: string = blockfrostAPI + "/addresses/" + address.toBech32() + "/utxos";
@@ -328,7 +328,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   const findWinningTickets = async () => {
 
-    const program = Program.new(vaultScript).compile(false)
+    const program = Program.new(vaultScript).compile(optimizeSmartContracts)
     const address = Address.fromValidatorHash(program.validatorHash);
 
     const blockfrostUrl: string = blockfrostAPI + "/addresses/" + address.toBech32() + "/utxos";

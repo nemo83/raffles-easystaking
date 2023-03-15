@@ -26,6 +26,7 @@ import {
   apiKey,
   networkParamsUrl
 } from "../../constants/blockfrost"
+import { optimizeSmartContracts } from "../../constants/lottery"
 import { sha256 } from 'js-sha256';
 
 const getKeyUtxo = async (scriptAddress: string, keyMPH: string, keyName: string) => {
@@ -101,7 +102,7 @@ export const createNftRaffle = async (
 
   // Compile the Raffle Program
   const raffleProgram = Program.new(lockNftScript);
-  const raffleUplcProgram = raffleProgram.compile(false);
+  const raffleUplcProgram = raffleProgram.compile(optimizeSmartContracts);
 
   // Extract the validator script address
   const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
@@ -109,7 +110,7 @@ export const createNftRaffle = async (
 
   // Compile the NFT Vault Script
   const vaultProgram = Program.new(nftVaultScript);
-  const vaultUplcProgram = vaultProgram.compile(false);
+  const vaultUplcProgram = vaultProgram.compile(optimizeSmartContracts);
 
   // Extract the validator script address
   const vaultAddress = Address.fromValidatorHash(vaultUplcProgram.validatorHash);
@@ -188,7 +189,7 @@ export const retrieveNft = async (
 
   // Compile the helios minting script
   const raffleProgram = Program.new(lockNftScript);
-  const raffleUplcProgram = raffleProgram.compile(false);
+  const raffleUplcProgram = raffleProgram.compile(optimizeSmartContracts);
 
   // Extract the validator script address
   const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
@@ -242,7 +243,7 @@ export const buyRaffleTickets = async (
 
   // Compile the helios minting script
   const raffleProgram = Program.new(raffleScript);
-  const raffleUplcProgram = raffleProgram.compile(false);
+  const raffleUplcProgram = raffleProgram.compile(optimizeSmartContracts);
   console.log('raffleUplcProgram.validatorHash ' + raffleUplcProgram.validatorHash.hex)
 
 
@@ -353,7 +354,7 @@ export const selectWinner = async (
 
   // Compile the Raffle Program
   const raffleProgram = Program.new(lockNftScript);
-  const raffleUplcProgram = raffleProgram.compile(false);
+  const raffleUplcProgram = raffleProgram.compile(optimizeSmartContracts);
 
   // Extract the validator script address
   const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
@@ -361,7 +362,7 @@ export const selectWinner = async (
 
   // Compile the NFT Vault Script
   const vaultProgram = Program.new(nftVaultScript);
-  const vaultUplcProgram = vaultProgram.compile(false);
+  const vaultUplcProgram = vaultProgram.compile(optimizeSmartContracts);
 
   // Extract the validator script address
   const vaultAddress = Address.fromValidatorHash(vaultUplcProgram.validatorHash);
@@ -439,7 +440,7 @@ export const selectWinner = async (
   const txHash = await walletApi.submitTx(tx);
   console.log('txHash: ' + txHash.hex)
 
-  const winner: Winner =  {
+  const winner: Winner = {
     winnerPkh: participants.at(Number(winningIndex)).hex,
     participants: participants.map(participant => participant.hex)
   }
@@ -461,7 +462,7 @@ export const collectPrize = async (
 
   // Compile the NFT Vault Script
   const vaultProgram = Program.new(nftVaultScript);
-  const vaultUplcProgram = vaultProgram.compile(false);
+  const vaultUplcProgram = vaultProgram.compile(optimizeSmartContracts);
 
   // Extract the validator script address
   const vaultAddress = Address.fromValidatorHash(vaultUplcProgram.validatorHash);

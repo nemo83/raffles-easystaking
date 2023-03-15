@@ -9,7 +9,7 @@ import path from 'path';
 import fs from 'fs';
 import { Program, Address } from '@hyperionbt/helios';
 import { network } from '../constants/blockfrost'
-import { lotteryApi } from '../constants/lottery'
+import { lotteryApi, optimizeSmartContracts } from '../constants/lottery'
 import toast from 'react-hot-toast'
 
 export async function getStaticProps() {
@@ -54,13 +54,13 @@ const NftRaffles: NextPage = (props: any) => {
 
 
   const buildScripts = () => {
-    const raffleProgram = Program.new(raffleScript).compile(false)
+    const raffleProgram = Program.new(raffleScript).compile(optimizeSmartContracts)
     console.log('raffle script built')
 
     const raffleAddress = Address.fromValidatorHash(raffleProgram.validatorHash);
     console.log('raffleAddress: ' + raffleAddress.toBech32())
 
-    const vaultProgram = Program.new(vaultScript).compile(false)
+    const vaultProgram = Program.new(vaultScript).compile(optimizeSmartContracts)
     console.log('vault script built')
 
     const vaultAddress = Address.fromValidatorHash(vaultProgram.validatorHash);
