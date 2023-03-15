@@ -62,15 +62,20 @@ const NftRaffles: NextPage = (props: any) => {
 
   const [walletPkh, setWalletPkh] = useState('');
 
+  const updatePkh = async () => {
+    if (walletApi) {
+      const walletPkh = await new WalletHelper(walletApi).baseAddress
+
+      setWalletPkh(walletPkh.pubKeyHash.hex)
+    } else {
+      setWalletPkh(null)
+    }
+  }
+
   useEffect(() => {
     (async () => {
-      if (walletApi) {
-        const walletPkh = await new WalletHelper(walletApi).baseAddress
-        console.log('setting wallet PKH')
-        setWalletPkh(walletPkh.pubKeyHash.hex)
-      } else {
-        setWalletPkh(null)
-      }
+      updatePkh()
+      console.log('setting wallet PKH')
     })()
   }, [walletApi])
 
@@ -351,7 +356,7 @@ const NftRaffles: NextPage = (props: any) => {
     }
 
     setWonNfts(myWonNfts)
-  
+
   }
 
   const userWon = (raffle: Raffle) => {
@@ -384,7 +389,7 @@ const NftRaffles: NextPage = (props: any) => {
       <div className="mb-6 text-4xl font-bold text-slate-600">
         Open Raffles
         <span className="float-right">
-          <FontAwesomeIcon icon={faRotate} onClick={() => inspectAddress().then(() => findWinningTickets)} />
+          <FontAwesomeIcon icon={faRotate} onClick={() => updatePkh().then(() => inspectAddress()).then(() => findWinningTickets)} />
         </span>
       </div>
       <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
