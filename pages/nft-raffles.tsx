@@ -24,7 +24,7 @@ import {
 import path from 'path';
 import fs from 'fs';
 
-import { blockfrostAPI, apiKey } from "../constants/blockfrost"
+import { blockfrostAPI, apiKey, network } from "../constants/blockfrost"
 import { lotteryApi } from "../constants/lottery"
 
 export async function getStaticProps() {
@@ -338,7 +338,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   useEffect(() => {
     (async () => fetchRaffles())()
-      .then(backendRaffles => setBackendRaffles(backendRaffles))
+      .then(backendRaffles => setBackendRaffles(backendRaffles.filter(raffle => raffle.network = network)))
     console.log('fetchRaffles')
   }, [])
 
