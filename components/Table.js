@@ -34,7 +34,7 @@ function Table({ title, columnNames, rows, cardanoScanIndex = -1 }) {
                                             </td>
                                         ) : (
                                             <td key={`rc${cIndex}`}>
-                                                {col && col.toString().startsWith('https') ? (
+                                                {col && col.toString().startsWith('http') ? (
                                                     <div className="relative justify-center w-2/3 h-20 text-center">
                                                         <Image
                                                             src={col}
