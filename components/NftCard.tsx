@@ -24,7 +24,7 @@ interface NftCard {
     vaultScript: string,
 }
 
-const TokenCard = ({
+const NftCard = ({
     policyIdHex,
     assetNameHex,
     collectionName,
@@ -212,4 +212,4 @@ const TokenCard = ({
     )
 }
 
-export default TokenCard
+export default NftCard

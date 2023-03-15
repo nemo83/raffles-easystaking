@@ -80,42 +80,49 @@ const NftRaffles: NextPage = (props: any) => {
     if (backendRaffles) {
       const raffles = onChainRaffles.map(onChainRaffle => {
         const beRaffle = backendRaffles.find(raffle => raffle.status == "open" && raffle.policy_id == onChainRaffle.nftPolicyId && raffle.asset_name == onChainRaffle.nftAssetName)
-        const raffle: Raffle = {
-          ...onChainRaffle,
-          collectionName: beRaffle.collection_name,
-          nftName: beRaffle.nft_name,
-          mainImgUrl: beRaffle.main_img_url
+        if (beRaffle) {
+          const raffle: Raffle = {
+            ...onChainRaffle,
+            collectionName: beRaffle.collection_name,
+            nftName: beRaffle.nft_name,
+            mainImgUrl: beRaffle.main_img_url
+          }
+          return raffle
+        } else {
+          return null
         }
-        return raffle
-      })
+      }).map(raffle => raffle) // filters undefined out
 
       const wonRaffles = wonNfts.map(wonNft => {
         const beRaffle = backendRaffles.find(raffle => raffle.status == "closed" && raffle.policy_id == wonNft.nftPolicyId && raffle.asset_name == wonNft.nftAssetName)
-        let participants: string[] = []
-        if (beRaffle.participants) {
-          participants = beRaffle.participants.split(",")
-        }
-        const numTickets = participants.reduce((acc, curr) => {
-          if (walletPkh == curr) {
-            return acc + 1
-          } else {
-            return acc
+        if (beRaffle) {
+          let participants: string[] = []
+          if (beRaffle.participants) {
+            participants = beRaffle.participants.split(",")
           }
-        }, 0)
-        const raffle: Raffle = {
-          ...wonNft,
-          collectionName: beRaffle.collection_name,
-          nftName: beRaffle.nft_name,
-          mainImgUrl: beRaffle.main_img_url,
-          ticketPrice: beRaffle.ticket_price,
-          numMaxTicketPerWallet: beRaffle.num_max_tickets_per_wallet,
-          numParticipants: beRaffle.num_max_participants,
-          participants: participants,
-          numTickets: numTickets
+          const numTickets = participants.reduce((acc, curr) => {
+            if (walletPkh == curr) {
+              return acc + 1
+            } else {
+              return acc
+            }
+          }, 0)
+          const raffle: Raffle = {
+            ...wonNft,
+            collectionName: beRaffle.collection_name,
+            nftName: beRaffle.nft_name,
+            mainImgUrl: beRaffle.main_img_url,
+            ticketPrice: beRaffle.ticket_price,
+            numMaxTicketPerWallet: beRaffle.num_max_tickets_per_wallet,
+            numParticipants: beRaffle.num_max_participants,
+            participants: participants,
+            numTickets: numTickets
+          }
+          return raffle
+        } else {
+          return null
         }
-        return raffle
-      })
-
+      }).map(raffle => raffle) // filters undefined out
       setRaffles(wonRaffles.concat(raffles))
     } else {
       setRaffles([])
@@ -182,7 +189,6 @@ const NftRaffles: NextPage = (props: any) => {
       participants: participants.map(participant => participant.hex),
       numTickets: numTickets
     }
-    console.log('raffle: ' + JSON.stringify(raffle))
     return raffle
 
   }
@@ -245,7 +251,7 @@ const NftRaffles: NextPage = (props: any) => {
       }
       return nft
     } else {
-      return undefined
+      return null
     }
   }
 

@@ -30,7 +30,7 @@ export const Distributions = () => {
         <a name="distributions">
             <div className="flex flex-wrap px-1 m-6">
                 {distributions.map((distribution, i) =>
-                    <div className="w-full px-2 mt-3 lg:w-1/2" key={`key-` + i}>
+                    <div className="w-full px-2 mt-3 lg:w-1/2" key={i}>
                         <TokenCard
                             name={distribution.title}
                             imageUrl={distribution.token_image_url}
