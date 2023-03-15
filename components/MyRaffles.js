@@ -11,7 +11,6 @@ function MyRaffles({ baseAddress }) {
             .then((data) => data.filter(raffle => !raffle.is_closed))
             .then((openRaffles) => openRaffles.map(raffle => {
                 let currency;
-                console.log('raffle: ' + JSON.stringify(raffle))
                 if (raffle.asset_name == null) {
                     currency = '₳'
                 } else {

@@ -12,7 +12,6 @@ function ClosedRaffles() {
             .then((data) => data.slice(0, 10))
             .then((openRaffles) => openRaffles.map(raffle => {
                 let currency;
-                console.log('raffle: ' + JSON.stringify(raffle))
                 if (raffle.asset_name == null) {
                     currency = '₳'
                 } else {
