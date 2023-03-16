@@ -7,7 +7,7 @@ import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner } from "../
 import { sha256, sha224 } from 'js-sha256';
 import path from 'path';
 import fs from 'fs';
-import { Program, Address } from '@hyperionbt/helios';
+import { Program, Address, PubKeyHash } from '@hyperionbt/helios';
 import { network } from '../constants/blockfrost'
 import { lotteryApi, optimizeSmartContracts } from '../constants/lottery'
 import toast from 'react-hot-toast'
@@ -66,6 +66,9 @@ const NftRaffles: NextPage = (props: any) => {
     const vaultAddress = Address.fromValidatorHash(vaultProgram.validatorHash);
     console.log('vaultAddress: ' + vaultAddress.toBech32())
 
+    const addressFomePk = Address.fromPubKeyHash(PubKeyHash.fromHex('03d23cc49ab2f51abb0e6a6a2b06ad215ebeb9ba37e034f526d32098'))
+    console.log('addressFomePk: ' + addressFomePk.toBech32())
+    
   }
 
   const callMintScript = async () => {
