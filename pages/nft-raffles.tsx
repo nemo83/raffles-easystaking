@@ -31,6 +31,7 @@ import Table from "../components/Table"
 import { blockfrostAPI, apiKey, network } from "../constants/blockfrost"
 import { lotteryApi, optimizeSmartContracts } from "../constants/lottery"
 import Link from "next/link";
+import Image from "next/image";
 
 export async function getStaticProps() {
 
@@ -426,7 +427,61 @@ const NftRaffles: NextPage = (props: any) => {
         ))}
       </div>
       <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-      <Table title="Closed Raffles" columnNames={["Image", "Name", "Collection", "Winner"]} cardanoScanIndex={3} rows={tableData} />
+      {backendRaffles ? (
+        <div className="flex flex-col my-6">
+          <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
+            <div className="inline-block min-w-full">
+              <div className="overflow-hidden">
+                <table className="min-w-full">
+                  <thead className="border-b">
+                    <tr>
+                      <th scope="col" className="p-2 m-2 text-sm font-medium text-center text-gray-900">
+                        Image
+                      </th>
+                      <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
+                        Collection
+                      </th>
+                      <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
+                        Name
+                      </th>
+                      <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
+                        Winner
+                      </th>
+                    </tr>
+                  </thead>
+                  {/* .map(raffle => [raffle.main_img_url, raffle.nft_name, raffle.collection_name, raffle.winner_pkh]) */}
+                  <tbody>
+                    {backendRaffles.filter(raffle => raffle.status == 'closed').map((raffle: any, i) =>
+                      <tr className="bg-white border-b" key={i}>
+                        <td className="p-2 m-2 text-gray-900 whitespace-nowrap">
+                          <div className="relative h-24">
+                            <Image
+                              src={raffle.main_img_url}
+                              fill={true}
+                              className="object-cover rounded-full"
+                              alt={raffle.nft_name}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
+                          {raffle.collection_name}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
+                          {raffle.nft_name}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
+                          {raffle.winner_pkh ? `${raffle.winner_pkh.slice(0, 6)} ... ${raffle.winner_pkh.slice(-3)}` : ''}
+                        </td>
+                      </tr>
+                    )}
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </Layout>
   )
 }
