@@ -1,6 +1,6 @@
 import {
-    Assets,
     Address,
+    StakeAddress,
     WalletHelper
 } from "@hyperionbt/helios";
 import { useWalletContext } from "./WalletProvider";
@@ -86,14 +86,14 @@ export default function EstimateRewards() {
 
         if (walletAddres != null) {
 
-            let stake;
+            let stake = null;
             if (walletAddres.startsWith('addr1')) {
                 //https://github.com/Emurgo/cardano-serialization-lib/issues/337
-                const address = Address.from_bech32(walletAddres);
-                const base = BaseAddress.from_address(address);
-                stake = RewardAddress.new(address.network_id(), base.stake_cred()).to_address().to_bech32();
+                const address = Address.fromBech32(walletAddres);
+                const stakeAddress = StakeAddress.fromAddress(address)
+                stake = stakeAddress.toBech32()
             } else if (walletAddres.startsWith('stake1')) {
-                stake = RewardAddress.from_address(Address.from_bech32(walletAddres)).to_address().to_bech32();
+                stake = StakeAddress.fromBech32(walletAddres).toBech32()
             } else {
                 toast.error('Unrecognized address format\nPlease enter either a receiving address (addr1..) or\nreward address (stake1..)')
                 return

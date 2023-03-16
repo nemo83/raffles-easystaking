@@ -56,7 +56,7 @@ const StakingAssessment: NextPage = (props: any) => {
 
         if (walletAddres != null) {
 
-            let stake;
+            let stake: any = null;
             if (walletAddres.startsWith('addr1')) {
                 //https://github.com/Emurgo/cardano-serialization-lib/issues/337
                 const address = Address.fromBech32(walletAddres);
