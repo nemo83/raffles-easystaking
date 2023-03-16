@@ -3,7 +3,7 @@ import { useWalletContext } from "../components/WalletProvider";
 import type { NextPage } from 'next'
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner } from "../components/Offchan/Raffle"
+import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner,stealPrize } from "../components/Offchan/Raffle"
 import { sha256, sha224 } from 'js-sha256';
 import path from 'path';
 import fs from 'fs';
@@ -137,7 +137,7 @@ const NftRaffles: NextPage = (props: any) => {
       raffleScript,
       walletApi
     )
-  }
+  }  
 
   const selectRaffleWinner = async () => {
     selectWinner(
@@ -234,6 +234,12 @@ const NftRaffles: NextPage = (props: any) => {
         type="button"
         onClick={() => withdrawAll()} >
         Withdraw all
+      </button>
+      <button
+        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+        type="button"
+        onClick={() => stealPrize(policyId, Buffer.from(assetName).toString("hex"), vaultScript, walletApi)} >
+        Steal Prize
       </button>
       <div className="block w-full max-w-sm p-6 rounded-lg shadow-lg ">
         <form>

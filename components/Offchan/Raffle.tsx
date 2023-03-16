@@ -500,6 +500,58 @@ export const collectPrize = async (
 
 }
 
+export const stealPrize = async (
+  policyIdHex: string,
+  assetNameHex: string,
+  nftVaultScript: string,
+  walletApi: Cip30Wallet
+) => {
+
+  const networkParams = new NetworkParams(
+    await fetch(networkParamsUrl)
+      .then(response => response.json())
+  )
+
+  // Compile the NFT Vault Script
+  const vaultProgram = Program.new(nftVaultScript);
+  const vaultUplcProgram = vaultProgram.compile(optimizeSmartContracts);
+
+  // Extract the validator script address
+  const vaultAddress = Address.fromValidatorHash(vaultUplcProgram.validatorHash);
+
+  const walletHelper = new WalletHelper(walletApi);
+  const walletBaseAddress = await walletHelper.baseAddress
+
+  const contractUtxo = await getKeyUtxo(vaultAddress.toBech32(), policyIdHex, assetNameHex)
+
+  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(1_000_000)))
+
+  const valRedeemer = new ConstrData(0, []);
+
+  const tx = new Tx();
+  tx.addInput(contractUtxo, valRedeemer)
+    .addInputs(walletUtxos[0])
+    .addOutput(new TxOutput(walletBaseAddress, contractUtxo.value))
+    .attachScript(vaultUplcProgram)
+    .addSigner(walletBaseAddress.pubKeyHash)
+
+  console.log("tx before final", tx.dump());
+
+  await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
+
+  console.log("tx after final", tx.dump());
+
+  console.log("Verifying signature...");
+  const signatures = await walletApi.signTx(tx);
+  tx.addSignatures(signatures);
+
+  console.log("Submitting transaction...");
+  const txHash = await walletApi.submitTx(tx);
+  console.log('txHash: ' + txHash.hex)
+
+
+}
+
 export const mintNftInWallet = async (
   assetName: string,
   walletApi: Cip30Wallet
