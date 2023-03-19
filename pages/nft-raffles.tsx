@@ -87,6 +87,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   const [onChainRaffles, setOnChainRaffles] = useState<OnChainRaffle[]>([])
   const [wonNfts, setWonNfts] = useState<WonNft[]>([])
+  const [myRaffles, setMyRaffles] = useState<Raffle[]>([])
   const [backendRaffles, setBackendRaffles] = useState([])
 
   const [tableData, setTableData] = useState([])
@@ -149,6 +150,14 @@ const NftRaffles: NextPage = (props: any) => {
         .map(raffle => [raffle.main_img_url, raffle.nft_name, raffle.collection_name, raffle.winner_pkh])
       setTableData(myTableData)
 
+      const myRaffles = backendRaffles.filter(raffle => {
+        if (raffle.participants) {
+          return raffle.participants.slice().split(",").indexOf(walletPkh) != -1
+        } else {
+          return false
+        }
+      })
+      setMyRaffles(myRaffles)
     } else {
       setRaffles([])
       setTableData([])
@@ -427,6 +436,79 @@ const NftRaffles: NextPage = (props: any) => {
         ))}
       </div>
       <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+
+      <div className="mb-6 text-4xl font-bold text-slate-600">
+        My Raffles
+      </div>
+      {backendRaffles ? (
+        <div className="flex flex-col my-6">
+          <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
+            <div className="inline-block min-w-full">
+              <div className="overflow-hidden">
+                <table className="min-w-full">
+                  <thead className="border-b">
+                    <tr>
+                      <th scope="col" className="p-2 m-2 text-sm font-medium text-center text-gray-900">
+                        Image
+                      </th>
+                      <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
+                        Collection
+                      </th>
+                      <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
+                        Name
+                      </th>
+                      <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
+                        Outcome
+                      </th>
+                    </tr>
+                  </thead>
+                  {/* .map(raffle => [raffle.main_img_url, raffle.nft_name, raffle.collection_name, raffle.winner_pkh]) */}
+                  <tbody>
+                    {backendRaffles.filter(raffle => raffle.status == 'closed').map((raffle: any, i) =>
+                      <tr className="bg-white border-b" key={i}>
+                        <td className="p-2 m-2 text-gray-900 whitespace-nowrap">
+                          <div className="relative h-24">
+                            <Image
+                              src={raffle.main_img_url}
+                              fill={true}
+                              className="object-cover rounded-full"
+                              alt={raffle.nft_name}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
+                          {raffle.collection_name}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
+                          {raffle.nft_name}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
+                          {raffle.winner_pkh == walletPkh ? (
+                            <span
+                              className="inline-block px-2 pt-1 pb-1 font-bold leading-none text-center align-baseline bg-green-600 rounded-full">
+                              Won
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-block px-2 pt-1 pb-1 font-bold leading-none text-center align-baseline bg-red-600 rounded-full">
+                              Lost
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
+      <div className="mb-6 text-4xl font-bold text-slate-600">
+        All Raffles
+      </div>
       {backendRaffles ? (
         <div className="flex flex-col my-6">
           <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
