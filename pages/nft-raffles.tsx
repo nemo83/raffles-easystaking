@@ -407,7 +407,7 @@ const NftRaffles: NextPage = (props: any) => {
           Raffles are currently running on <span className="font-bold">Mainnet BETA</span> use at your own risk.
         </div>
       ) : null}
-      <div className="mb-6 text-4xl font-bold text-slate-600">
+      <div className="my-6 text-4xl font-bold text-slate-600">
         Open Raffles
         <span className="float-right">
           <Link href="#"
@@ -445,7 +445,7 @@ const NftRaffles: NextPage = (props: any) => {
       </div>
       <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
 
-      <div className="mb-6 text-4xl font-bold text-slate-600">
+      <div className="my-6 text-4xl font-bold text-slate-600">
         My Raffles
       </div>
       {backendRaffles ? (
@@ -514,7 +514,7 @@ const NftRaffles: NextPage = (props: any) => {
         </div>
       ) : null}
       <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
-      <div className="mb-6 text-4xl font-bold text-slate-600">
+      <div className="my-6 text-4xl font-bold text-slate-600">
         All Raffles
       </div>
       {backendRaffles ? (
