@@ -1,4 +1,4 @@
-export const network = "preview"
+export const network = process.env.NEXT_PUBLIC_CARDANO_NETWORK
 
 export const getNetworkParam = (network: string) => `https://d1t0d7c2nekuk0.cloudfront.net/${network}.json`
 
