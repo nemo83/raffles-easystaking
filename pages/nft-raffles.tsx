@@ -28,7 +28,7 @@ import {
   faRotate
 } from "@fortawesome/free-solid-svg-icons";
 import Table from "../components/Table"
-import { blockfrostAPI, apiKey, network } from "../constants/blockfrost"
+import { getBlockfrostKey, getBlockfrostUrl, network } from "../constants/blockfrost"
 import { lotteryApi, optimizeSmartContracts } from "../constants/lottery"
 import Link from "next/link";
 import Image from "next/image";
@@ -229,13 +229,13 @@ const NftRaffles: NextPage = (props: any) => {
 
   const getRaffles = async (scriptAddress: string, assetId: string) => {
 
-    const blockfrostUrl: string = blockfrostAPI + "/addresses/" + scriptAddress + "/utxos/" + assetId;
+    const blockfrostUrl: string = getBlockfrostUrl(network) + "/addresses/" + scriptAddress + "/utxos/" + assetId;
 
     let resp = await fetch(blockfrostUrl, {
       method: "GET",
       headers: {
         accept: "application/json",
-        project_id: apiKey,
+        project_id: getBlockfrostKey(network),
       },
     });
 
@@ -254,13 +254,13 @@ const NftRaffles: NextPage = (props: any) => {
 
   const getWinningTickets = async (scriptAddress: string, assetId: string) => {
 
-    const blockfrostUrl: string = blockfrostAPI + "/addresses/" + scriptAddress + "/utxos/" + assetId;
+    const blockfrostUrl: string = getBlockfrostUrl(network) + "/addresses/" + scriptAddress + "/utxos/" + assetId;
 
     let resp = await fetch(blockfrostUrl, {
       method: "GET",
       headers: {
         accept: "application/json",
-        project_id: apiKey,
+        project_id: getBlockfrostKey(network),
       },
     });
 
@@ -312,13 +312,13 @@ const NftRaffles: NextPage = (props: any) => {
     const program = Program.new(raffleScript).compile(optimizeSmartContracts)
     const address = Address.fromValidatorHash(program.validatorHash);
 
-    const blockfrostUrl: string = blockfrostAPI + "/addresses/" + address.toBech32() + "/utxos";
+    const blockfrostUrl: string = getBlockfrostUrl(network) + "/addresses/" + address.toBech32() + "/utxos";
 
     let resp = await fetch(blockfrostUrl, {
       method: "GET",
       headers: {
         accept: "application/json",
-        project_id: apiKey,
+        project_id: getBlockfrostKey(network),
       },
     });
 
@@ -341,13 +341,13 @@ const NftRaffles: NextPage = (props: any) => {
     const program = Program.new(vaultScript).compile(optimizeSmartContracts)
     const address = Address.fromValidatorHash(program.validatorHash);
 
-    const blockfrostUrl: string = blockfrostAPI + "/addresses/" + address.toBech32() + "/utxos";
+    const blockfrostUrl: string = getBlockfrostUrl(network) + "/addresses/" + address.toBech32() + "/utxos";
 
     let resp = await fetch(blockfrostUrl, {
       method: "GET",
       headers: {
         accept: "application/json",
-        project_id: apiKey,
+        project_id: getBlockfrostKey(network),
       },
     });
 
