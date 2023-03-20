@@ -378,7 +378,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   useEffect(() => {
     (async () => fetchRaffles())()
-      .then(backendRaffles => setBackendRaffles(backendRaffles.filter(raffle => raffle.network = network)))
+      .then(backendRaffles => setBackendRaffles(backendRaffles.filter(raffle => raffle.network == network)))
     console.log('fetchRaffles')
   }, [])
 
