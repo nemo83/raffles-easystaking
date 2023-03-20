@@ -10,11 +10,13 @@ import { useWalletContext } from "../components/WalletProvider";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import {
+    Address,
+    StakeAddress,
     Cip30Handle,
     Cip30Wallet,
     WalletHelper
 } from "@hyperionbt/helios";
-import { ClassElement } from 'typescript'
+import { getBlockfrostKey, getBlockfrostUrl, network } from '../constants/blockfrost'
 
 declare global {
     interface Window {
@@ -85,6 +87,46 @@ const Nav: NextPage = (props: any) => {
         setAvailableWallets(aWallets)
 
     }, [])
+
+    useEffect(() => {
+
+        const getBalance = async () => {
+            if (baseAddress) {
+                const isMainnet = 'mainnet' == network.toString()
+                const stakingAddress = StakeAddress.fromHash(!isMainnet, Address.fromBech32(baseAddress).stakingHash).toBech32()
+                let resp = await fetch(getBlockfrostUrl(network) + `/accounts/${stakingAddress}`, {
+                    method: "GET",
+                    headers: {
+                        accept: "application/json",
+                        project_id: getBlockfrostKey(network),
+                    },
+                });
+
+                if (resp?.status > 299) {
+                    throw console.error("NFT not found", resp);
+                }
+                const payload = await resp.json();
+
+                console.log('payload: ' + JSON.stringify(payload))
+
+                if (payload.controlled_amount) {
+                    const controlledAmount = payload.controlled_amount
+                    console.log('controlledAmount: ' + controlledAmount)
+                    const balance = controlledAmount / 1_000_000
+                    setBalance('' + balance.toFixed(2))
+                }
+            } else {
+                setBalance('N/A')
+            }
+
+
+        }
+
+        getBalance()
+
+        console.log('balance?')
+
+    }, [baseAddress])
 
     async function connect(walletName: string) {
 
@@ -344,7 +386,7 @@ const Nav: NextPage = (props: any) => {
                                     ) : null}
                                 </div>
                                 <div
-                                    onClick={() => { disconnect(); setShowSubMenu(!showSubMenu)  }}
+                                    onClick={() => { disconnect(); setShowSubMenu(!showSubMenu) }}
                                     className="flex items-center justify-start h-8 p-0 pl-3 mx-1 my-2 text-black capitalize bg-gray-200 w-28 opacity-95 flex-container right-2 hover:underline hover:cursor-pointer top-28">
                                     Disconnect
                                 </div>

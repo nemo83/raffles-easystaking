@@ -22,22 +22,23 @@ import {
   ByteArrayData
 } from "@hyperionbt/helios";
 import {
-  blockfrostAPI,
-  apiKey,
-  networkParamsUrl
+  network,
+  getBlockfrostKey,
+  getNetworkParam,
+  getBlockfrostUrl
 } from "../../constants/blockfrost"
 import { optimizeSmartContracts } from "../../constants/lottery"
 import { sha256 } from 'js-sha256';
 
 const getKeyUtxo = async (scriptAddress: string, keyMPH: string, keyName: string) => {
 
-  const blockfrostUrl: string = blockfrostAPI + "/addresses/" + scriptAddress + "/utxos/" + keyMPH + keyName;
+  const blockfrostUrl: string = getBlockfrostUrl(network) + "/addresses/" + scriptAddress + "/utxos/" + keyMPH + keyName;
 
   let resp = await fetch(blockfrostUrl, {
     method: "GET",
     headers: {
       accept: "application/json",
-      project_id: apiKey,
+      project_id: getBlockfrostKey(network),
     },
   });
 
@@ -96,7 +97,7 @@ export const createNftRaffle = async (
   walletApi: Cip30Wallet) => {
 
   const networkParams = new NetworkParams(
-    await fetch(networkParamsUrl)
+    await fetch(getNetworkParam(network))
       .then(response => response.json())
   )
 
@@ -183,7 +184,7 @@ export const retrieveNft = async (
 ) => {
 
   const networkParams = new NetworkParams(
-    await fetch(networkParamsUrl)
+    await fetch(getNetworkParam(network))
       .then(response => response.json())
   )
 
@@ -237,7 +238,7 @@ export const buyRaffleTickets = async (
 ) => {
 
   const networkParams = new NetworkParams(
-    await fetch(networkParamsUrl)
+    await fetch(getNetworkParam(network))
       .then(response => response.json())
   )
 
@@ -348,7 +349,7 @@ export const selectWinner = async (
 ) => {
 
   const networkParams = new NetworkParams(
-    await fetch(networkParamsUrl)
+    await fetch(getNetworkParam(network))
       .then(response => response.json())
   )
 
@@ -456,7 +457,7 @@ export const collectPrize = async (
 ) => {
 
   const networkParams = new NetworkParams(
-    await fetch(networkParamsUrl)
+    await fetch(getNetworkParam(network))
       .then(response => response.json())
   )
 
@@ -508,7 +509,7 @@ export const stealPrize = async (
 ) => {
 
   const networkParams = new NetworkParams(
-    await fetch(networkParamsUrl)
+    await fetch(getNetworkParam(network))
       .then(response => response.json())
   )
 
@@ -630,7 +631,7 @@ export const mintNftInWallet = async (
   tx.addCollateral(colatUtxo);
 
   const networkParams = new NetworkParams(
-    await fetch(networkParamsUrl)
+    await fetch(getNetworkParam(network))
       .then(response => response.json())
   )
   console.log("tx before final", tx.dump());
