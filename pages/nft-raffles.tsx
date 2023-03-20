@@ -395,7 +395,7 @@ const NftRaffles: NextPage = (props: any) => {
   return (
     <Layout>
       <div
-        className="px-6 py-5 mb-4 text-base text-blue-600 bg-blue-300 rounded-lg"
+        className="px-6 py-5 my-4 text-base text-blue-600 bg-blue-300 rounded-lg"
         role="alert">
         Raffles are currently running on the Cardano <span className="font-bold">PREVIEW</span> testnet
       </div>

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import toast, { Toaster } from 'react-hot-toast'
 import type { NextPage } from 'next'
 import {
-    faHome, faDice, faQuestion, faHeartbeat, faFileImage
+    faHome, faDice, faQuestion, faHeartbeat, faFileImage, faWallet, faChevronDown, faChevronUp
 } from "@fortawesome/free-solid-svg-icons"
 import { useWalletContext } from "../components/WalletProvider";
 import Link from 'next/link';
@@ -14,6 +14,7 @@ import {
     Cip30Wallet,
     WalletHelper
 } from "@hyperionbt/helios";
+import { ClassElement } from 'typescript'
 
 declare global {
     interface Window {
@@ -34,10 +35,12 @@ const Nav: NextPage = (props: any) => {
     const FRIENDLY_NAME_KEY = "friendly-name"
 
     const [showMenu, setShowMenu] = useState(false)
-
+    const [showSubMenu, setShowSubMenu] = useState(false)
     const [showWallets, setShowWallets] = useState(false)
+
     const [availableWallets, setAvailableWallets] = useState([])
     const [walletApi, setWalletApi] = useWalletContext()
+    const [balance, setBalance] = useState('N/A')
     const [friendlyName, setFriendlyName] = useState('')
 
     const [baseAddress, setBaseAddress] = useState(null)
@@ -206,7 +209,7 @@ const Nav: NextPage = (props: any) => {
                 </>
             ) : null}
 
-            <div className="container flex flex-wrap items-center w-full pt-3 pb-3 mx-auto my-2 mt-0 md:pb-0">
+            <div className="container flex flex-wrap items-center w-full pt-3 pb-3 mx-auto my-2 mt-0 lg:pb-0">
 
 
                 <div className="block pr-4 lg:hidden">
@@ -277,61 +280,81 @@ const Nav: NextPage = (props: any) => {
 
                 </div>
 
-                <div className={`relative hidden pl-4 pr-4 space-x-2 dropdown pull-right md:pr-0 lg:block ` + (walletApi ? ' border-2 border-solid rounded-md' : '')}>
-                    <div className="relative inline-block">
-                        <div>
+                <div className="relative hidden pl-4 pr-4 space-x-2 dropdown pull-right md:pr-0 lg:flex">
+                    <div className={`relative flex m-2 p-2` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-white' : '')}>
+                        {/* Connect */}
+                        <div className={`text-slate-50 px-2 font-semibold`}>
                             <button
-                                className='px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50'
+                                className={`px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50 ` + (walletApi ? 'hidden' : '')}
                                 type="button"
                                 id="menu-button"
                                 aria-expanded="true"
                                 aria-haspopup="true"
                                 onClick={() => setShowWallets(!showWallets)}
                             >Connect wallet</button>
+                            <div className={walletApi ? ' ' : 'hidden'}>
+                                {balance} ₳
+                            </div>
                         </div>
                         {showWallets && availableWallets ? (
-                            <div className="absolute right-0 mt-2 origin-top-right bg-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
-                                <div className="py-1" role="none">
+                            <div className="absolute mt-10 origin-top-right bg-gray-200 rounded-md shadow-lg right-4 ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
+                                <div className="py-1 divide-y-2 divide-white" role="none">
                                     {availableWallets.map((wallet, i) => (
-
                                         <div
                                             key={i}
                                             onClick={() => { setShowWallets(false); connect(wallet.name) }}
-                                            className={"m-1 p-0 w-28 h-8 bg-gray-200 flex opacity-95 flex-container justify-start items-center right-2 hover:underline hover:cursor-pointer top-" + wallet.top}>
+                                            className={"mx-1 my-2 p-0 w-28 h-8 bg-gray-200 flex opacity-95 flex-container justify-start items-center right-2 hover:underline hover:cursor-pointer top-" + wallet.top}>
                                             {wallet.icon ? (
                                                 <Image src={wallet.icon} width="30" height="30" alt={wallet.name} />
                                             ) : null}
                                             <div className="pl-3 text-black capitalize">{wallet.name}</div>
                                         </div>
-
-
                                     ))}
                                 </div>
                             </div>
-                        ) : <></>}
+                        ) : null}
+
+                        <div
+                            className={`text-slate-50 font-semibold px-2 ` + (walletApi ? '' : 'hidden')}
+                            onClick={() => setShowSubMenu(!showSubMenu)}>
+                            <FontAwesomeIcon
+                                icon={faWallet}
+                                className="mr-3"
+                            />
+                            {baseAddress ? baseAddress.slice(0, 12) : null} &nbsp;
+                            <FontAwesomeIcon
+                                icon={showSubMenu ? faChevronUp : faChevronDown}
+                                className="mr-3"
+                            />
+                        </div>
+                        {walletApi && showSubMenu ? (
+                            <div className="absolute right-0 mt-10 origin-top-right bg-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
+                                <div className="py-1 divide-y-2 divide-white" role="none">
+                                    {(currentRoute == '/raffles') ? (
+                                        <div
+                                            onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}
+                                            className="flex items-center justify-start h-8 p-0 pl-3 mx-1 my-2 text-black capitalize bg-gray-200 w-28 opacity-95 flex-container right-2 hover:underline hover:cursor-pointer top-28">
+                                            Participate
+                                        </div>
+                                        // <div>
+                                        //     <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
+                                        //         onClick={() => setShowModal(!showModal)}>Participate</button>
+
+                                        // </div>
+                                    ) : null}
+                                </div>
+                                <div
+                                    onClick={() => { disconnect(); setShowSubMenu(!showSubMenu)  }}
+                                    className="flex items-center justify-start h-8 p-0 pl-3 mx-1 my-2 text-black capitalize bg-gray-200 w-28 opacity-95 flex-container right-2 hover:underline hover:cursor-pointer top-28">
+                                    Disconnect
+                                </div>
+                            </div>
+                        ) : null}
+
                     </div>
 
-                    {walletApi && baseAddress ? (
-                        <span>
-                            <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
-                                onClick={() => disconnect()}>Disconnect</button>
-                        </span>
-                    ) : null}
 
-                    {(currentRoute == '/raffles') ? (
-                        <span>
-                            {walletApi && baseAddress ? (
-                                <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
-                                    onClick={() => setShowModal(!showModal)}>Participate</button>
-                            ) : (
-                                <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-400'
-                                    onClick={() => {
-                                        toast.error("Please connect wallet!")
-                                    }}
-                                >Participate</button>
-                            )}
-                        </span>
-                    ) : null}
+
 
                 </div>
 
