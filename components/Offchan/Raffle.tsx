@@ -75,8 +75,12 @@ const getKeyUtxo = async (scriptAddress: string, keyMPH: string, keyName: string
   );
 }
 
+export const rnd = (seed: string) => {
+  return ((BigInt("1103515245") * BigInt(seed) + BigInt(12345)) % BigInt("2147483648"))
+}
+
 const calculateWinningIndex = (seed: string, numParticipants: string) => {
-  return ((BigInt("1103515245") * BigInt(seed) + BigInt(12345)) % BigInt("2147483648")) % BigInt(numParticipants)
+  return rnd(seed) % BigInt(numParticipants)
 }
 
 interface CreateRaffle {

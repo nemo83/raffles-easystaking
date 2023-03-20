@@ -3,8 +3,7 @@ import { useWalletContext } from "../components/WalletProvider";
 import type { NextPage } from 'next'
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner,stealPrize } from "../components/Offchan/Raffle"
-import { sha256, sha224 } from 'js-sha256';
+import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner, stealPrize, rnd } from "../components/Offchan/Raffle"
 import path from 'path';
 import fs from 'fs';
 import { Program, Address, PubKeyHash } from '@hyperionbt/helios';
@@ -47,11 +46,16 @@ const NftRaffles: NextPage = (props: any) => {
   const [numMaxTicketsPerPerson, setNumMaxTicketsPerPerson] = useState(3);
   const [seed, setSeed] = useState('');
   const [salt, setSalt] = useState('');
+  const [nextSeed, setNextSeed] = useState('')
 
   const [mainImgUrl, setMainImgUrl] = useState('https://ipfs.io/ipfs/QmdHiHmWdt2gonmViGwJcvp4gfZiuVyrtub7H7iCc5QSmf');
 
   const [walletApi, setWalletApi] = useWalletContext();
 
+  useEffect(() => {
+    const nextSeed = rnd(seed)
+    setNextSeed(nextSeed.toString())
+  }, [seed])
 
   const buildScripts = () => {
     const raffleProgram = Program.new(raffleScript).compile(optimizeSmartContracts)
@@ -284,6 +288,10 @@ const NftRaffles: NextPage = (props: any) => {
               Salt
             </label>
             <input type={'text'} value={salt} onChange={(event) => setSalt(event.target.value)}></input>
+            <label className="block mb-1 text-sm font-bold text-black">
+              Next Salt
+            </label>
+            <input type={'text'} value={nextSeed} disabled={true}></input>
             <button
               className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
               type="button"
