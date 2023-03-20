@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <Layout>
       <div className="hidden p-6 text-gray-700 bg-white rounded-lg shadow-lg">
-        <h2 className="mb-5 text-3xl font-semibold">EASY1 Stakepool</h2>
+        <h2 className="mb-5 text-3xl font-semibold">EASY1 Stake Pool</h2>
         <p className="text-lg">
           Welcome to the EASY1 Stakepool website.
         </p>
@@ -64,7 +64,7 @@ export default function Home() {
         >
           <div className="flex items-center justify-center h-full">
             <div className="text-white">
-              <h2 className="mb-4 text-4xl font-semibold">EASY1 Stakepool</h2>
+              <h2 className="mb-4 text-4xl font-semibold">EASY1 Stake Pool</h2>
               <h4 className="mb-6 text-xl font-semibold">Staking  | Airdrops | Raffles</h4>
               {/* <a
                 className="inline-block py-3 mb-1 text-sm font-medium leading-snug text-gray-200 uppercase transition duration-150 ease-in-out border-2 border-gray-200 rounded px-7 hover:bg-black hover:bg-opacity-5 focus:outline-none focus:ring-0"
