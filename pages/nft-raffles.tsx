@@ -396,14 +396,14 @@ const NftRaffles: NextPage = (props: any) => {
     <Layout>
       {network == 'preview' ? (
         <div
-          className="px-6 py-5 my-4 text-base text-blue-600 bg-blue-300 rounded-lg"
+          className="px-6 py-5 my-2 text-base text-blue-600 bg-blue-300 rounded-lg"
           role="alert">
           Raffles are currently running on the Cardano <span className="font-bold">PREVIEW</span> testnet
         </div>
       ) : null}
       {network == 'mainnet' ? (
         <div
-          className="px-6 py-5 my-4 text-base text-black bg-yellow-300 rounded-lg">
+          className="px-6 py-5 my-2 text-base text-black bg-yellow-300 rounded-lg">
           Raffles are currently running on <span className="font-bold">Mainnet BETA</span> use at your own risk.
         </div>
       ) : null}

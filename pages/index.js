@@ -56,7 +56,7 @@ export default function Home() {
         </p>
       </div>
       <div
-        className="relative p-12 mt-4 overflow-hidden text-center bg-no-repeat bg-cover rounded-lg"
+        className="relative overflow-hidden text-center bg-no-repeat bg-cover rounded-lg"
         style={{ height: 400 + 'px', backgroundImage: `url(${nigtsky.src})` }}>
         <div
           className="absolute top-0 bottom-0 left-0 right-0 w-full h-full overflow-hidden bg-fixed"

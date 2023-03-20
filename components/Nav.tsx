@@ -251,7 +251,7 @@ const Nav: NextPage = (props: any) => {
                 </>
             ) : null}
 
-            <div className="container flex flex-wrap items-center w-full pt-3 pb-3 mx-auto my-2 mt-0 lg:pb-0">
+            <div className="container flex flex-wrap items-center w-full pt-2 pb-3 mx-auto my-1 mt-0 lg:pb-0">
 
 
                 <div className="block pr-4 lg:hidden">
@@ -323,7 +323,7 @@ const Nav: NextPage = (props: any) => {
                 </div>
 
                 <div className="relative hidden pl-4 pr-4 space-x-2 dropdown pull-right md:pr-0 lg:flex">
-                    <div className={`relative flex m-2 p-2` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-white' : '')}>
+                    <div className={`relative flex p-1` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-white' : '')}>
                         {/* Connect */}
                         <div className={`text-slate-50 px-2 font-semibold`}>
                             <button
