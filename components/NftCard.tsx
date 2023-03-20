@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useWalletContext } from "../components/WalletProvider";
 import { buyRaffleTickets, collectPrize } from './Offchan/Raffle'
 import { toast } from 'react-hot-toast';
+import { network } from '../constants/blockfrost';
 
 interface NftCard {
     policyIdHex: string,
@@ -53,6 +54,8 @@ const NftCard = ({
 
     const [options, setOptions] = useState([])
 
+    const [floorPrice, setFloorPrice] = useState('N/A')
+
     useEffect(() => {
         const options = []
         const numAvailTickets = Math.min((maxNumTicketsPerWallet - numWalletPurchasedTickets), maxParticipants - numPurchasedTickets)
@@ -61,6 +64,26 @@ const NftCard = ({
         }
         setOptions(options)
     }, [maxNumTicketsPerWallet, numWalletPurchasedTickets, numPurchasedTickets, maxParticipants])
+
+    useEffect(() => {
+
+        const getFloorPrice = async () => {
+
+            const response = await fetch(`https://api.cnftjungle.io/api/collections/listings/floor/${policyIdHex}`)
+
+            if (response.status < 300) {
+                const floorPrice = await response.json()
+                setFloorPrice('' + (Number(floorPrice) / 1_000_000))
+            }
+
+        }
+
+        if (network == 'mainnet') {
+            getFloorPrice()
+        }
+
+    }, [policyIdHex])
+
 
     const buyTicket = async () => {
         return buyRaffleTickets(
@@ -162,7 +185,7 @@ const NftCard = ({
 
                         <div className="flex items-center justify-between gap-1 mb-2">
                             <span className="grid font-bold text-gray-900 rounded-sm place-content-center">
-                                {nftName}
+                                {nftName.slice(0, 20)} {nftName && nftName.length > 20 ? '...' : ''}
                             </span>
 
                             <div className="flex items-center justify-center gap-1">
@@ -173,7 +196,8 @@ const NftCard = ({
                                         className="transition duration-150 ease-in-out transititext-primary text-primary hover:text-primary-600 focus:text-primary-600 active:text-primary-700 dark:text-primary-400 dark:hover:text-primary-500 dark:focus:text-primary-500 dark:active:text-primary-600"
                                         // data-te-toggle="tooltip"
                                         title="Floor price">
-                                        100</a>
+                                        {floorPrice}
+                                    </a>
                                 </span>
                                 <img src="cardano-blue.png" alt="cardano Logo" className="w-[22px] h-[21.85px] object-contain" />
                             </div>
