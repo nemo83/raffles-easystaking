@@ -33,6 +33,8 @@ const Nav: NextPage = (props: any) => {
     const WALLET_NAME_KEY = "wallet-name"
     const FRIENDLY_NAME_KEY = "friendly-name"
 
+    const [showMenu, setShowMenu] = useState(false)
+
     const [showWallets, setShowWallets] = useState(false)
     const [availableWallets, setAvailableWallets] = useState([])
     const [walletApi, setWalletApi] = useWalletContext()
@@ -204,9 +206,22 @@ const Nav: NextPage = (props: any) => {
                 </>
             ) : null}
 
-            <div className="container flex flex-wrap items-center w-full pt-3 pb-3 mx-auto mt-0 md:pb-0">
+            <div className="container flex flex-wrap items-center w-full pt-3 pb-3 mx-auto my-2 mt-0 md:pb-0">
 
-                <div className="z-20 flex-grow hidden w-full mt-2 bg-sky-600 lg:flex lg:items-center lg:w-auto lg:block lg:mt-0" id="nav-content">
+
+                <div className="block pr-4 lg:hidden">
+                    <button id="nav-toggle"
+                        className="flex items-center px-3 py-2 text-gray-300 border border-gray-300 rounded appearance-none hover:text-slate-50 hover:border-slate-50 focus:outline-none"
+                        onClick={() => setShowMenu(!showMenu)}>
+                        <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <title>Menu</title>
+                            <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div className={`z-20 flex-grow w-full mt-2 bg-sky-600 lg:flex lg:items-center lg:w-auto lg:block lg:mt-0` + (showMenu ? ' ' : ' hidden')} id="nav-content">
+
                     <ul className="items-center flex-1 px-4 list-reset lg:flex md:px-0">
                         <li className="my-2 mr-6 md:my-0">
                             <Link href="/" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/' ? navSelected : navNotSelected)}>
@@ -262,32 +277,34 @@ const Nav: NextPage = (props: any) => {
 
                 </div>
 
-                <div className="relative pl-4 pr-4 space-x-2 dropdown pull-right md:pr-0">
+                <div className={`relative hidden pl-4 pr-4 space-x-2 dropdown pull-right md:pr-0 lg:block ` + (walletApi ? ' border-2 border-solid rounded-md' : '')}>
                     <div className="relative inline-block">
                         <div>
                             <button
-                                className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
+                                className='px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50'
                                 type="button"
                                 id="menu-button"
                                 aria-expanded="true"
                                 aria-haspopup="true"
                                 onClick={() => setShowWallets(!showWallets)}
-                            >Connect</button>
+                            >Connect wallet</button>
                         </div>
                         {showWallets && availableWallets ? (
-                            <div className="absolute right-0 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
+                            <div className="absolute right-0 mt-2 origin-top-right bg-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
                                 <div className="py-1" role="none">
-                                    {availableWallets.map(wallet => (
-                                        <button key={wallet.name}
-                                            onClick={() => {
-                                                setShowWallets(false)
-                                                connect(wallet.name)
-                                            }}
-                                            className={"m-1 p-0 w-16 h-16 text-black opacity-95 hover:scale-140 shadow-lg hover:shadow-xl hidden md:block right-2 lg:right-10 top-" + wallet.top}>
-                                            {
-                                                wallet.icon ? <Image className="px-2 text-md" src={wallet.icon} width="30" height="30" alt={wallet.name} /> : <span className="capitalize">{wallet.name}</span>
-                                            }
-                                        </button>
+                                    {availableWallets.map((wallet, i) => (
+
+                                        <div
+                                            key={i}
+                                            onClick={() => { setShowWallets(false); connect(wallet.name) }}
+                                            className={"m-1 p-0 w-28 h-8 bg-gray-200 flex opacity-95 flex-container justify-start items-center right-2 hover:underline hover:cursor-pointer top-" + wallet.top}>
+                                            {wallet.icon ? (
+                                                <Image src={wallet.icon} width="30" height="30" alt={wallet.name} />
+                                            ) : null}
+                                            <div className="pl-3 text-black capitalize">{wallet.name}</div>
+                                        </div>
+
+
                                     ))}
                                 </div>
                             </div>
@@ -317,7 +334,6 @@ const Nav: NextPage = (props: any) => {
                     ) : null}
 
                 </div>
-
 
             </div>
         </nav>
