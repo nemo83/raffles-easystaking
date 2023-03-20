@@ -28,7 +28,7 @@ export const Distributions = () => {
 
     return (
         <a name="distributions">
-            <div className="flex flex-wrap px-1 m-6">
+            <div className="flex flex-wrap">
                 {distributions.map((distribution, i) =>
                     <div className="w-full px-2 mt-3 lg:w-1/2" key={i}>
                         <TokenCard
