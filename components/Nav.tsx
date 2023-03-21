@@ -55,25 +55,7 @@ const Nav: NextPage = (props: any) => {
 
 
     useEffect(() => {
-        initCardanoDAppConnectorBridge(async (walletApi) => {
 
-            console.log('walletApi: ' + walletApi)
-            console.log('about to enable')
-            walletApi.enable()
-            console.log('enabled')
-
-            setWalletApi(walletApi)
-
-            const walletHelper = new WalletHelper(walletApi)
-
-            const baseAddress = await walletHelper.baseAddress
-            console.log('baseAddress: ' + baseAddress.toBech32())
-            setBaseAddress(baseAddress.toBech32())
-
-        })
-    }, [])
-
-    useEffect(() => {
         // Friendly Name restore
         const saveFriendlyName = localStorage.getItem(FRIENDLY_NAME_KEY)
         if (saveFriendlyName != null) {
@@ -103,9 +85,29 @@ const Nav: NextPage = (props: any) => {
                     attemptConnectWallet()
                 }
 
+            } else {
+                console.log('No window.cardano object')
             }
         })
+
         setAvailableWallets(aWallets)
+
+        initCardanoDAppConnectorBridge(async (eternl) => {
+
+            if (eternl.name === 'eternl') {
+                console.log('*** eternl: ' + eternl)
+                console.log('about to enable')
+
+                const handle: Cip30Handle = await eternl.enable();
+                const walletApi = new Cip30Wallet(handle);
+
+                console.log('enabled')
+
+                setWalletApi(walletApi)
+
+            }
+        })
+
 
     }, [])
 
@@ -156,12 +158,6 @@ const Nav: NextPage = (props: any) => {
 
         setWalletApi(walletApi)
 
-        const walletHelper = new WalletHelper(walletApi)
-
-        const baseAddress = await walletHelper.baseAddress
-        console.log('baseAddress: ' + baseAddress.toBech32())
-        setBaseAddress(baseAddress.toBech32())
-
         const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
         if (!isReconnect) {
             localStorage.setItem(WALLET_NAME_KEY, walletName)
@@ -171,9 +167,8 @@ const Nav: NextPage = (props: any) => {
     }
 
     async function disconnect() {
-        setWalletApi(null)
-        setBaseAddress(null)
         localStorage.removeItem(WALLET_NAME_KEY)
+        setWalletApi(null)
     }
 
     async function participate() {
