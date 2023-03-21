@@ -1,4 +1,5 @@
 export const network = process.env.NEXT_PUBLIC_CARDANO_NETWORK
+export const origin = process.env.NEXT_PUBLIC_ORIGIN
 
 export const getNetworkParam = (network: string) => `https://d1t0d7c2nekuk0.cloudfront.net/${network}.json`
 

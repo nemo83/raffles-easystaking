@@ -16,7 +16,7 @@ import {
     Cip30Wallet,
     WalletHelper
 } from "@hyperionbt/helios";
-import { getBlockfrostKey, getBlockfrostUrl, network } from '../constants/blockfrost'
+import { getBlockfrostKey, getBlockfrostUrl, network, origin } from '../constants/blockfrost'
 import { initCardanoDAppConnectorBridge } from '../components/Eternl/cardano-dapp-connector-bridge'
 
 declare global {
@@ -92,7 +92,7 @@ const Nav: NextPage = (props: any) => {
 
         setAvailableWallets(aWallets)
 
-        initCardanoDAppConnectorBridge(async (eternl) => {
+        initCardanoDAppConnectorBridge(async (eternl, origin) => {
 
             if (eternl.name === 'eternl') {
                 const handle: Cip30Handle = await eternl.enable();
