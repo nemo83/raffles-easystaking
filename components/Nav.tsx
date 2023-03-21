@@ -94,11 +94,16 @@ const Nav: NextPage = (props: any) => {
 
         initCardanoDAppConnectorBridge(async (eternl) => {
 
+            console.log('init dapp called')
+
             if (eternl.name === 'eternl') {
+                console.log('eternl!')
                 const handle: Cip30Handle = await eternl.enable();
                 const walletApi = new Cip30Wallet(handle);
                 setWalletApi(walletApi)
 
+            } else {
+                console.log('not eternl!')
             }
         })
 
