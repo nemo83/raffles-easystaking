@@ -92,7 +92,7 @@ const Nav: NextPage = (props: any) => {
 
         setAvailableWallets(aWallets)
 
-        initCardanoDAppConnectorBridge(async (eternl, origin) => {
+        initCardanoDAppConnectorBridge(async (eternl) => {
 
             if (eternl.name === 'eternl') {
                 const handle: Cip30Handle = await eternl.enable();
