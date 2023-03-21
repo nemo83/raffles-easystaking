@@ -2,10 +2,6 @@
 
 const securityHeaders = [
   {
-    key: 'X-Frame-Options',
-    value: 'SAMEORIGIN'
-  },
-  {
     key: 'Content-Security-Policy',
     value: 'frame-ancestors https://*.eternl.io/ https://eternl.io/ ionic: capacitor: chrome-extension: http://localhost:*/ https://localhost:*/;'
   }
