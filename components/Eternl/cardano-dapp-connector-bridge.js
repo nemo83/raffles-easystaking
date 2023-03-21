@@ -6,7 +6,7 @@
 // Callback onBridgeCreated: async (walletApi) => {}
 export function initCardanoDAppConnectorBridge(onBridgeCreated) {
 
-    var _debug                  = false // set to true for debug logs.
+    var _debug                  = true // set to true for debug logs.
     var _label                  = 'DAppConnectorBridge: ' // set to true for debug logs.
   
     var _walletNamespace        = null // eg. eternl
