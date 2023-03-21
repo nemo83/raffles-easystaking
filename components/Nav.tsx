@@ -17,6 +17,7 @@ import {
     WalletHelper
 } from "@hyperionbt/helios";
 import { getBlockfrostKey, getBlockfrostUrl, network } from '../constants/blockfrost'
+import { initCardanoDAppConnectorBridge } from '../components/Eternl/cardano-dapp-connector-bridge'
 
 declare global {
     interface Window {
@@ -51,6 +52,19 @@ const Nav: NextPage = (props: any) => {
 
     // Modal
     const [showModal, setShowModal] = useState(false);
+
+
+    useEffect(() => {
+        initCardanoDAppConnectorBridge(async (walletApi) => {
+
+            console.log('walletApi: ' + walletApi)
+            console.log('about to enable')
+            walletApi.enable()
+            console.log('enabled')
+
+            setWalletApi(walletApi)
+        })
+    }, [])
 
     useEffect(() => {
         // Friendly Name restore
