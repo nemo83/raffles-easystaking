@@ -112,7 +112,7 @@ const Nav: NextPage = (props: any) => {
 
                 const walletHelper = new WalletHelper(walletApi)
                 const baseAddress = await walletHelper.baseAddress
-                setBaseAddress(baseAddress)
+                setBaseAddress(baseAddress.toBech32())
 
             } else {
                 setBaseAddress(null)
