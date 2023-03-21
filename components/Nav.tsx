@@ -17,6 +17,7 @@ import {
     WalletHelper
 } from "@hyperionbt/helios";
 import { getBlockfrostKey, getBlockfrostUrl, network } from '../constants/blockfrost'
+import { initCardanoDAppConnectorBridge } from '../components/Eternl/cardano-dapp-connector-bridge'
 
 declare global {
     interface Window {
@@ -52,7 +53,9 @@ const Nav: NextPage = (props: any) => {
     // Modal
     const [showModal, setShowModal] = useState(false);
 
+
     useEffect(() => {
+
         // Friendly Name restore
         const saveFriendlyName = localStorage.getItem(FRIENDLY_NAME_KEY)
         if (saveFriendlyName != null) {
@@ -82,11 +85,43 @@ const Nav: NextPage = (props: any) => {
                     attemptConnectWallet()
                 }
 
+            } else {
+                console.log('No window.cardano object')
             }
         })
+
         setAvailableWallets(aWallets)
 
+        initCardanoDAppConnectorBridge(async (eternl) => {
+
+            if (eternl.name === 'eternl') {
+                const handle: Cip30Handle = await eternl.enable();
+                const walletApi = new Cip30Wallet(handle);
+                setWalletApi(walletApi)
+
+            }
+        })
+
     }, [])
+
+    useEffect(() => {
+
+        (async () => {
+
+            if (walletApi) {
+
+                const walletHelper = new WalletHelper(walletApi)
+                const baseAddress = await walletHelper.baseAddress
+                setBaseAddress(baseAddress.toBech32())
+
+            } else {
+                setBaseAddress(null)
+            }
+
+        })()
+
+
+    }, [walletApi])
 
     useEffect(() => {
 
@@ -135,12 +170,6 @@ const Nav: NextPage = (props: any) => {
 
         setWalletApi(walletApi)
 
-        const walletHelper = new WalletHelper(walletApi)
-
-        const baseAddress = await walletHelper.baseAddress
-        console.log('baseAddress: ' + baseAddress.toBech32())
-        setBaseAddress(baseAddress.toBech32())
-
         const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
         if (!isReconnect) {
             localStorage.setItem(WALLET_NAME_KEY, walletName)
@@ -150,9 +179,8 @@ const Nav: NextPage = (props: any) => {
     }
 
     async function disconnect() {
-        setWalletApi(null)
-        setBaseAddress(null)
         localStorage.removeItem(WALLET_NAME_KEY)
+        setWalletApi(null)
     }
 
     async function participate() {
@@ -177,7 +205,7 @@ const Nav: NextPage = (props: any) => {
                     json
                 })))
         }).then(({ status, ok, json }) => {
-            console.log('json: ' + JSON.stringify(json))
+
             const message = json
             switch (status) {
                 case 200:
