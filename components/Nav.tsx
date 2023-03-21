@@ -106,6 +106,25 @@ const Nav: NextPage = (props: any) => {
 
     useEffect(() => {
 
+        (async () => {
+
+            if (walletApi) {
+
+                const walletHelper = new WalletHelper(walletApi)
+                const baseAddress = await walletHelper.baseAddress
+                setBaseAddress(baseAddress)
+
+            } else {
+                setBaseAddress(null)
+            }
+
+        })()
+
+
+    }, [walletApi])
+
+    useEffect(() => {
+
         const getBalance = async () => {
             if (baseAddress) {
                 const isMainnet = 'mainnet' == network.toString()
@@ -186,7 +205,7 @@ const Nav: NextPage = (props: any) => {
                     json
                 })))
         }).then(({ status, ok, json }) => {
-            
+
             const message = json
             switch (status) {
                 case 200:
