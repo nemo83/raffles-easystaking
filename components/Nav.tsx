@@ -63,6 +63,13 @@ const Nav: NextPage = (props: any) => {
             console.log('enabled')
 
             setWalletApi(walletApi)
+
+            const walletHelper = new WalletHelper(walletApi)
+
+            const baseAddress = await walletHelper.baseAddress
+            console.log('baseAddress: ' + baseAddress.toBech32())
+            setBaseAddress(baseAddress.toBech32())
+
         })
     }, [])
 
