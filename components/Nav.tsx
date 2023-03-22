@@ -357,7 +357,7 @@ const Nav: NextPage = (props: any) => {
 
                 </div>
 
-                <div className="relative flex pt-3 space-x-2 dropdown pull-right">
+                <div className="relative flex ml-4 space-x-2 dropdown pull-right">
                     <div className={`relative flex p-1` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-white' : '')}>
                         {/* Connect */}
                         <div className={`text-slate-50 px-2 font-semibold`}>
