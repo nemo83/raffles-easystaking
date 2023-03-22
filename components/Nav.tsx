@@ -410,14 +410,14 @@ const Nav: NextPage = (props: any) => {
                                 {(currentRoute == '/raffles') ? (
                                     <div
                                         onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}
-                                        className="w-full m-0 text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
+                                        className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
                                         Participate
                                     </div>
                                 ) : null}
 
                                 <div
                                     onClick={() => { disconnect(); setShowSubMenu(!showSubMenu) }}
-                                    className="w-full m-0 text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
+                                    className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
                                     Disconnect
                                 </div>
                             </div>
