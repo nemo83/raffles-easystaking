@@ -289,7 +289,7 @@ const Nav: NextPage = (props: any) => {
             <div className="container flex flex-wrap items-center w-full pt-2 pb-3 mx-auto my-1 mt-0 lg:pb-0">
 
 
-                <div className="block pr-4 lg:hidden">
+                <div className="flex-grow block pr-4 lg:hidden">
                     <button id="nav-toggle"
                         className="flex items-center px-3 py-2 text-gray-300 border border-gray-300 rounded appearance-none hover:text-slate-50 hover:border-slate-50 focus:outline-none"
                         onClick={() => setShowMenu(!showMenu)}>
@@ -357,7 +357,7 @@ const Nav: NextPage = (props: any) => {
 
                 </div>
 
-                <div className="relative hidden pl-4 pr-4 space-x-2 dropdown pull-right md:pr-0 lg:flex">
+                <div className="relative flex pt-3 space-x-2 dropdown pull-right">
                     <div className={`relative flex p-1` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-white' : '')}>
                         {/* Connect */}
                         <div className={`text-slate-50 px-2 font-semibold`}>
@@ -404,25 +404,20 @@ const Nav: NextPage = (props: any) => {
                                 className="mr-3"
                             />
                         </div>
-                        {walletApi && showSubMenu ? (
-                            <div className="absolute right-0 mt-10 origin-top-right bg-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
-                                <div className="py-1 divide-y-2 divide-white" role="none">
-                                    {(currentRoute == '/raffles') ? (
-                                        <div
-                                            onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}
-                                            className="flex items-center justify-start h-8 p-0 pl-3 mx-1 my-2 text-black capitalize bg-gray-200 w-28 opacity-95 flex-container right-2 hover:underline hover:cursor-pointer top-28">
-                                            Participate
-                                        </div>
-                                        // <div>
-                                        //     <button type='button' className='px-3 py-2 rounded-full dropdown-toggle bg-slate-300 hover:bg-slate-400'
-                                        //         onClick={() => setShowModal(!showModal)}>Participate</button>
 
-                                        // </div>
-                                    ) : null}
-                                </div>
+                        {walletApi && showSubMenu ? (
+                            <div className="absolute flex flex-col w-full mt-10 origin-top-right bg-gray-200 divide-y-2 divide-white rounded-md" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
+                                {(currentRoute == '/raffles') ? (
+                                    <div
+                                        onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}
+                                        className="w-full m-0 text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
+                                        Participate
+                                    </div>
+                                ) : null}
+
                                 <div
                                     onClick={() => { disconnect(); setShowSubMenu(!showSubMenu) }}
-                                    className="flex items-center justify-start h-8 p-0 pl-3 mx-1 my-2 text-black capitalize bg-gray-200 w-28 opacity-95 flex-container right-2 hover:underline hover:cursor-pointer top-28">
+                                    className="w-full m-0 text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
                                     Disconnect
                                 </div>
                             </div>
