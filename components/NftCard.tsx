@@ -92,7 +92,25 @@ const NftCard = ({
             numTickets,
             raffleScript,
             walletApi
-        )
+        ).then(() => {
+            toast.success('Transaction successfully submited!')
+            setShowModal(false)
+            setInterval(callback, 20000, 6)
+        }).catch(errorMessage => {
+            console.log('error', errorMessage)
+            toast.error(errorMessage.message)
+        })
+    }
+
+    const collectNft = async () => {
+        collectPrize(policyIdHex, assetNameHex, vaultScript, walletApi)
+            .then(() => {
+                toast.success("Success!\nThe NFT it's on his way!")
+            })
+            .catch(errorMessage => {
+                console.log('error', errorMessage)
+                toast.error(errorMessage.message)
+            })
     }
 
     const setInterval = async (fn: () => void, delay: number, times: number) => {
@@ -150,11 +168,7 @@ const NftCard = ({
                                 className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase bg-blue-400 rounded shadow outline-none hover:bg-blue-500 focus:outline-none"
                                 type="button"
                                 onClick={() => {
-                                    buyTicket().then(() => {
-                                        toast.success('Transaction successfully submited!')
-                                        setShowModal(false)
-                                        setInterval(callback, 20000, 6)
-                                    })
+                                    buyTicket()
                                 }} >
                                 Buy Ticket
                             </button>
@@ -244,7 +258,7 @@ const NftCard = ({
                             <button
                                 type='button'
                                 className='w-full bg-red-500 rounded'
-                                onClick={() => collectPrize(policyIdHex, assetNameHex, vaultScript, walletApi)}>
+                                onClick={() => collectNft()}>
                                 Collect prize
                             </button>
                         </div>) : null}

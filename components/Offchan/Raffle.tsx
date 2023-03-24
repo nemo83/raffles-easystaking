@@ -19,7 +19,6 @@ import {
   ByteArray,
   ValidatorHash,
   Cip30Wallet,
-  ByteArrayData
 } from "@hyperionbt/helios";
 import {
   network,
@@ -59,10 +58,6 @@ const getKeyUtxo = async (scriptAddress: string, keyMPH: string, keyName: string
       [tokenName, BigInt(1)],
     ]]
   ]));
-
-  console.log('payload[0].tx_hash: ' + payload[0].tx_hash)
-  console.log('payload[0].output_index: ' + payload[0].output_index)
-  console.log('inline datum: ' + payload[0].inline_datum)
 
   return new UTxO(
     TxId.fromHex(payload[0].tx_hash),
@@ -111,7 +106,6 @@ export const createNftRaffle = async (
 
   // Extract the validator script address
   const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
-  console.log('valAddr: ' + raffleAddress.toBech32())
 
   // Compile the NFT Vault Script
   const vaultProgram = Program.new(nftVaultScript);
@@ -119,9 +113,6 @@ export const createNftRaffle = async (
 
   // Extract the validator script address
   const vaultAddress = Address.fromValidatorHash(vaultUplcProgram.validatorHash);
-  console.log('vaultAddress: ' + vaultAddress.toBech32())
-  console.log('vaultAddress.validatorHash.hex: ' + vaultAddress.validatorHash.hex)
-  console.log('vaultAddress.toHex: ' + vaultAddress.toHex())
 
   const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
@@ -160,15 +151,10 @@ export const createNftRaffle = async (
     .addOutput(new TxOutput(raffleAddress, nftValue, Datum.inline(raffleDatum._toUplcData())))
     .finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1]);
 
-  console.log("tx after final", tx.dump());
-
-  console.log("Verifying signature...");
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
-  console.log("Submitting transaction...");
   const txHash = await walletApi.submitTx(tx);
-  console.log('txHash: ' + txHash.hex)
 
   const newRaffle: CreateRaffle = {
     adminPkh: walletBaseAddress.pubKeyHash.hex,
@@ -198,7 +184,6 @@ export const retrieveNft = async (
 
   // Extract the validator script address
   const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
-  console.log('valAddr: ' + raffleAddress.toBech32())
 
   const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
@@ -220,16 +205,10 @@ export const retrieveNft = async (
     .addSigner(walletBaseAddress.pubKeyHash)
     .finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
-  console.log("tx after final", tx.dump());
-
-  console.log("Verifying signature...");
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
-  console.log("Submitting transaction...");
   const txHash = await walletApi.submitTx(tx);
-  console.log('txHash: ' + txHash.hex)
-
 
 }
 
@@ -249,13 +228,9 @@ export const buyRaffleTickets = async (
   // Compile the helios minting script
   const raffleProgram = Program.new(raffleScript);
   const raffleUplcProgram = raffleProgram.compile(optimizeSmartContracts);
-  console.log('raffleUplcProgram.validatorHash ' + raffleUplcProgram.validatorHash.hex)
-
 
   // Extract the validator script address
   const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
-  console.log('valAddr: ' + raffleAddress.toBech32())
-  console.log('valAddr.bytes: ' + raffleAddress.toHex())
 
   const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
@@ -264,35 +239,32 @@ export const buyRaffleTickets = async (
 
   const foo = contractUtxo.origOutput.datum.data as ListData
   const adminPkh = PubKeyHash.fromUplcData(foo.list[0])
-  console.log('adminPkh: ' + adminPkh.hex)
 
   const ticketPrice = Value.fromUplcData(foo.list[1])
-  console.log('ticketPrice: ' + ticketPrice.toSchemaJson())
 
   const numMaxTicketsPerWallet = foo.list[2] as IntData
-  console.log('numMaxTicketsPerWallet: ' + numMaxTicketsPerWallet.value)
 
   const participants = (foo.list[3] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
-  console.log('participants: ' + participants)
 
   const numMaxParticipants = foo.list[4] as IntData
-  console.log('numMaxParticipants: ' + numMaxParticipants.value)
 
   const seedHash = ByteArray.fromUplcData(foo.list[5])
-  console.log('seedHash: ' + seedHash)
 
   const vaultPkh = ValidatorHash.fromUplcData(foo.list[6])
-  console.log('vaultPkh: ' + vaultPkh.hex)
 
   const newParticipants = participants.slice()
   for (var i = 0; i < numTicketsToBuy; i++) {
     newParticipants.unshift(walletBaseAddress.pubKeyHash)
   }
-  console.log('newParticipants: ' + newParticipants)
 
   // Join raffle by paying 5 $ada
   const ticketsPrice = new Value(BigInt(numTicketsToBuy) * ticketPrice.lovelace)
-  const walletUtxos = await walletHelper.pickUtxos(ticketsPrice)
+  const walletUtxos = await walletHelper
+    .pickUtxos(ticketsPrice)
+    .catch(error => {
+      console.error(error)
+      throw new Error(' Insufficient Funds')
+    })
 
   const newDatum = new (raffleProgram.types.Datum)(
     adminPkh,
@@ -321,19 +293,14 @@ export const buyRaffleTickets = async (
     .attachScript(raffleUplcProgram)
     .addSigner(walletBaseAddress.pubKeyHash)
 
-  console.log("tx before final", tx.dump());
 
   await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
-  console.log("tx after final", tx.dump());
 
-  console.log("Verifying signature...");
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
-  console.log("Submitting transaction...");
   const txHash = await walletApi.submitTx(tx);
-  console.log('txHash: ' + txHash.hex)
 
 }
 
@@ -363,7 +330,6 @@ export const selectWinner = async (
 
   // Extract the validator script address
   const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
-  console.log('valAddr: ' + raffleAddress.toBech32())
 
   // Compile the NFT Vault Script
   const vaultProgram = Program.new(nftVaultScript);
@@ -371,45 +337,28 @@ export const selectWinner = async (
 
   // Extract the validator script address
   const vaultAddress = Address.fromValidatorHash(vaultUplcProgram.validatorHash);
-  console.log('vaultAddress: ' + vaultAddress.toBech32())
-  console.log('vaultAddress.validatorHash.hex: ' + vaultAddress.validatorHash.hex)
-  console.log('vaultAddress.toHex: ' + vaultAddress.toHex())
 
   const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
-  console.log('walletBaseAddress: ' + walletBaseAddress.toBech32())
-  console.log('walletBaseAddress.pubKeyHash: ' + walletBaseAddress.pubKeyHash.hex)
 
-
-  console.log('a')
   const contractUtxo = await getKeyUtxo(raffleAddress.toBech32(), policyIdHex, assetNameHex)
-  console.log('b')
-  // const nonEmptyDatumUtxo = contractUtxo.filter(utxo => utxo.origOutput.datum != null)
 
   const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(5_000_000)))
-  console.log('c')
 
   const foo = contractUtxo.origOutput.datum.data as ListData
   const adminPkh = PubKeyHash.fromUplcData(foo.list[0])
-  console.log('adminPkh: ' + adminPkh.hex)
 
   const participants = (foo.list[3] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
-  console.log('participants: ' + participants)
 
   const vaultPkh = PubKeyHash.fromUplcData(foo.list[6])
-  console.log('vaultPkh: ' + vaultPkh.hex)
 
   const totalValueLocked = contractUtxo.value
 
   const vaultValue = new Value(BigInt(2_000_000), totalValueLocked.assets)
-  console.log('vaultValue: ' + vaultValue.toSchemaJson())
 
   const adminValue = totalValueLocked.sub(vaultValue)
-  console.log('adminValue: ' + adminValue.toSchemaJson())
 
   const winningIndex = calculateWinningIndex(seed, `${participants.length}`)
-  console.log('winningIndex: ' + winningIndex)
-  // const valRedeemer = new ConstrData(0, []);
 
   const valRedeemer = (new (raffleProgram.types.Redeemer as any).SelectWinner(
     new ByteArray(Array.from(new TextEncoder().encode(seed))),
@@ -431,19 +380,12 @@ export const selectWinner = async (
     .attachScript(raffleUplcProgram)
     .addSigner(walletBaseAddress.pubKeyHash)
 
-  console.log("tx before final", tx.dump());
-
   await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
-  console.log("tx after final", tx.dump());
-
-  console.log("Verifying signature...");
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
-  console.log("Submitting transaction...");
   const txHash = await walletApi.submitTx(tx);
-  console.log('txHash: ' + txHash.hex)
 
   const winner: Winner = {
     winnerPkh: participants.at(Number(winningIndex)).hex,
@@ -478,6 +420,10 @@ export const collectPrize = async (
   const contractUtxo = await getKeyUtxo(vaultAddress.toBech32(), policyIdHex, assetNameHex)
 
   const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(1_000_000)))
+    .catch(error => {
+      console.error('error', error)
+      throw new Error("Not enough funds!")
+    })
 
   const valRedeemer = new ConstrData(1, []);
 
@@ -488,20 +434,13 @@ export const collectPrize = async (
     .attachScript(vaultUplcProgram)
     .addSigner(walletBaseAddress.pubKeyHash)
 
-  console.log("tx before final", tx.dump());
 
   await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
-  console.log("tx after final", tx.dump());
-
-  console.log("Verifying signature...");
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
-  console.log("Submitting transaction...");
   const txHash = await walletApi.submitTx(tx);
-  console.log('txHash: ' + txHash.hex)
-
 
 }
 
@@ -540,20 +479,13 @@ export const stealPrize = async (
     .attachScript(vaultUplcProgram)
     .addSigner(walletBaseAddress.pubKeyHash)
 
-  console.log("tx before final", tx.dump());
 
   await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
-  console.log("tx after final", tx.dump());
-
-  console.log("Verifying signature...");
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
-  console.log("Submitting transaction...");
   const txHash = await walletApi.submitTx(tx);
-  console.log('txHash: ' + txHash.hex)
-
 
 }
 
@@ -561,8 +493,6 @@ export const mintNftInWallet = async (
   assetName: string,
   walletApi: Cip30Wallet
 ) => {
-
-  console.log('mint nft')
 
   // Get wallet UTXOs
   const walletHelper = new WalletHelper(walletApi);
@@ -638,19 +568,13 @@ export const mintNftInWallet = async (
     await fetch(getNetworkParam(network))
       .then(response => response.json())
   )
-  console.log("tx before final", tx.dump());
 
   // Send any change back to the buyer
   await tx.finalize(networkParams, changeAddr, utxos[1]);
-  console.log("tx after final", tx.dump());
 
-  console.log("Verifying signature...");
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
 
-  console.log("Submitting transaction...");
   const txHash = await walletApi.submitTx(tx);
-
-  console.log("txHash", txHash.hex);
 
 }
