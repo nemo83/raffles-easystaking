@@ -3,7 +3,7 @@ import { useWalletContext } from "../components/WalletProvider";
 import type { NextPage } from 'next'
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner, stealPrize, rnd } from "../components/Offchan/Raffle"
+import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner, stealPrize, rnd, getKeyUtxo, parseDatum } from "../components/Offchan/Raffle"
 import path from 'path';
 import fs from 'fs';
 import { Program, Address, PubKeyHash } from '@hyperionbt/helios';
@@ -72,7 +72,7 @@ const NftRaffles: NextPage = (props: any) => {
 
     const addressFomePk = Address.fromPubKeyHash(PubKeyHash.fromHex('03d23cc49ab2f51abb0e6a6a2b06ad215ebeb9ba37e034f526d32098'))
     console.log('addressFomePk: ' + addressFomePk.toBech32())
-    
+
   }
 
   const callMintScript = async () => {
@@ -141,7 +141,7 @@ const NftRaffles: NextPage = (props: any) => {
       raffleScript,
       walletApi
     )
-  }  
+  }
 
   const selectRaffleWinner = async () => {
     selectWinner(
@@ -211,6 +211,53 @@ const NftRaffles: NextPage = (props: any) => {
 
   }
 
+  const updateDbRaffles = async () => {
+
+    const uplcProgram = Program.new(raffleScript).compile(optimizeSmartContracts)
+
+    const address = Address.fromValidatorHash(uplcProgram.validatorHash)
+
+    fetch(`${lotteryApi}/nft_raffles`, {
+      headers: {
+        accept: "application/json"
+      }
+    })
+      .then(raffles => raffles.json())
+      .then(raffles => {
+        const promises = raffles
+          .filter(raffle => raffle.network == network)
+          .map(raffle => getKeyUtxo(address.toBech32(), raffle.policy_id, raffle.asset_name)
+            .then(utxo => {
+              const datum = parseDatum(utxo.origOutput.datum.data, Program.new(raffleScript))
+              const body = JSON.stringify({
+                policy_id: raffle.policy_id,
+                asset_name: raffle.asset_name,
+                collection_name: raffle.collection_name,
+                nft_name: raffle.nft_name,
+                main_img_url: raffle.main_img_url,
+                status: raffle.status,
+                network,
+                participants: datum.participants
+              })
+
+              console.log('body: ' + body)
+
+              return fetch(`${lotteryApi}/nft_raffles`, {
+                method: "PUT",
+                headers: {
+                  'content-type': "application/json",
+                  accept: "application/json"
+                },
+                body
+              })
+
+            }))
+
+        Promise.all(promises)
+      })
+
+  }
+
 
   return (
     <Layout >
@@ -244,6 +291,12 @@ const NftRaffles: NextPage = (props: any) => {
         type="button"
         onClick={() => stealPrize(policyId, Buffer.from(assetName).toString("hex"), vaultScript, walletApi)} >
         Steal Prize
+      </button>
+      <button
+        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+        type="button"
+        onClick={() => updateDbRaffles()} >
+        Update DB Raffles
       </button>
       <div className="block w-full max-w-sm p-6 rounded-lg shadow-lg ">
         <form>

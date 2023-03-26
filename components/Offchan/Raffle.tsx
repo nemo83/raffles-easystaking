@@ -19,6 +19,7 @@ import {
   ByteArray,
   ValidatorHash,
   Cip30Wallet,
+  UplcData,
 } from "@hyperionbt/helios";
 import {
   network,
@@ -29,7 +30,7 @@ import {
 import { optimizeSmartContracts } from "../../constants/lottery"
 import { sha256 } from 'js-sha256';
 
-const getKeyUtxo = async (scriptAddress: string, keyMPH: string, keyName: string) => {
+export const getKeyUtxo = async (scriptAddress: string, keyMPH: string, keyName: string) => {
 
   const blockfrostUrl: string = getBlockfrostUrl(network) + "/addresses/" + scriptAddress + "/utxos/" + keyMPH + keyName;
 
@@ -209,6 +210,50 @@ export const retrieveNft = async (
   tx.addSignatures(signatures);
 
   const txHash = await walletApi.submitTx(tx);
+
+}
+
+interface DatumV1 {
+  adminPkh: string,
+  ticketPrice: Number,
+  numMaxTicketsPerWallet: Number,
+  participants: string[],
+  numMaxParticipants: Number,
+  seedHash: string,
+  vaultPkh: string
+}
+
+export const parseDatum = (datum: UplcData, raffleProgram: Program) => {
+
+  const data = datum as ListData
+
+  const adminPkh = PubKeyHash.fromUplcData(data.list[0])
+
+  const ticketPrice = Value.fromUplcData(data.list[1])
+
+  const numMaxTicketsPerWallet = data.list[2] as IntData
+
+  const participants = (data.list[3] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
+
+  const numMaxParticipants = data.list[4] as IntData
+
+  const seedHash = ByteArray.fromUplcData(data.list[5])
+
+  const vaultPkh = ValidatorHash.fromUplcData(data.list[6])
+
+  const newParticipants = participants.slice()
+
+  const datumV1: DatumV1 = {
+    adminPkh: adminPkh.hex,
+    ticketPrice: Number(ticketPrice.lovelace),
+    numMaxTicketsPerWallet: Number(numMaxTicketsPerWallet.value),
+    participants: newParticipants.map(participant => participant.hex),
+    numMaxParticipants: Number(numMaxParticipants.value),
+    seedHash: seedHash.hex,
+    vaultPkh: vaultPkh.hex
+  }
+
+  return datumV1
 
 }
 
