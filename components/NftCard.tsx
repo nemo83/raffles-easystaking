@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faTicket, faStar, faCalendar
+    faTicket, faStar, faCalendar, faClock
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -58,6 +58,33 @@ const NftCard = ({
 
     const [floorPrice, setFloorPrice] = useState('N/A')
 
+    const [countdown, setCountdown] = useState(0)
+    const [cdInterval, setCDInterval] = useState(null)
+    const [cdValue, setCDValue] = useState('')
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCountdown(deadline.getTime() - new Date().getTime())
+        }, 1000);
+        setCDInterval(interval)
+    }, [deadline]);
+
+    useEffect(() => {
+        if (countdown < 60000 && cdInterval) {
+            clearInterval(cdInterval)
+        }
+
+        const days = Math.floor(countdown / (1000 * 60 * 60 * 24));
+        const hours = Math.floor(
+          (countdown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        );
+        const minutes = Math.floor((countdown % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((countdown % (1000 * 60)) / 1000);
+
+        setCDValue(`${days}d ${hours}h ${minutes}m ${seconds}s`)
+
+    }, [countdown, cdInterval]);
+
     useEffect(() => {
         const options = []
         const numAvailTickets = Math.min((maxNumTicketsPerWallet - numWalletPurchasedTickets), maxParticipants - numPurchasedTickets)
@@ -97,7 +124,7 @@ const NftCard = ({
         ).then(() => {
             toast.success('Transaction successfully submited!')
             setShowModal(false)
-            setInterval(callback, 20000, 6)
+            repeatN(callback, 20000, 6)
         }).catch(errorMessage => {
             console.log('error', errorMessage)
             toast.error(errorMessage.message)
@@ -115,7 +142,7 @@ const NftCard = ({
             })
     }
 
-    const setInterval = async (fn: () => void, delay: number, times: number) => {
+    const repeatN = async (fn: () => void, delay: number, times: number) => {
         var x = 0;
         var intervalID = window.setInterval(function () {
 
@@ -223,7 +250,7 @@ const NftCard = ({
                         <div className="flex items-center justify-between gap-1 mb-2">
                             <span className="grid text-sm text-gray-900 place-content-center">
                                 <p>
-                                    <FontAwesomeIcon icon={faCalendar} size="sm" /> {deadline ? deadline.toLocaleDateString() : 'N/A'}
+                                    <FontAwesomeIcon icon={faClock} size="sm" /> {cdValue}
                                 </p>
                             </span>
 
