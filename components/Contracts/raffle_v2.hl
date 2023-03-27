@@ -12,7 +12,7 @@ spending raffle
 
       func is_admin(self, tx: Tx) -> Bool { tx.is_signed_by(self.admin) }
 
-      func is_deadline_passed(self, tx: Tx) -> Bool { now < datum.deadline }
+      func is_deadline_passed(self, tx: Tx) -> Bool { tx.time_range.is_after(self.deadline) }
   }
 
   enum Redeemer {
@@ -95,7 +95,7 @@ spending raffle
 
   func main(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
       tx: Tx = context.tx;
-      now: Time = tx.time_range.start;
+      
       redeemer.switch {
         Admin => {
             datum.is_admin(tx).trace("TRACE_IS_ADMIN: ")

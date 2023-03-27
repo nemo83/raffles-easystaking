@@ -165,7 +165,7 @@ const NftRaffles: NextPage = (props: any) => {
       ticketPrice,
       date,
       saltedSeed,
-      raffleScript,
+      raffleV2Script,
       vaultScript,
       walletApi
     ).then(async (createRaffle) => {
@@ -211,7 +211,7 @@ const NftRaffles: NextPage = (props: any) => {
     return retrieveNft(
       policyId,
       Buffer.from(assetName).toString("hex"),
-      raffleScript,
+      raffleV2Script,
       walletApi
     )
   }
@@ -223,6 +223,45 @@ const NftRaffles: NextPage = (props: any) => {
       policyId,
       Buffer.from(assetName).toString("hex"),
       raffleScript,
+      vaultScript,
+      walletApi
+    ).then(async (winner) => {
+
+      const body = JSON.stringify({
+        policy_id: policyId,
+        asset_name: Buffer.from(assetName).toString("hex"),
+        network,
+        winner_pkh: winner.winnerPkh,
+        participants: winner.participants
+      })
+
+      console.log('body: ' + body)
+
+      let resp = await fetch(`${lotteryApi}/nft_raffles/close`, {
+        method: "POST",
+        headers: {
+          'content-type': "application/json",
+          accept: "application/json"
+        },
+        body
+      });
+
+      if (resp?.status == 200) {
+        toast.success('NFT Raffle successfully created!')
+      } else {
+        toast.error('Error while creating NFT Raffle')
+      }
+
+    })
+  }
+
+  const selectRaffleWinnerV2 = async () => {
+    raffleV2.selectWinner(
+      seed,
+      salt,
+      policyId,
+      Buffer.from(assetName).toString("hex"),
+      raffleV2Script,
       vaultScript,
       walletApi
     ).then(async (winner) => {
@@ -422,6 +461,9 @@ const NftRaffles: NextPage = (props: any) => {
               Next Salt
             </label>
             <input type={'text'} value={nextSeed} disabled={true}></input>
+          </div>
+          <div>
+            <h2> Raffle V1</h2>
             <button
               className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
               type="button"
@@ -433,6 +475,26 @@ const NftRaffles: NextPage = (props: any) => {
               type="button"
               onClick={() => selectRaffleWinner()} >
               Select Winner
+            </button>
+          </div><div>
+            <h2> Raffle V2</h2>
+            <button
+              className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+              type="button"
+              onClick={() => createRaffleV2()} >
+              Create Raffle
+            </button>
+            <button
+              className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+              type="button"
+              onClick={() => selectRaffleWinnerV2()} >
+              Select Winner
+            </button>
+            <button
+              className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+              type="button"
+              onClick={() => createRaffleV2()} >
+              Migrate Raffle
             </button>
           </div>
         </form>

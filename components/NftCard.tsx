@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faTicket, faStar,
+    faTicket, faStar, faCalendar
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useWalletContext } from "../components/WalletProvider";
-import { buyRaffleTickets, collectPrize } from './Offchan/Raffle'
+import * as raffleV2 from './Offchan/RaffleV2'
 import { toast } from 'react-hot-toast';
 import { network } from '../constants/blockfrost';
 
@@ -20,6 +20,7 @@ interface NftCard {
     maxNumTicketsPerWallet: number,
     numPurchasedTickets: number,
     numWalletPurchasedTickets: number | undefined,
+    deadline: Date | undefined,
     userWon: boolean,
     raffleScript: string,
     vaultScript: string,
@@ -37,6 +38,7 @@ const NftCard = ({
     maxNumTicketsPerWallet,
     numPurchasedTickets,
     numWalletPurchasedTickets,
+    deadline,
     userWon,
     raffleScript,
     vaultScript,
@@ -86,7 +88,7 @@ const NftCard = ({
 
 
     const buyTicket = async () => {
-        return buyRaffleTickets(
+        return raffleV2.buyRaffleTickets(
             policyIdHex,
             assetNameHex,
             numTickets,
@@ -103,7 +105,7 @@ const NftCard = ({
     }
 
     const collectNft = async () => {
-        collectPrize(policyIdHex, assetNameHex, vaultScript, walletApi)
+        raffleV2.collectPrize(policyIdHex, assetNameHex, vaultScript, walletApi)
             .then(() => {
                 toast.success("Success!\nThe NFT it's on his way!")
             })
@@ -218,6 +220,14 @@ const NftCard = ({
 
                         </div>
 
+                        <div className="flex items-center justify-between gap-1 mb-2">
+                            <span className="grid text-sm text-gray-900 place-content-center">
+                                <p>
+                                    <FontAwesomeIcon icon={faCalendar} size="sm" /> {deadline ? deadline.toLocaleDateString() : 'N/A'}
+                                </p>
+                            </span>
+
+                        </div>
                         <div className="flex items-center justify-between gap-1 mb-2">
                             <span className="grid text-sm text-gray-900 place-content-center">
                                 <p>

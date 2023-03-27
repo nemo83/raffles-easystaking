@@ -19,7 +19,8 @@ import {
   PubKeyHash,
   IntData,
   Program,
-  WalletHelper
+  WalletHelper,
+  Time
 } from "@hyperionbt/helios"
 import path from 'path';
 import fs from 'fs';
@@ -27,7 +28,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faRotate
 } from "@fortawesome/free-solid-svg-icons";
-import Table from "../components/Table"
 import { getBlockfrostKey, getBlockfrostUrl, network } from "../constants/blockfrost"
 import { lotteryApi, optimizeSmartContracts } from "../constants/lottery"
 import Link from "next/link";
@@ -37,12 +37,15 @@ export async function getStaticProps() {
 
   const contractsDirectory = path.join(process.cwd(), 'components/Contracts/');
   const raffleContract = fs.readFileSync(contractsDirectory + 'raffle.hl', 'utf8');
+  const raffleV2Contract = fs.readFileSync(contractsDirectory + 'raffle_v2.hl', 'utf8');
   const vaultContract = fs.readFileSync(contractsDirectory + 'vault.hl', 'utf8');
   const raffleScript = raffleContract.toString();
+  const raffleV2Script = raffleV2Contract.toString();
   const vaultScript = vaultContract.toString();
 
   const scripts = {
     raffleScript,
+    raffleV2Script,
     vaultScript
   }
 
@@ -57,7 +60,7 @@ export async function getStaticProps() {
 const NftRaffles: NextPage = (props: any) => {
 
   const raffleScript = props.scripts.raffleScript
-
+  const raffleV2Script = props.scripts.raffleV2Script
   const vaultScript = props.scripts.vaultScript
 
   const [walletApi, setWalletApi] = useWalletContext();
@@ -135,7 +138,8 @@ const NftRaffles: NextPage = (props: any) => {
             numMaxTicketPerWallet: beRaffle.num_max_tickets_per_wallet,
             numParticipants: beRaffle.num_max_participants,
             participants: participants,
-            numTickets: numTickets
+            numTickets: numTickets,
+            deadline: null
           }
           return raffle
         } else {
@@ -172,7 +176,8 @@ const NftRaffles: NextPage = (props: any) => {
     numMaxTicketPerWallet: number,
     numParticipants: number,
     participants: string[],
-    numTickets: number | undefined
+    numTickets: number | undefined,
+    deadline: Date | undefined
   }
 
   interface Raffle {
@@ -185,7 +190,8 @@ const NftRaffles: NextPage = (props: any) => {
     numMaxTicketPerWallet: number,
     numParticipants: number,
     participants: string[],
-    numTickets: number | undefined
+    numTickets: number | undefined,
+    deadline: Date | undefined
   }
 
   interface WonNft {
@@ -202,6 +208,7 @@ const NftRaffles: NextPage = (props: any) => {
     const numMaxTicketPerWallet = datum.list[2] as IntData
     const participants = (datum.list[3] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
     const numMaxParticipants = datum.list[4] as IntData
+    const deadline = Time.fromUplcData(datum.list[7])
 
     const numTickets = participants.reduce((acc, curr) => {
       if (walletPkh == curr.hex) {
@@ -221,7 +228,8 @@ const NftRaffles: NextPage = (props: any) => {
       numMaxTicketPerWallet: Number(numMaxTicketPerWallet.value),
       numParticipants: Number(numMaxParticipants.value),
       participants: participants.map(participant => participant.hex),
-      numTickets: numTickets
+      numTickets: numTickets,
+      deadline: new Date(Number(deadline.value))
     }
     return raffle
 
@@ -309,7 +317,7 @@ const NftRaffles: NextPage = (props: any) => {
 
     console.log('Running inspectAddress')
 
-    const program = Program.new(raffleScript).compile(optimizeSmartContracts)
+    const program = Program.new(raffleV2Script).compile(optimizeSmartContracts)
     const address = Address.fromValidatorHash(program.validatorHash);
 
     const blockfrostUrl: string = getBlockfrostUrl(network) + "/addresses/" + address.toBech32() + "/utxos";
@@ -437,8 +445,9 @@ const NftRaffles: NextPage = (props: any) => {
             ticketPrices={raffle.ticketPrice}
             numWalletPurchasedTickets={raffle.numTickets}
             maxNumTicketsPerWallet={raffle.numMaxTicketPerWallet}
-            raffleScript={raffleScript}
+            raffleScript={raffleV2Script}
             vaultScript={vaultScript}
+            deadline={raffle.deadline}
             callback={inspectAddress}
             userWon={userWon(raffle)} />
         ))}
