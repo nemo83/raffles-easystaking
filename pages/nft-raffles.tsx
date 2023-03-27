@@ -338,6 +338,7 @@ const NftRaffles: NextPage = (props: any) => {
         .flatMap(utxo => utxo.amount)
         .filter(amount => amount.unit != 'lovelace')
         .map(nft => getRaffles(address.toBech32(), nft.unit)))
+      // console.log('onChainRaffles', JSON.stringify(raffles))
       setOnChainRaffles(raffles)
     } else {
       setOnChainRaffles([])
@@ -387,7 +388,11 @@ const NftRaffles: NextPage = (props: any) => {
 
   useEffect(() => {
     (async () => fetchRaffles())()
-      .then(backendRaffles => setBackendRaffles(backendRaffles.filter(raffle => raffle.network == network)))
+      .then(backendRaffles => {
+        const filteredRaffles = backendRaffles.filter(raffle => raffle.network == network)
+        // console.log('filteredRaffles', JSON.stringify(filteredRaffles))
+        setBackendRaffles(filteredRaffles)
+      })
     console.log('fetchRaffles')
   }, [])
 

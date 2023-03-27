@@ -323,11 +323,19 @@ export const buyRaffleTickets = async (
     BigInt(numTicketsToBuy)
   ))._toUplcData()
 
+  const now = new Date()
+  const before = new Date(now.getTime())
+  before.setHours(now.getHours() - 1)
+  const after = new Date(now.getTime())
+  after.setHours(now.getHours() + 1)
+
   const tx = new Tx();
   tx.addInput(contractUtxo, valRedeemer)
     .addInputs(walletUtxos[0])
     .addOutput(new TxOutput(raffleAddress, targetValue, Datum.inline(newDatum)))
     .attachScript(raffleUplcProgram)
+    .validFrom(before)
+    .validTo(after)
     .addSigner(walletBaseAddress.pubKeyHash)
 
   await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
@@ -406,11 +414,20 @@ export const selectWinner = async (
     participants.at(Number(winningIndex))
   )
 
+  const now = new Date()
+  const before = new Date(now.getTime())
+  before.setHours(now.getHours() - 1)
+  const after = new Date(now.getTime())
+  after.setHours(now.getHours() + 1)
+
+
   const tx = new Tx();
   tx.addInput(contractUtxo, valRedeemer)
     .addInputs(walletUtxos[0])
     .addOutput(new TxOutput(walletBaseAddress, adminValue))
     .addOutput(new TxOutput(vaultAddress, vaultValue, Datum.inline(vaultDatum)))
+    .validFrom(before)
+    .validTo(after)
     .attachScript(raffleUplcProgram)
     .addSigner(walletBaseAddress.pubKeyHash)
 

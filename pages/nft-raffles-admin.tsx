@@ -325,7 +325,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   const updateDbRaffles = async () => {
 
-    const uplcProgram = Program.new(raffleScript).compile(optimizeSmartContracts)
+    const uplcProgram = Program.new(raffleV2Script).compile(optimizeSmartContracts)
 
     const address = Address.fromValidatorHash(uplcProgram.validatorHash)
 
