@@ -139,20 +139,20 @@ spending raffle
 
           // 2 ada + NFT sent to winner address
           // Reminder of the ada sent to admin wallet.
-
           // admin or Deadline passed or enough participants
-          (datum.is_admin(tx).trace("TRACE_IS_ADMIN: ") || datum.is_deadline_passed(tx).trace("DEADLINE_NOT_PASSED: ") || rafflefull(datum).trace("TRACE_RAFFLE_FULL: ")) &&
+          (datum.is_deadline_passed(tx).trace("DEADLINE_NOT_PASSED: ") || rafflefull(datum).trace("TRACE_RAFFLE_FULL: ")) &&
           // the seed is valid
           (datum.seedHash == concatSha).trace("SEED_MATCH: ") &&
+          // There's at least 1 participant
+          (datum.participants.length == 0).trace("NO_PARTICIPANTS: ") &&
           // The winning index is correct (tmp)
-          (select_winning_index(seed, datum.numMaxParticipants) == selectWinner.index).trace("TRACE_INDEX: ") &&
+          (select_winning_index(seed, datum.participants.length) == selectWinner.index).trace("TRACE_INDEX: ") &&
           // Check correct values sent to admin and vault
           values_sent_to_admin_and_vault(tx, 
             context.get_current_input().output.value,
             datum.vaultPkh, 
             datum.admin, 
-            datum.participants.get(selectWinner.index)
-            )
+            datum.participants.get(selectWinner.index))
         }
     }
   }
