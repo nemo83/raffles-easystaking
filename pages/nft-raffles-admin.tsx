@@ -4,6 +4,7 @@ import type { NextPage } from 'next'
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner, stealPrize, rnd, getKeyUtxo, parseDatum } from "../components/Offchan/Raffle"
+import * as raffleV2 from "../components/Offchan/RaffleV2"
 import path from 'path';
 import fs from 'fs';
 import { Program, Address, PubKeyHash } from '@hyperionbt/helios';
@@ -15,12 +16,15 @@ export async function getStaticProps() {
 
   const contractsDirectory = path.join(process.cwd(), 'components/Contracts/');
   const raffleContract = fs.readFileSync(contractsDirectory + 'raffle.hl', 'utf8');
+  const raffleV2Contract = fs.readFileSync(contractsDirectory + 'raffle_v2.hl', 'utf8');
   const vaultContract = fs.readFileSync(contractsDirectory + 'vault.hl', 'utf8');
+  const raffleV2Script = raffleV2Contract.toString();
   const raffleScript = raffleContract.toString();
   const vaultScript = vaultContract.toString();
 
   const scripts = {
     raffleScript,
+    raffleV2Script,
     vaultScript
   }
 
@@ -35,6 +39,7 @@ export async function getStaticProps() {
 const NftRaffles: NextPage = (props: any) => {
 
   const raffleScript = props.scripts.raffleScript
+  const raffleV2Script = props.scripts.raffleV2Script
   const vaultScript = props.scripts.vaultScript
 
   const [policyId, setPolicyId] = useState('');
@@ -44,6 +49,7 @@ const NftRaffles: NextPage = (props: any) => {
   const [ticketPrice, setTicketPrice] = useState(5_000_000);
   const [numMaxParticipants, setNumMaxParticipants] = useState(10);
   const [numMaxTicketsPerPerson, setNumMaxTicketsPerPerson] = useState(3);
+  const [deadline, setDeadline] = useState('');
   const [seed, setSeed] = useState('');
   const [salt, setSalt] = useState('');
   const [nextSeed, setNextSeed] = useState('')
@@ -57,21 +63,32 @@ const NftRaffles: NextPage = (props: any) => {
     setNextSeed(nextSeed.toString())
   }, [seed])
 
-  const buildScripts = () => {
-    const raffleProgram = Program.new(raffleScript).compile(optimizeSmartContracts)
-    console.log('raffle script built')
+  useEffect(() => {
 
+    console.log('deadline', deadline)
+
+    const dateTime = deadline + 'T21:45:00Z'
+    console.log('dateTime', dateTime)
+    const date = new Date(dateTime)
+
+    console.log('date', date.getTime())
+
+
+  }, [deadline])
+
+  const buildScripts = () => {
+
+    const raffleProgram = Program.new(raffleScript).compile(optimizeSmartContracts)
     const raffleAddress = Address.fromValidatorHash(raffleProgram.validatorHash);
     console.log('raffleAddress: ' + raffleAddress.toBech32())
 
-    const vaultProgram = Program.new(vaultScript).compile(optimizeSmartContracts)
-    console.log('vault script built')
+    const raffleV2Program = Program.new(raffleV2Script).compile(optimizeSmartContracts)
+    const raffleV2Address = Address.fromValidatorHash(raffleV2Program.validatorHash);
+    console.log('raffleV2Address: ' + raffleV2Address.toBech32())
 
+    const vaultProgram = Program.new(vaultScript).compile(optimizeSmartContracts)
     const vaultAddress = Address.fromValidatorHash(vaultProgram.validatorHash);
     console.log('vaultAddress: ' + vaultAddress.toBech32())
-
-    const addressFomePk = Address.fromPubKeyHash(PubKeyHash.fromHex('03d23cc49ab2f51abb0e6a6a2b06ad215ebeb9ba37e034f526d32098'))
-    console.log('addressFomePk: ' + addressFomePk.toBech32())
 
   }
 
@@ -133,6 +150,62 @@ const NftRaffles: NextPage = (props: any) => {
     })
 
   }
+
+  const createRaffleV2 = async () => {
+
+    const saltedSeed = `${seed}${salt}`
+
+    const date = new Date(deadline + 'T21:45:00Z')
+
+    raffleV2.createNftRaffle(
+      policyId,
+      Buffer.from(assetName).toString("hex"),
+      numMaxParticipants,
+      numMaxTicketsPerPerson,
+      ticketPrice,
+      date,
+      saltedSeed,
+      raffleScript,
+      vaultScript,
+      walletApi
+    ).then(async (createRaffle) => {
+
+      const body = JSON.stringify({
+        policy_id: policyId,
+        asset_name: Buffer.from(assetName).toString("hex"),
+        collection_name: collectionName,
+        nft_name: nftName,
+        main_img_url: mainImgUrl,
+        network,
+        admin_pkh: createRaffle.adminPkh,
+        ticket_price: ticketPrice,
+        num_max_tickets_per_wallet: numMaxTicketsPerPerson,
+        num_max_participants: numMaxParticipants,
+        seed_hash: createRaffle.seedHash,
+        vault_pkh: createRaffle.vaultPkh
+      })
+
+      console.log('body: ' + body)
+
+      let resp = await fetch(`${lotteryApi}/nft_raffles`, {
+        method: "POST",
+        headers: {
+          'content-type': "application/json",
+          accept: "application/json"
+        },
+        body
+      });
+
+      if (resp?.status == 200) {
+        toast.success('NFT Raffle successfully created!')
+      } else {
+        toast.error('Error while creating NFT Raffle')
+      }
+
+    })
+
+  }
+
 
   const withdrawAll = async () => {
     return retrieveNft(
@@ -329,6 +402,10 @@ const NftRaffles: NextPage = (props: any) => {
               Max number of Participants
             </label>
             <input type={'number'} value={numMaxParticipants} onChange={(event) => setNumMaxParticipants(Number(event.target.value))}></input>
+            <label className="block mb-1 text-sm font-bold text-black">
+              Deadline
+            </label>
+            <input type={'date'} value={deadline} onChange={(event) => setDeadline(event.target.value)}></input>
             <label className="block mb-1 text-sm font-bold text-black">
               Max tickets per Wallet
             </label>
