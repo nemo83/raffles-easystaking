@@ -112,7 +112,7 @@ const NftRaffles: NextPage = (props: any) => {
         } else {
           return null
         }
-      }).map(raffle => raffle) // filters undefined out
+      }).filter(raffle => raffle) // filters undefined out
 
       // Won Raffles
       const wonRaffles = wonNfts.map(wonNft => {
@@ -145,7 +145,8 @@ const NftRaffles: NextPage = (props: any) => {
         } else {
           return null
         }
-      }).map(raffle => raffle) // filters undefined out
+      }).filter(raffle => raffle) // filters undefined out
+
       setRaffles(wonRaffles.concat(raffles))
 
       const myTableData = backendRaffles

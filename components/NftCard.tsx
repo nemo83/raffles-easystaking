@@ -58,32 +58,34 @@ const NftCard = ({
 
     const [floorPrice, setFloorPrice] = useState('N/A')
 
-    const [countdown, setCountdown] = useState(0)
-    const [cdInterval, setCDInterval] = useState(null)
+    const [expired, setExpired] = useState(false)
     const [cdValue, setCDValue] = useState('')
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setCountdown(deadline.getTime() - new Date().getTime())
-        }, 1000);
-        setCDInterval(interval)
-    }, [deadline]);
+        if (deadline) {
+            const interval = setInterval(() => {
+                const now = new Date().getTime()
+                if (now > deadline.getTime()) {
+                    console.log('expired')
+                    setCDValue("Expired")
+                    setExpired(true)
+                    clearInterval(interval)
+                } else {
+                    const countdown = deadline.getTime() - now
+                    const days = Math.floor(countdown / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor(
+                        (countdown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+                    );
+                    const minutes = Math.floor((countdown % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((countdown % (1000 * 60)) / 1000);
 
-    useEffect(() => {
-        if (countdown < 60000 && cdInterval) {
-            clearInterval(cdInterval)
+                    setExpired(false)
+                    setCDValue(`${days}d ${hours}h ${minutes}m ${seconds}s`)
+                }
+            }, 1000);
+
         }
-
-        const days = Math.floor(countdown / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
-          (countdown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-        );
-        const minutes = Math.floor((countdown % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((countdown % (1000 * 60)) / 1000);
-
-        setCDValue(`${days}d ${hours}h ${minutes}m ${seconds}s`)
-
-    }, [countdown, cdInterval]);
+    }, [deadline]);
 
     useEffect(() => {
         const options = []
@@ -274,8 +276,8 @@ const NftCard = ({
                         <div className='w-full my-1'>
                             <button
                                 type='button'
-                                className={`w-full rounded ` + (numPurchasedTickets < maxParticipants ? 'bg-blue-500' : 'bg-gray-500')}
-                                disabled={numPurchasedTickets >= maxParticipants}
+                                className={`w-full rounded ` + (numPurchasedTickets < maxParticipants && !expired ? 'bg-blue-500' : 'bg-gray-500')}
+                                disabled={numPurchasedTickets >= maxParticipants || expired}
                                 onClick={() => {
                                     if (!walletApi) {
                                         toast.error("Wallet not connected")
@@ -286,7 +288,7 @@ const NftCard = ({
                                     }
                                 }
                                 }>
-                                {numPurchasedTickets < maxParticipants ? (
+                                {numPurchasedTickets < maxParticipants && !expired ? (
                                     <span>Buy Ticket ({ticketPrices / 1_000_000} ₳)</span>
                                 ) : "Drawing winner"}
                             </button>
