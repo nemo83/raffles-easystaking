@@ -139,7 +139,7 @@ const NftRaffles: NextPage = (props: any) => {
             numParticipants: beRaffle.num_max_participants,
             participants: participants,
             numTickets: numTickets,
-            deadline: null
+            deadline: new Date(beRaffle.deadline)
           }
           return raffle
         } else {
@@ -210,6 +210,8 @@ const NftRaffles: NextPage = (props: any) => {
     const participants = (datum.list[3] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
     const numMaxParticipants = datum.list[4] as IntData
     const deadline = Time.fromUplcData(datum.list[7])
+
+    console.log('deadline', deadline.value)
 
     const numTickets = participants.reduce((acc, curr) => {
       if (walletPkh == curr.hex) {

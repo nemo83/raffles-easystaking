@@ -325,9 +325,9 @@ export const buyRaffleTickets = async (
 
   const now = new Date()
   const before = new Date(now.getTime())
-  before.setHours(now.getHours() - 1)
+  before.setMinutes(now.getMinutes() - 5)
   const after = new Date(now.getTime())
-  after.setHours(now.getHours() + 1)
+  after.setMinutes(now.getMinutes() + 5)
 
   const tx = new Tx();
   tx.addInput(contractUtxo, valRedeemer)
@@ -416,10 +416,9 @@ export const selectWinner = async (
 
   const now = new Date()
   const before = new Date(now.getTime())
-  before.setHours(now.getHours() - 1)
+  before.setMinutes(now.getMinutes() - 5)
   const after = new Date(now.getTime())
-  after.setHours(now.getHours() + 1)
-
+  after.setMinutes(now.getMinutes() + 5)
 
   const tx = new Tx();
   tx.addInput(contractUtxo, valRedeemer)

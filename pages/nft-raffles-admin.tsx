@@ -64,16 +64,9 @@ const NftRaffles: NextPage = (props: any) => {
   }, [seed])
 
   useEffect(() => {
-
     console.log('deadline', deadline)
-
-    const dateTime = deadline + 'T21:45:00Z'
-    console.log('dateTime', dateTime)
-    const date = new Date(dateTime)
-
+    const date = new Date(deadline)
     console.log('date', date.getTime())
-
-
   }, [deadline])
 
   const buildScripts = () => {
@@ -155,7 +148,7 @@ const NftRaffles: NextPage = (props: any) => {
 
     const saltedSeed = `${seed}${salt}`
 
-    const date = new Date(deadline + 'T21:45:00Z')
+    const date = new Date(deadline)
 
     raffleV2.createNftRaffle(
       policyId,
@@ -182,7 +175,8 @@ const NftRaffles: NextPage = (props: any) => {
         num_max_tickets_per_wallet: numMaxTicketsPerPerson,
         num_max_participants: numMaxParticipants,
         seed_hash: createRaffle.seedHash,
-        vault_pkh: createRaffle.vaultPkh
+        vault_pkh: createRaffle.vaultPkh,
+        deadline: date.toISOString()
       })
 
       console.log('body: ' + body)
@@ -336,35 +330,41 @@ const NftRaffles: NextPage = (props: any) => {
       .then(raffles => raffles.json())
       .then(raffles => {
         const promises = raffles
-          .filter(raffle => raffle.network == network)
-          .map(raffle => getKeyUtxo(address.toBech32(), raffle.policy_id, raffle.asset_name)
-            .then(utxo => {
-              const datum = parseDatum(utxo.origOutput.datum.data, Program.new(raffleScript))
-              const body = JSON.stringify({
-                policy_id: raffle.policy_id,
-                asset_name: raffle.asset_name,
-                collection_name: raffle.collection_name,
-                nft_name: raffle.nft_name,
-                main_img_url: raffle.main_img_url,
-                status: raffle.status,
-                network,
-                participants: datum.participants
+          .filter(raffle => raffle.network == network && raffle.policy_id == policyId)
+          .map(raffle => {
+            raffleV2
+              .getKeyUtxo(address.toBech32(), raffle.policy_id, raffle.asset_name)
+              .then(utxo => {
+                console.log('utxo', JSON.stringify(utxo))
+                const datum = raffleV2.parseDatum(utxo.origOutput.datum.data, Program.new(raffleScript))
+                const body = JSON.stringify({
+                  policy_id: raffle.policy_id,
+                  asset_name: raffle.asset_name,
+                  collection_name: raffle.collection_name,
+                  nft_name: raffle.nft_name,
+                  main_img_url: raffle.main_img_url,
+                  status: raffle.status,
+                  network,
+                  participants: datum.participants.map(participant => participant.hex),
+                  deadline: new Date(Number(datum.deadline.value)).toISOString()
+                })
+
+                return fetch(`${lotteryApi}/nft_raffles`, {
+                  method: "PUT",
+                  headers: {
+                    'content-type': "application/json",
+                    accept: "application/json"
+                  },
+                  body
+                })
+
               })
+          })
 
-              console.log('body: ' + body)
-
-              return fetch(`${lotteryApi}/nft_raffles`, {
-                method: "PUT",
-                headers: {
-                  'content-type': "application/json",
-                  accept: "application/json"
-                },
-                body
-              })
-
-            }))
-
-        Promise.all(promises)
+        return Promise.all(promises)
+      })
+      .then(promises => {
+        console.log('promises', JSON.stringify(promises))
       })
 
   }
@@ -420,7 +420,7 @@ const NftRaffles: NextPage = (props: any) => {
       new Value(BigInt(Number(datumV1.ticketPrice))),
       datumV1.numMaxTicketsPerWallet,
       datumV1.participants,
-      datumV1.numMaxParticipants,
+      numMaxParticipants,
       datumV1.seedHash,
       uplcVaultProgram.validatorHash,
       date.getTime()
@@ -515,7 +515,7 @@ const NftRaffles: NextPage = (props: any) => {
             <label className="block mb-1 text-sm font-bold text-black">
               Deadline
             </label>
-            <input type={'date'} value={deadline} onChange={(event) => setDeadline(event.target.value)}></input>
+            <input type={'datetime-local'} value={deadline} onChange={(event) => setDeadline(event.target.value)}></input>
             <label className="block mb-1 text-sm font-bold text-black">
               Max tickets per Wallet
             </label>
