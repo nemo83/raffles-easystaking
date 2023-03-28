@@ -153,7 +153,6 @@ const Nav: NextPage = (props: any) => {
 
                 if (payload.controlled_amount) {
                     const controlledAmount = payload.controlled_amount
-                    console.log('controlledAmount: ' + controlledAmount)
                     const balance = controlledAmount / 1_000_000
                     setBalance('' + balance.toFixed(2))
                 }
@@ -165,8 +164,6 @@ const Nav: NextPage = (props: any) => {
         }
 
         getBalance()
-
-        console.log('balance?')
 
     }, [baseAddress])
 

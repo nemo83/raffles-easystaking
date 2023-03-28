@@ -63,12 +63,6 @@ const NftRaffles: NextPage = (props: any) => {
     setNextSeed(nextSeed.toString())
   }, [seed])
 
-  useEffect(() => {
-    console.log('deadline', deadline)
-    const date = new Date(deadline)
-    console.log('date', date.getTime())
-  }, [deadline])
-
   const buildScripts = () => {
 
     const raffleProgram = Program.new(raffleScript).compile(optimizeSmartContracts)
