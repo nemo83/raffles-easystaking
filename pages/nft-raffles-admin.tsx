@@ -398,7 +398,7 @@ const NftRaffles: NextPage = (props: any) => {
 
     const value = new Value(BigInt(1_000_000))
 
-    const raffleV1Utxo = await raffleV2.getKeyUtxo(raffleAddress.toBech32(), policyId, Buffer.from(assetName).toString("hex"))
+    const raffleV1Utxo = await getKeyUtxo(raffleAddress.toBech32(), policyId, Buffer.from(assetName).toString("hex"))
 
     const datumV1 = parseDatum(raffleV1Utxo.origOutput.datum.data, raffleProgram)
     console.log('datumV1', JSON.stringify(datumV1))
