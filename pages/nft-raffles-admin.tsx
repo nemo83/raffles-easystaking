@@ -63,6 +63,18 @@ const NftRaffles: NextPage = (props: any) => {
     setNextSeed(nextSeed.toString())
   }, [seed])
 
+  useEffect(() => {
+
+    if (policyId) {
+      if (policyId.indexOf(".") != -1) {
+        const parts = policyId.split(".")
+        setPolicyId(parts[0])
+        setAssetName(Buffer.from(parts[1], "hex").toString())
+      }
+    }
+
+  }, [policyId])
+
   const buildScripts = () => {
 
     const raffleProgram = Program.new(raffleScript).compile(optimizeSmartContracts)
