@@ -211,8 +211,6 @@ const NftRaffles: NextPage = (props: any) => {
     const numMaxParticipants = datum.list[4] as IntData
     const deadline = Time.fromUplcData(datum.list[7])
 
-    console.log('deadline', deadline.value)
-
     const numTickets = participants.reduce((acc, curr) => {
       if (walletPkh == curr.hex) {
         return acc + 1
