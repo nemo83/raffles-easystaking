@@ -13,7 +13,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@hyperionbt/helios": "0.13.4",
+    "@hyperionbt/helios": "0.13.7",
     "@types/react": "^18.0.28",
     "chart.js": "^4.2.1",
     "faker": "^5.5.3",

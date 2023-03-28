@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faTicket, faStar,
+    faTicket, faStar, faClock
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useWalletContext } from "../components/WalletProvider";
-import { buyRaffleTickets, collectPrize } from './Offchan/Raffle'
+import * as raffleV2 from './Offchan/RaffleV2'
 import { toast } from 'react-hot-toast';
 import { network } from '../constants/blockfrost';
 
@@ -20,6 +20,7 @@ interface NftCard {
     maxNumTicketsPerWallet: number,
     numPurchasedTickets: number,
     numWalletPurchasedTickets: number | undefined,
+    deadline: Date | undefined,
     userWon: boolean,
     raffleScript: string,
     vaultScript: string,
@@ -37,6 +38,7 @@ const NftCard = ({
     maxNumTicketsPerWallet,
     numPurchasedTickets,
     numWalletPurchasedTickets,
+    deadline,
     userWon,
     raffleScript,
     vaultScript,
@@ -55,6 +57,35 @@ const NftCard = ({
     const [options, setOptions] = useState([])
 
     const [floorPrice, setFloorPrice] = useState('N/A')
+
+    const [expired, setExpired] = useState(false)
+    const [cdValue, setCDValue] = useState('')
+
+    useEffect(() => {
+        if (deadline) {
+            const interval = setInterval(() => {
+                const now = new Date().getTime()
+                if (now > deadline.getTime()) {
+                    console.log('expired')
+                    setCDValue("Expired")
+                    setExpired(true)
+                    clearInterval(interval)
+                } else {
+                    const countdown = deadline.getTime() - now
+                    const days = Math.floor(countdown / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor(
+                        (countdown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+                    );
+                    const minutes = Math.floor((countdown % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((countdown % (1000 * 60)) / 1000);
+
+                    setExpired(false)
+                    setCDValue(`${days}d ${hours}h ${minutes}m ${seconds}s`)
+                }
+            }, 1000);
+
+        }
+    }, [deadline]);
 
     useEffect(() => {
         const options = []
@@ -86,7 +117,7 @@ const NftCard = ({
 
 
     const buyTicket = async () => {
-        return buyRaffleTickets(
+        return raffleV2.buyRaffleTickets(
             policyIdHex,
             assetNameHex,
             numTickets,
@@ -95,7 +126,7 @@ const NftCard = ({
         ).then(() => {
             toast.success('Transaction successfully submited!')
             setShowModal(false)
-            setInterval(callback, 20000, 6)
+            repeatN(callback, 20000, 6)
         }).catch(errorMessage => {
             console.log('error', errorMessage)
             toast.error(errorMessage.message)
@@ -103,7 +134,7 @@ const NftCard = ({
     }
 
     const collectNft = async () => {
-        collectPrize(policyIdHex, assetNameHex, vaultScript, walletApi)
+        raffleV2.collectPrize(policyIdHex, assetNameHex, vaultScript, walletApi)
             .then(() => {
                 toast.success("Success!\nThe NFT it's on his way!")
             })
@@ -113,7 +144,7 @@ const NftCard = ({
             })
     }
 
-    const setInterval = async (fn: () => void, delay: number, times: number) => {
+    const repeatN = async (fn: () => void, delay: number, times: number) => {
         var x = 0;
         var intervalID = window.setInterval(function () {
 
@@ -221,6 +252,14 @@ const NftCard = ({
                         <div className="flex items-center justify-between gap-1 mb-2">
                             <span className="grid text-sm text-gray-900 place-content-center">
                                 <p>
+                                    <FontAwesomeIcon icon={faClock} size="sm" /> {cdValue}
+                                </p>
+                            </span>
+
+                        </div>
+                        <div className="flex items-center justify-between gap-1 mb-2">
+                            <span className="grid text-sm text-gray-900 place-content-center">
+                                <p>
                                     <FontAwesomeIcon icon={faTicket} size="sm" /> Tickets: {numPurchasedTickets}/{maxParticipants}
                                 </p>
                             </span>
@@ -237,8 +276,8 @@ const NftCard = ({
                         <div className='w-full my-1'>
                             <button
                                 type='button'
-                                className={`w-full rounded ` + (numPurchasedTickets < maxParticipants ? 'bg-blue-500' : 'bg-gray-500')}
-                                disabled={numPurchasedTickets >= maxParticipants}
+                                className={`w-full rounded ` + (numPurchasedTickets < maxParticipants && !expired ? 'bg-blue-500' : 'bg-gray-500')}
+                                disabled={numPurchasedTickets >= maxParticipants || expired}
                                 onClick={() => {
                                     if (!walletApi) {
                                         toast.error("Wallet not connected")
@@ -249,7 +288,7 @@ const NftCard = ({
                                     }
                                 }
                                 }>
-                                {numPurchasedTickets < maxParticipants ? (
+                                {numPurchasedTickets < maxParticipants && !expired ? (
                                     <span>Buy Ticket ({ticketPrices / 1_000_000} ₳)</span>
                                 ) : "Drawing winner"}
                             </button>

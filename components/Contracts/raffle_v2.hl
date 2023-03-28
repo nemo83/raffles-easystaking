@@ -12,7 +12,9 @@ spending raffle
 
       func is_admin(self, tx: Tx) -> Bool { tx.is_signed_by(self.admin) }
 
-      func is_deadline_passed(self, tx: Tx) -> Bool { now < datum.deadline }
+      func is_before_deadline(self, tx: Tx) -> Bool { tx.time_range.is_before(self.deadline) }
+
+      func is_after_deadline(self, tx: Tx) -> Bool { tx.time_range.is_after(self.deadline) }
   }
 
   enum Redeemer {
@@ -95,7 +97,8 @@ spending raffle
 
   func main(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
       tx: Tx = context.tx;
-      now: Time = tx.time_range.start;
+      print("tx.time_range: " + tx.time_range.show());
+      print("datum.deadline: " + datum.deadline.show());
       redeemer.switch {
         Admin => {
             datum.is_admin(tx).trace("TRACE_IS_ADMIN: ")
@@ -108,7 +111,7 @@ spending raffle
           // 3. new datum is like current + participants contains the pkh of current signer.
           if (is_signed_by_participant(tx, joinRaffle.pkh).trace("TRACE_SIGNED_BY_PARTICIPANT: ") && 
               raffle_not_full(datum).trace("RAFFLE_NOT_FULL: ") &&
-              (!datum.is_deadline_passed(tx)).trace("DEADLINE_NOT_PASSED: ")) {
+              datum.is_before_deadline(tx).trace("BEFORE_DEADLINE: ")) {
             
             input: TxOutput = context.get_current_input().output;
 
@@ -139,22 +142,20 @@ spending raffle
 
           // 2 ada + NFT sent to winner address
           // Reminder of the ada sent to admin wallet.
-
-          // Deadline passed
-          datum.is_deadline_passed(tx).trace("DEADLINE_NOT_PASSED: ") &&
-          // admin or enough participants
-          (datum.is_admin(tx).trace("TRACE_IS_ADMIN: ") || rafflefull(datum).trace("TRACE_RAFFLE_FULL: ")) &&
+          // admin or Deadline passed or enough participants
+          (datum.is_after_deadline(tx).trace("DEADLINE_NOT_PASSED: ") || rafflefull(datum).trace("TRACE_RAFFLE_FULL: ")) &&
           // the seed is valid
           (datum.seedHash == concatSha).trace("SEED_MATCH: ") &&
+          // There's at least 1 participant
+          (datum.participants.length >= 0).trace("NO_PARTICIPANTS: ") &&
           // The winning index is correct (tmp)
-          (select_winning_index(seed, datum.numMaxParticipants) == selectWinner.index).trace("TRACE_INDEX: ") &&
+          (select_winning_index(seed, datum.participants.length) == selectWinner.index).trace("TRACE_INDEX: ") &&
           // Check correct values sent to admin and vault
           values_sent_to_admin_and_vault(tx, 
             context.get_current_input().output.value,
             datum.vaultPkh, 
             datum.admin, 
-            datum.participants.get(selectWinner.index)
-            )
+            datum.participants.get(selectWinner.index))
         }
     }
   }
