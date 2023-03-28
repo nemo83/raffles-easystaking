@@ -7,8 +7,8 @@ import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner, stealPrize
 import * as raffleV2 from "../components/Offchan/RaffleV2"
 import path from 'path';
 import fs from 'fs';
-import { Program, Address, PubKeyHash } from '@hyperionbt/helios';
-import { network } from '../constants/blockfrost'
+import { Program, Address, PubKeyHash, NetworkParams, WalletHelper, Tx, Assets, MintingPolicyHash, hexToBytes, Value } from '@hyperionbt/helios';
+import { getNetworkParam, network } from '../constants/blockfrost'
 import { lotteryApi, optimizeSmartContracts } from '../constants/lottery'
 import toast from 'react-hot-toast'
 
@@ -206,7 +206,6 @@ const NftRaffles: NextPage = (props: any) => {
 
   }
 
-
   const withdrawAll = async () => {
     return retrieveNft(
       policyId,
@@ -367,6 +366,80 @@ const NftRaffles: NextPage = (props: any) => {
 
         Promise.all(promises)
       })
+
+  }
+
+  const migrateToV2 = async () => {
+
+    const networkParams = new NetworkParams(
+      await fetch(getNetworkParam(network))
+        .then(response => response.json())
+    )
+  
+    // Compile the Raffle Program
+    const raffleProgram = Program.new(raffleScript);
+    const raffleUplcProgram = raffleProgram.compile(optimizeSmartContracts);
+  
+    // Extract the validator script address
+    const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
+  
+    // Compile the NFT Vault Script
+    const raffleV2Program = Program.new(raffleV2Script);
+    const uplcRaffleV2Program = raffleV2Program.compile(optimizeSmartContracts);
+  
+    // Extract the validator script address
+    const raffleV2Address = Address.fromValidatorHash(uplcRaffleV2Program.validatorHash);
+  
+    const walletHelper = new WalletHelper(walletApi);
+    const walletBaseAddress = await walletHelper.baseAddress
+  
+    // Lock NFT Prize in contract TX
+    const tx = new Tx();
+  
+    const assets = new Assets();
+  
+    assets.addComponent(
+      MintingPolicyHash.fromHex(policyId),
+      hexToBytes(assetName),
+      BigInt(1)
+    );
+  
+    // NFT and 2 $ada to send to SC
+    const nftValue = new Value(BigInt(2_000_000), assets)
+  
+    const utxo = await raffleV2.getKeyUtxo(raffleAddress.toBech32(), policyId, assetName)
+    
+    // Datum
+    const raffleDatum = new (raffleProgram.types.Datum)(
+      walletBaseAddress.pubKeyHash,
+      new Value(BigInt(ticketPriceInLovelaces)),
+      numMaxTicketsPerWallet,
+      [],
+      numParticipants,
+      seedHash,
+      vaultUplcProgram.validatorHash,
+      deadline.getTime()
+    )
+  
+    const walletUtxos = await walletHelper.pickUtxos(nftValue)
+  
+    await tx
+      .addInputs(walletUtxos[0])
+      .addOutput(new TxOutput(raffleAddress, nftValue, Datum.inline(raffleDatum._toUplcData())))
+      .finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1]);
+  
+    const signatures = await walletApi.signTx(tx);
+    tx.addSignatures(signatures);
+  
+    const txHash = await walletApi.submitTx(tx);
+  
+    const newRaffle: CreateRaffle = {
+      adminPkh: walletBaseAddress.pubKeyHash.hex,
+      seedHash,
+      vaultPkh: vaultUplcProgram.validatorHash.hex
+    }
+  
+    return newRaffle
 
   }
 
