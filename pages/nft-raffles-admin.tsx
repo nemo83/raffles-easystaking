@@ -384,13 +384,6 @@ const NftRaffles: NextPage = (props: any) => {
     const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
 
     // Compile the NFT Vault Script
-    const vaultProgram = Program.new(vaultScript);
-    const uplcVaultProgram = vaultProgram.compile(optimizeSmartContracts);
-
-    // Extract the validator script address
-    const vaultAddress = Address.fromValidatorHash(uplcVaultProgram.validatorHash);
-
-    // Compile the NFT Vault Script
     const raffleV2Program = Program.new(raffleV2Script);
     const uplcRaffleV2Program = raffleV2Program.compile(optimizeSmartContracts);
 
@@ -412,8 +405,6 @@ const NftRaffles: NextPage = (props: any) => {
 
     const walletUtxos = await walletHelper.pickUtxos(value)
 
-    const date = new Date(deadline + 'T21:45:00Z')
-
     // Datum
     const raffleV2Datum = new (raffleV2Program.types.Datum)(
       datumV1.adminPkh,
@@ -422,8 +413,8 @@ const NftRaffles: NextPage = (props: any) => {
       datumV1.participants,
       numMaxParticipants,
       datumV1.seedHash,
-      uplcVaultProgram.validatorHash,
-      date.getTime()
+      datumV1.vaultPkh,
+      new Date(deadline)
     )
 
     await tx

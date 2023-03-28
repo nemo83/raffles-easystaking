@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faTicket, faStar, faCalendar, faClock
+    faTicket, faStar, faClock
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
