@@ -307,103 +307,109 @@ const Nav: NextPage = (props: any) => {
                 <div className="w-1/2 pr-0">
                     <div className="relative flex inline-block float-right">
 
-                        <div className="relative text-sm text-gray-100">
-                            <button id="userButton" className="flex items-center mr-3 focus:outline-none">
+                        <div className="relative flex text-sm text-gray-100">
 
-                                <div className='mr-3'>
+                            <div className='flex flex-col justify-center mr-3'>
+                                <FontAwesomeIcon
+                                    icon={theme == 'light' ? farMoon : faSun}
+                                    onClick={() => theme == 'light' ? setTheme('dark') : setTheme('light')}
+                                    className={theme == 'light' ? 'text-myblue' : ''}
+                                    size="xl"
+                                />
+                            </div>
+
+                            <div className={`relative flex p-1` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-myblue border-myblue dark:divide-white' : '')}>
+                                {/* Connect */}
+                                <div className={`text-myblue dark:text-slate-50 px-2 font-semibold`}>
+                                    <button
+                                        className={`px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50 ` + (walletApi ? 'hidden' : '')}
+                                        type="button"
+                                        id="menu-button"
+                                        aria-expanded="true"
+                                        aria-haspopup="true"
+                                        onClick={() => setShowWallets(!showWallets)}
+                                    >Connect wallet</button>
+                                    <div className={walletApi ? ' ' : 'hidden'}>
+                                        {balance} ₳
+                                    </div>
+                                </div>
+                                {showWallets && availableWallets ? (
+                                    <div className="absolute mt-10 origin-top-right bg-gray-200 rounded-md shadow-lg right-4 ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
+                                        <div className="py-1 divide-y-2 divide-white" role="none">
+                                            {availableWallets.map((wallet, i) => (
+                                                <div
+                                                    key={i}
+                                                    onClick={() => { setShowWallets(false); connect(wallet.name) }}
+                                                    className={"mx-1 my-2 p-0 w-28 h-8 bg-gray-200 flex opacity-95 flex-container justify-start items-center right-2 hover:underline hover:cursor-pointer top-" + wallet.top}>
+                                                    {wallet.icon ? (
+                                                        <Image src={wallet.icon} width="30" height="30" alt={wallet.name} />
+                                                    ) : null}
+                                                    <div className="pl-3 text-black capitalize">{wallet.name}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null}
+
+                                <div
+                                    className={`text-myblue dark:text-slate-50 font-semibold px-2 ` + (walletApi ? '' : 'hidden')}
+                                    onClick={() => setShowSubMenu(!showSubMenu)}>
                                     <FontAwesomeIcon
-                                        icon={theme == 'light' ? farMoon : faSun}
-                                        onClick={() => theme == 'light' ? setTheme('dark') : setTheme('light')}
-                                        className={theme == 'light' ? 'text-myblue' : ''}
-                                        size="lg"
+                                        icon={faWallet}
+                                        className="mr-3"
+                                    />
+                                    {baseAddress ? baseAddress.slice(0, 12) : null} &nbsp;
+                                    <FontAwesomeIcon
+                                        icon={showSubMenu ? faChevronUp : faChevronDown}
+                                        className="mr-3"
                                     />
                                 </div>
 
-                                <div className={`relative flex p-1` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-myblue border-myblue dark:divide-white' : '')}>
-                                    {/* Connect */}
-                                    <div className={`text-myblue dark:text-slate-50 px-2 font-semibold`}>
-                                        <button
-                                            className={`px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50 ` + (walletApi ? 'hidden' : '')}
-                                            type="button"
-                                            id="menu-button"
-                                            aria-expanded="true"
-                                            aria-haspopup="true"
-                                            onClick={() => setShowWallets(!showWallets)}
-                                        >Connect wallet</button>
-                                        <div className={walletApi ? ' ' : 'hidden'}>
-                                            {balance} ₳
-                                        </div>
-                                    </div>
-                                    {showWallets && availableWallets ? (
-                                        <div className="absolute mt-10 origin-top-right bg-gray-200 rounded-md shadow-lg right-4 ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
-                                            <div className="py-1 divide-y-2 divide-white" role="none">
-                                                {availableWallets.map((wallet, i) => (
-                                                    <div
-                                                        key={i}
-                                                        onClick={() => { setShowWallets(false); connect(wallet.name) }}
-                                                        className={"mx-1 my-2 p-0 w-28 h-8 bg-gray-200 flex opacity-95 flex-container justify-start items-center right-2 hover:underline hover:cursor-pointer top-" + wallet.top}>
-                                                        {wallet.icon ? (
-                                                            <Image src={wallet.icon} width="30" height="30" alt={wallet.name} />
-                                                        ) : null}
-                                                        <div className="pl-3 text-black capitalize">{wallet.name}</div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ) : null}
-
-                                    <div
-                                        className={`text-myblue dark:text-slate-50 font-semibold px-2 ` + (walletApi ? '' : 'hidden')}
-                                        onClick={() => setShowSubMenu(!showSubMenu)}>
-                                        <FontAwesomeIcon
-                                            icon={faWallet}
-                                            className="mr-3"
-                                        />
-                                        {baseAddress ? baseAddress.slice(0, 12) : null} &nbsp;
-                                        <FontAwesomeIcon
-                                            icon={showSubMenu ? faChevronUp : faChevronDown}
-                                            className="mr-3"
-                                        />
-                                    </div>
-
-                                    {walletApi && showSubMenu ? (
-                                        <div className="absolute flex flex-col w-full mt-10 origin-top-right bg-gray-200 divide-y-2 divide-white rounded-md" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
-                                            {(currentRoute == '/raffles') ? (
-                                                <div
-                                                    onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}
-                                                    className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
-                                                    Participate
-                                                </div>
-                                            ) : null}
-
+                                {false ? (
+                                    <div className="absolute flex flex-col w-full mt-10 origin-top-right bg-gray-200 divide-y-2 divide-white rounded-md" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
+                                        {(currentRoute == '/raffles') ? (
                                             <div
-                                                onClick={() => { disconnect(); setShowSubMenu(!showSubMenu) }}
+                                                onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}
                                                 className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
-                                                Disconnect
+                                                Participate
                                             </div>
+                                        ) : null}
+
+                                        <div
+                                            onClick={() => { disconnect(); setShowSubMenu(!showSubMenu) }}
+                                            className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
+                                            Disconnect
                                         </div>
-                                    ) : null}
+                                    </div>
+                                ) : null}
 
-                                </div>
-
-                            </button>
-                            <div id="userMenu"
-                                className="absolute top-0 right-0 z-30 invisible min-w-full mt-2 mt-12 overflow-auto bg-gray-900 rounded shadow-md">
-                                <ul className="list-reset">
-                                    <li><a href="#"
-                                        className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">My
-                                        account</a></li>
-                                    <li><a href="#"
-                                        className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">Notifications</a>
-                                    </li>
-                                    <li>
-                                        <hr className="mx-2 border-t border-gray-400" />
-                                    </li>
-                                    <li><a href="#"
-                                        className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">Logout</a>
-                                    </li>
-                                </ul>
                             </div>
+
+                            {walletApi && showSubMenu ? (
+                                <div id="userMenu"
+                                    className="absolute top-0 right-0 z-30 min-w-full mt-12 overflow-auto bg-gray-900 rounded shadow-md">
+                                    <ul className="list-reset">
+                                        <li>
+                                            <a href="#"
+                                                className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">
+                                                Participate
+                                            </a>
+                                        </li>
+                                        <li><a href="#"
+                                            className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">
+                                            Notifications
+                                        </a>
+                                        </li>
+                                        <li>
+                                            <hr className="mx-2 border-t border-gray-400" />
+                                        </li>
+                                        <li><a href="#"
+                                            className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">Logout</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            ) : null}
+
                         </div>
 
 
