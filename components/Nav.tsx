@@ -298,13 +298,13 @@ const Nav: NextPage = (props: any) => {
 
             <div className="container flex flex-wrap items-center w-full pt-2 pb-3 mx-auto my-1 mt-0 lg:pb-0">
 
-                <div className="w-1/2 pl-2 md:pl-0">
-                    <a className="flex text-base font-bold no-underline text-myblue dark:text-gray-100 xl:text-xl hover:no-underline text" href="#">
-                        <Image src="easy1staking-logo.svg" width={25} height={19} alt="EASY1 Staking" />
+                <div className="w-1/3 pl-2 md:w-1/2 md:pl-0">
+                    <a className="flex text-xl font-bold no-underline text-myblue dark:text-gray-100 xl:text-xl hover:no-underline text" href="#">
+                        <Image src="easy1staking-logo.svg" width={35} height={25} alt="EASY1 Staking" />
                         <div className='ml-3'>EASY1 Staking</div>
                     </a>
                 </div>
-                <div className="w-1/2 pr-0">
+                <div className="w-2/3 pr-0 md:w-1/2">
                     <div className="relative flex inline-block float-right">
 
                         <div className="relative flex text-sm text-gray-100">
@@ -333,23 +333,6 @@ const Nav: NextPage = (props: any) => {
                                         {balance} ₳
                                     </div>
                                 </div>
-                                {showWallets && availableWallets ? (
-                                    <div className="absolute mt-10 origin-top-right bg-gray-200 rounded-md shadow-lg right-4 ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
-                                        <div className="py-1 divide-y-2 divide-white" role="none">
-                                            {availableWallets.map((wallet, i) => (
-                                                <div
-                                                    key={i}
-                                                    onClick={() => { setShowWallets(false); connect(wallet.name) }}
-                                                    className={"mx-1 my-2 p-0 w-28 h-8 bg-gray-200 flex opacity-95 flex-container justify-start items-center right-2 hover:underline hover:cursor-pointer top-" + wallet.top}>
-                                                    {wallet.icon ? (
-                                                        <Image src={wallet.icon} width="30" height="30" alt={wallet.name} />
-                                                    ) : null}
-                                                    <div className="pl-3 text-black capitalize">{wallet.name}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ) : null}
 
                                 <div
                                     className={`text-myblue dark:text-slate-50 font-semibold px-2 ` + (walletApi ? '' : 'hidden')}
@@ -386,9 +369,8 @@ const Nav: NextPage = (props: any) => {
                             </div>
 
                             {walletApi && showSubMenu ? (
-                                <div id="userMenu"
-                                    className="absolute top-0 right-0 z-30 min-w-full mt-12 overflow-auto bg-gray-200 rounded shadow-md">
-                                    <ul className="list-reset">
+                                <div className="absolute top-0 right-0 z-30 min-w-full mt-12 overflow-auto bg-gray-200 rounded shadow-md">
+                                    <ul >
                                         {(currentRoute == '/raffles') ? (
                                             <>
                                                 <li>
@@ -414,10 +396,38 @@ const Nav: NextPage = (props: any) => {
                                 </div>
                             ) : null}
 
+                            {showWallets && availableWallets ? (
+                                <div className="absolute top-0 right-0 z-30 min-w-full mt-12 overflow-auto text-lg capitalize bg-gray-200 rounded shadow-md text-myblue">
+                                    <ul>
+                                        {availableWallets.map((wallet, i) => (
+                                            <>
+                                                <li key={i}>
+                                                    <Link
+                                                        href="#"
+                                                        onClick={() => { setShowWallets(false); connect(wallet.name) }}
+                                                        className={"mx-1 my-2 p-0 w-28 h-8 bg-gray-200 flex opacity-95 flex-container justify-start items-center right-2 hover:underline hover:cursor-pointer top-" + wallet.top}>
+                                                        {wallet.icon ? (
+                                                            <Image src={wallet.icon} width="30" height="30" alt={wallet.name} />
+                                                        ) : null}
+                                                        {wallet.name}
+                                                    </Link>
+                                                </li>
+                                                {i < availableWallets.length - 1 ? (
+                                                    <li>
+                                                        <hr className="mx-2 border-t border-gray-400" />
+                                                    </li>
+                                                ) : null}
+
+                                            </>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ) : null}
+
                         </div>
 
 
-                        <div className="flex-grow block pr-4 lg:hidden">
+                        <div className="flex-grow block px-4 lg:hidden">
                             <button id="nav-toggle"
                                 className="flex items-center px-3 py-2 text-gray-300 border border-gray-300 rounded appearance-none hover:text-slate-50 hover:border-slate-50 focus:outline-none"
                                 onClick={() => setShowMenu(!showMenu)}>
@@ -430,8 +440,6 @@ const Nav: NextPage = (props: any) => {
                     </div>
 
                 </div>
-
-
 
                 <div className={`z-20 flex-grow w-full mt-2 bg-gray-100 dark:bg-gray-600 lg:flex lg:items-center lg:w-auto lg:block lg:mt-0` + (showMenu ? ' ' : ' hidden')} id="nav-content">
 
@@ -489,13 +497,6 @@ const Nav: NextPage = (props: any) => {
                         ) : null}
 
                     </ul>
-
-                </div>
-
-                <div className="relative flex ml-4 space-x-2 dropdown pull-right">
-
-
-
 
                 </div>
 
