@@ -387,24 +387,28 @@ const Nav: NextPage = (props: any) => {
 
                             {walletApi && showSubMenu ? (
                                 <div id="userMenu"
-                                    className="absolute top-0 right-0 z-30 min-w-full mt-12 overflow-auto bg-gray-900 rounded shadow-md">
+                                    className="absolute top-0 right-0 z-30 min-w-full mt-12 overflow-auto bg-gray-200 rounded shadow-md">
                                     <ul className="list-reset">
+                                        {(currentRoute == '/raffles') ? (
+                                            <>
+                                                <li>
+                                                    <Link href="#"
+                                                        className="block px-4 py-2 no-underline text-myblue hover:bg-gray-800 hover:no-underline"
+                                                        onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}>
+                                                        Participate
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <hr className="mx-2 border-t border-gray-400" />
+                                                </li>
+                                            </>
+                                        ) : null}
                                         <li>
-                                            <a href="#"
-                                                className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">
-                                                Participate
-                                            </a>
-                                        </li>
-                                        <li><a href="#"
-                                            className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">
-                                            Notifications
-                                        </a>
-                                        </li>
-                                        <li>
-                                            <hr className="mx-2 border-t border-gray-400" />
-                                        </li>
-                                        <li><a href="#"
-                                            className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">Logout</a>
+                                            <Link href="#"
+                                                className="block px-4 py-2 no-underline text-myblue hover:bg-gray-800 hover:no-underline"
+                                                onClick={() => { disconnect(); setShowSubMenu(!showSubMenu) }}>
+                                                Disconnect
+                                            </Link>
                                         </li>
                                     </ul>
                                 </div>
