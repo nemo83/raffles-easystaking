@@ -4,8 +4,12 @@ import Image from 'next/image'
 import toast, { Toaster } from 'react-hot-toast'
 import type { NextPage } from 'next'
 import {
-    faHome, faDice, faQuestion, faHeartbeat, faFileImage, faWallet, faChevronDown, faChevronUp
+    faHome, faDice, faQuestion, faHeartbeat, faFileImage, faWallet, faChevronDown, faChevronUp,
+    faSun, faMoon
 } from "@fortawesome/free-solid-svg-icons"
+import {
+    faSun as farSun, faMoon as farMoon
+} from "@fortawesome/free-regular-svg-icons"
 import { useWalletContext } from "../components/WalletProvider";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -18,6 +22,7 @@ import {
 } from "@hyperionbt/helios";
 import { getBlockfrostKey, getBlockfrostUrl, network, origin } from '../constants/blockfrost'
 import { initCardanoDAppConnectorBridge } from '../components/Eternl/cardano-dapp-connector-bridge'
+import { useTheme } from "next-themes";
 
 declare global {
     interface Window {
@@ -27,6 +32,13 @@ declare global {
 
 
 const Nav: NextPage = (props: any) => {
+
+    // Theme
+    const { systemTheme, theme, setTheme } = useTheme();
+    console.log(systemTheme)
+    console.log(theme)
+
+    const currentTheme = theme === 'system' ? systemTheme : theme;
 
     const stakingAnalysis = false
     const faq = false
@@ -47,6 +59,7 @@ const Nav: NextPage = (props: any) => {
     const [friendlyName, setFriendlyName] = useState('')
 
     const [baseAddress, setBaseAddress] = useState(null)
+
     const navSelected = 'text-slate-50 border-slate-50 hover:border-white'
     const navNotSelected = 'text-gray-300 border-gray-300 hover:border-white'
 
@@ -224,7 +237,7 @@ const Nav: NextPage = (props: any) => {
 
     }
     return (
-        <nav id="header" className="fixed top-0 z-10 w-full shadow bg-sky-600">
+        <nav id="header" className="fixed top-0 z-10 w-full bg-gray-100 shadow dark:bg-gray-600">
 
             <Toaster />
 
@@ -285,26 +298,141 @@ const Nav: NextPage = (props: any) => {
 
             <div className="container flex flex-wrap items-center w-full pt-2 pb-3 mx-auto my-1 mt-0 lg:pb-0">
 
+                <div className="w-1/2 pl-2 md:pl-0">
+                    <a className="flex text-base font-bold no-underline text-myblue dark:text-gray-100 xl:text-xl hover:no-underline text" href="#">
+                        <Image src="easy1staking-logo.svg" width={25} height={19} alt="EASY1 Staking" />  EASY1 Staking
+                    </a>
+                </div>
+                <div className="w-1/2 pr-0">
+                    <div className="relative flex inline-block float-right">
 
-                <div className="flex-grow block pr-4 lg:hidden">
-                    <button id="nav-toggle"
-                        className="flex items-center px-3 py-2 text-gray-300 border border-gray-300 rounded appearance-none hover:text-slate-50 hover:border-slate-50 focus:outline-none"
-                        onClick={() => setShowMenu(!showMenu)}>
-                        <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <title>Menu</title>
-                            <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
-                        </svg>
-                    </button>
+                        <div className="relative text-sm text-gray-100">
+                            <button id="userButton" className="flex items-center mr-3 focus:outline-none">
+
+                                <div className='mr-3'>
+                                    <FontAwesomeIcon
+                                        icon={theme == 'light' ? farMoon : faSun}
+                                        onClick={() => theme == 'light' ? setTheme('dark') : setTheme('light')}
+                                        className={theme == 'light' ? 'text-gray-600' : ''}
+                                        size="lg"
+                                    />
+                                </div>
+
+
+
+                                <div className={`relative flex p-1` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-white' : '')}>
+                                    {/* Connect */}
+                                    <div className={`text-slate-50 px-2 font-semibold`}>
+                                        <button
+                                            className={`px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50 ` + (walletApi ? 'hidden' : '')}
+                                            type="button"
+                                            id="menu-button"
+                                            aria-expanded="true"
+                                            aria-haspopup="true"
+                                            onClick={() => setShowWallets(!showWallets)}
+                                        >Connect wallet</button>
+                                        <div className={walletApi ? ' ' : 'hidden'}>
+                                            {balance} ₳
+                                        </div>
+                                    </div>
+                                    {showWallets && availableWallets ? (
+                                        <div className="absolute mt-10 origin-top-right bg-gray-200 rounded-md shadow-lg right-4 ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
+                                            <div className="py-1 divide-y-2 divide-white" role="none">
+                                                {availableWallets.map((wallet, i) => (
+                                                    <div
+                                                        key={i}
+                                                        onClick={() => { setShowWallets(false); connect(wallet.name) }}
+                                                        className={"mx-1 my-2 p-0 w-28 h-8 bg-gray-200 flex opacity-95 flex-container justify-start items-center right-2 hover:underline hover:cursor-pointer top-" + wallet.top}>
+                                                        {wallet.icon ? (
+                                                            <Image src={wallet.icon} width="30" height="30" alt={wallet.name} />
+                                                        ) : null}
+                                                        <div className="pl-3 text-black capitalize">{wallet.name}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ) : null}
+
+                                    <div
+                                        className={`text-slate-50 font-semibold px-2 ` + (walletApi ? '' : 'hidden')}
+                                        onClick={() => setShowSubMenu(!showSubMenu)}>
+                                        <FontAwesomeIcon
+                                            icon={faWallet}
+                                            className="mr-3"
+                                        />
+                                        {baseAddress ? baseAddress.slice(0, 12) : null} &nbsp;
+                                        <FontAwesomeIcon
+                                            icon={showSubMenu ? faChevronUp : faChevronDown}
+                                            className="mr-3"
+                                        />
+                                    </div>
+
+                                    {walletApi && showSubMenu ? (
+                                        <div className="absolute flex flex-col w-full mt-10 origin-top-right bg-gray-200 divide-y-2 divide-white rounded-md" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
+                                            {(currentRoute == '/raffles') ? (
+                                                <div
+                                                    onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}
+                                                    className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
+                                                    Participate
+                                                </div>
+                                            ) : null}
+
+                                            <div
+                                                onClick={() => { disconnect(); setShowSubMenu(!showSubMenu) }}
+                                                className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
+                                                Disconnect
+                                            </div>
+                                        </div>
+                                    ) : null}
+
+                                </div>
+
+                            </button>
+                            <div id="userMenu"
+                                className="absolute top-0 right-0 z-30 invisible min-w-full mt-2 mt-12 overflow-auto bg-gray-900 rounded shadow-md">
+                                <ul className="list-reset">
+                                    <li><a href="#"
+                                        className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">My
+                                        account</a></li>
+                                    <li><a href="#"
+                                        className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">Notifications</a>
+                                    </li>
+                                    <li>
+                                        <hr className="mx-2 border-t border-gray-400" />
+                                    </li>
+                                    <li><a href="#"
+                                        className="block px-4 py-2 text-gray-100 no-underline hover:bg-gray-800 hover:no-underline">Logout</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                        <div className="flex-grow block pr-4 lg:hidden">
+                            <button id="nav-toggle"
+                                className="flex items-center px-3 py-2 text-gray-300 border border-gray-300 rounded appearance-none hover:text-slate-50 hover:border-slate-50 focus:outline-none"
+                                onClick={() => setShowMenu(!showMenu)}>
+                                <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <title>Menu</title>
+                                    <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div className={`z-20 flex-grow w-full mt-2 bg-sky-600 lg:flex lg:items-center lg:w-auto lg:block lg:mt-0` + (showMenu ? ' ' : ' hidden')} id="nav-content">
+
+
+                <div className={`z-20 flex-grow w-full mt-2 bg-gray-100 dark:bg-gray-600 lg:flex lg:items-center lg:w-auto lg:block lg:mt-0` + (showMenu ? ' ' : ' hidden')} id="nav-content">
 
                     <ul className="items-center flex-1 px-4 list-reset lg:flex md:px-0">
                         <li className="my-2 mr-6 md:my-0">
-                            <Link href="/" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/' ? navSelected : navNotSelected)}>
+                            <Link href="/" className={`block py-1 pl-1 no-underline align-middle border-b-2 text-myblue dark:text-gray-100 hover:text-gray-600 dark:hover:text-myblue ` +
+                                (currentRoute == '/' ? ' ' : ' ')}>
                                 <FontAwesomeIcon
                                     icon={faHome}
-                                    className="mr-3 text-blue-400"
+                                    className="mr-3"
                                 />
                                 <span className="pb-1 text-lg md:pb-0">Home</span>
                             </Link>
@@ -313,7 +441,7 @@ const Nav: NextPage = (props: any) => {
                             <Link href="/raffles" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/raffles' ? navSelected : navNotSelected)}>
                                 <FontAwesomeIcon
                                     icon={faDice}
-                                    className="mr-3"
+                                    className={`mr-3 ` + (currentRoute == '/raffles' ? navSelected : navNotSelected)}
                                 />
                                 <span className="pb-1 text-lg md:pb-0">Raffles</span>
                             </Link>
@@ -322,7 +450,7 @@ const Nav: NextPage = (props: any) => {
                             <Link href="/nft-raffles" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/nft-raffles' ? navSelected : navNotSelected)}>
                                 <FontAwesomeIcon
                                     icon={faFileImage}
-                                    className="mr-3"
+                                    className={`mr-3 ` + (currentRoute == '/nft-raffles' ? navSelected : navNotSelected)}
                                 />
                                 <span className="pb-1 text-lg md:pb-0">NFT Raffles</span>
                             </Link>
@@ -355,72 +483,6 @@ const Nav: NextPage = (props: any) => {
                 </div>
 
                 <div className="relative flex ml-4 space-x-2 dropdown pull-right">
-                    <div className={`relative flex p-1` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-white' : '')}>
-                        {/* Connect */}
-                        <div className={`text-slate-50 px-2 font-semibold`}>
-                            <button
-                                className={`px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50 ` + (walletApi ? 'hidden' : '')}
-                                type="button"
-                                id="menu-button"
-                                aria-expanded="true"
-                                aria-haspopup="true"
-                                onClick={() => setShowWallets(!showWallets)}
-                            >Connect wallet</button>
-                            <div className={walletApi ? ' ' : 'hidden'}>
-                                {balance} ₳
-                            </div>
-                        </div>
-                        {showWallets && availableWallets ? (
-                            <div className="absolute mt-10 origin-top-right bg-gray-200 rounded-md shadow-lg right-4 ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
-                                <div className="py-1 divide-y-2 divide-white" role="none">
-                                    {availableWallets.map((wallet, i) => (
-                                        <div
-                                            key={i}
-                                            onClick={() => { setShowWallets(false); connect(wallet.name) }}
-                                            className={"mx-1 my-2 p-0 w-28 h-8 bg-gray-200 flex opacity-95 flex-container justify-start items-center right-2 hover:underline hover:cursor-pointer top-" + wallet.top}>
-                                            {wallet.icon ? (
-                                                <Image src={wallet.icon} width="30" height="30" alt={wallet.name} />
-                                            ) : null}
-                                            <div className="pl-3 text-black capitalize">{wallet.name}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ) : null}
-
-                        <div
-                            className={`text-slate-50 font-semibold px-2 ` + (walletApi ? '' : 'hidden')}
-                            onClick={() => setShowSubMenu(!showSubMenu)}>
-                            <FontAwesomeIcon
-                                icon={faWallet}
-                                className="mr-3"
-                            />
-                            {baseAddress ? baseAddress.slice(0, 12) : null} &nbsp;
-                            <FontAwesomeIcon
-                                icon={showSubMenu ? faChevronUp : faChevronDown}
-                                className="mr-3"
-                            />
-                        </div>
-
-                        {walletApi && showSubMenu ? (
-                            <div className="absolute flex flex-col w-full mt-10 origin-top-right bg-gray-200 divide-y-2 divide-white rounded-md" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
-                                {(currentRoute == '/raffles') ? (
-                                    <div
-                                        onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}
-                                        className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
-                                        Participate
-                                    </div>
-                                ) : null}
-
-                                <div
-                                    onClick={() => { disconnect(); setShowSubMenu(!showSubMenu) }}
-                                    className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
-                                    Disconnect
-                                </div>
-                            </div>
-                        ) : null}
-
-                    </div>
 
 
 
