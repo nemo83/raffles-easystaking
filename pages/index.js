@@ -2,7 +2,7 @@ import Layout from "../components/Layout";
 import { Distributions } from "../components/Distributions";
 import dynamic from 'next/dynamic';
 import Link from "next/link";
-import easy1staking from '../img/jpg/easy1staking.jpg'
+import easy1staking from '../img/jpg/easy1staking-full.jpg'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -56,7 +56,7 @@ export default function Home() {
         </p>
       </div>
       <div
-        className="relative overflow-hidden text-center bg-no-repeat bg-cover rounded-lg"
+        className="relative overflow-hidden text-center bg-center bg-no-repeat bg-cover rounded-lg"
         style={{ height: 400 + 'px', backgroundImage: `url(${easy1staking.src})` }}>
         <div
           className="absolute top-0 bottom-0 left-0 right-0 w-full h-full overflow-hidden bg-fixed"

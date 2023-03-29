@@ -60,8 +60,8 @@ const Nav: NextPage = (props: any) => {
 
     const [baseAddress, setBaseAddress] = useState(null)
 
-    const navSelected = 'text-slate-50 border-slate-50 hover:border-white'
-    const navNotSelected = 'text-gray-300 border-gray-300 hover:border-white'
+    const navSelected = 'text-myblue dark:text-slate-50 border-mypink dark:border-mypink'
+    const navNotSelected = 'text-gray-300 border-gray-300 hover:border-mypink dark:hover:border-mypink hover:text-gray-600 hover:text-myblue dark:hover:text-slate-50'
 
     // Modal
     const [showModal, setShowModal] = useState(false);
@@ -300,7 +300,8 @@ const Nav: NextPage = (props: any) => {
 
                 <div className="w-1/2 pl-2 md:pl-0">
                     <a className="flex text-base font-bold no-underline text-myblue dark:text-gray-100 xl:text-xl hover:no-underline text" href="#">
-                        <Image src="easy1staking-logo.svg" width={25} height={19} alt="EASY1 Staking" />  EASY1 Staking
+                        <Image src="easy1staking-logo.svg" width={25} height={19} alt="EASY1 Staking" />
+                        <div className='ml-3'>EASY1 Staking</div>
                     </a>
                 </div>
                 <div className="w-1/2 pr-0">
@@ -313,16 +314,14 @@ const Nav: NextPage = (props: any) => {
                                     <FontAwesomeIcon
                                         icon={theme == 'light' ? farMoon : faSun}
                                         onClick={() => theme == 'light' ? setTheme('dark') : setTheme('light')}
-                                        className={theme == 'light' ? 'text-gray-600' : ''}
+                                        className={theme == 'light' ? 'text-myblue' : ''}
                                         size="lg"
                                     />
                                 </div>
 
-
-
-                                <div className={`relative flex p-1` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-white' : '')}>
+                                <div className={`relative flex p-1` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-myblue border-myblue dark:divide-white' : '')}>
                                     {/* Connect */}
-                                    <div className={`text-slate-50 px-2 font-semibold`}>
+                                    <div className={`text-myblue dark:text-slate-50 px-2 font-semibold`}>
                                         <button
                                             className={`px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50 ` + (walletApi ? 'hidden' : '')}
                                             type="button"
@@ -354,7 +353,7 @@ const Nav: NextPage = (props: any) => {
                                     ) : null}
 
                                     <div
-                                        className={`text-slate-50 font-semibold px-2 ` + (walletApi ? '' : 'hidden')}
+                                        className={`text-myblue dark:text-slate-50 font-semibold px-2 ` + (walletApi ? '' : 'hidden')}
                                         onClick={() => setShowSubMenu(!showSubMenu)}>
                                         <FontAwesomeIcon
                                             icon={faWallet}
@@ -428,8 +427,8 @@ const Nav: NextPage = (props: any) => {
 
                     <ul className="items-center flex-1 px-4 list-reset lg:flex md:px-0">
                         <li className="my-2 mr-6 md:my-0">
-                            <Link href="/" className={`block py-1 pl-1 no-underline align-middle border-b-2 text-myblue dark:text-gray-100 hover:text-gray-600 dark:hover:text-myblue ` +
-                                (currentRoute == '/' ? ' ' : ' ')}>
+                            <Link href="/" className={`block py-1 pl-1 no-underline align-middle border-b-2 ` +
+                                (currentRoute == '/' ? navSelected : navNotSelected)}>
                                 <FontAwesomeIcon
                                     icon={faHome}
                                     className="mr-3"
@@ -438,10 +437,11 @@ const Nav: NextPage = (props: any) => {
                             </Link>
                         </li>
                         <li className="my-2 mr-6 md:my-0">
-                            <Link href="/raffles" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/raffles' ? navSelected : navNotSelected)}>
+                            <Link href="/raffles" className={`block py-1 pl-1  no-underline align-middle border-b-2 ` +
+                                (currentRoute == '/raffles' ? navSelected : navNotSelected)}>
                                 <FontAwesomeIcon
                                     icon={faDice}
-                                    className={`mr-3 ` + (currentRoute == '/raffles' ? navSelected : navNotSelected)}
+                                    className="mr-3"
                                 />
                                 <span className="pb-1 text-lg md:pb-0">Raffles</span>
                             </Link>
@@ -450,7 +450,7 @@ const Nav: NextPage = (props: any) => {
                             <Link href="/nft-raffles" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/nft-raffles' ? navSelected : navNotSelected)}>
                                 <FontAwesomeIcon
                                     icon={faFileImage}
-                                    className={`mr-3 ` + (currentRoute == '/nft-raffles' ? navSelected : navNotSelected)}
+                                    className="mr-3"
                                 />
                                 <span className="pb-1 text-lg md:pb-0">NFT Raffles</span>
                             </Link>
