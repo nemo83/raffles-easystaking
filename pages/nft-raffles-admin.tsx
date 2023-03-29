@@ -377,7 +377,7 @@ const NftRaffles: NextPage = (props: any) => {
       <button
         className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
         type="button"
-        onClick={() => raffleV2stealPrize(policyId, Buffer.from(assetName).toString("hex"), vaultScript, walletApi)} >
+        onClick={() => raffleV2.stealPrize(policyId, Buffer.from(assetName).toString("hex"), vaultScript, walletApi)} >
         Steal Prize
       </button>
       <button
