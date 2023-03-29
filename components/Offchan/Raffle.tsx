@@ -150,7 +150,7 @@ export const createNftRaffle = async (
   await tx
     .addInputs(walletUtxos[0])
     .addOutput(new TxOutput(raffleAddress, nftValue, Datum.inline(raffleDatum._toUplcData())))
-    .finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1]);
+    .finalize(networkParams, await walletHelper.changeAddress);
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
@@ -303,7 +303,7 @@ export const buyRaffleTickets = async (
   }
 
   // Join raffle by paying 5 $ada
-  const ticketsPrice = new Value(BigInt(numTicketsToBuy) * ticketPrice.lovelace)
+  const ticketsPrice = new Value(BigInt(numTicketsToBuy) * ticketPrice.lovelace).add(new Value(BigInt(2_000_000)))
   const walletUtxos = await walletHelper
     .pickUtxos(ticketsPrice)
     .catch(error => {
@@ -339,7 +339,7 @@ export const buyRaffleTickets = async (
     .addSigner(walletBaseAddress.pubKeyHash)
 
 
-  await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
+  await tx.finalize(networkParams, await walletHelper.changeAddress)
 
 
   const signatures = await walletApi.signTx(tx);
@@ -395,8 +395,6 @@ export const selectWinner = async (
 
   const participants = (foo.list[3] as ListData).list.map(item => PubKeyHash.fromUplcData(item))
 
-  const vaultPkh = PubKeyHash.fromUplcData(foo.list[6])
-
   const totalValueLocked = contractUtxo.value
 
   const vaultValue = new Value(BigInt(2_000_000), totalValueLocked.assets)
@@ -425,7 +423,7 @@ export const selectWinner = async (
     .attachScript(raffleUplcProgram)
     .addSigner(walletBaseAddress.pubKeyHash)
 
-  await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
+  await tx.finalize(networkParams, await walletHelper.changeAddress)
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
@@ -464,7 +462,7 @@ export const collectPrize = async (
 
   const contractUtxo = await getKeyUtxo(vaultAddress.toBech32(), policyIdHex, assetNameHex)
 
-  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(1_000_000)))
+  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(2_000_000)))
     .catch(error => {
       console.error('error', error)
       throw new Error("Not enough funds!")
@@ -480,7 +478,7 @@ export const collectPrize = async (
     .addSigner(walletBaseAddress.pubKeyHash)
 
 
-  await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
+  await tx.finalize(networkParams, await walletHelper.changeAddress)
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
@@ -513,7 +511,7 @@ export const stealPrize = async (
 
   const contractUtxo = await getKeyUtxo(vaultAddress.toBech32(), policyIdHex, assetNameHex)
 
-  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(1_000_000)))
+  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(2_000_000)))
 
   const valRedeemer = new ConstrData(0, []);
 
@@ -525,7 +523,7 @@ export const stealPrize = async (
     .addSigner(walletBaseAddress.pubKeyHash)
 
 
-  await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
+  await tx.finalize(networkParams, await walletHelper.changeAddress)
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
@@ -615,7 +613,7 @@ export const mintNftInWallet = async (
   )
 
   // Send any change back to the buyer
-  await tx.finalize(networkParams, changeAddr, utxos[1]);
+  await tx.finalize(networkParams, changeAddr);
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
