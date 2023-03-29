@@ -193,7 +193,7 @@ export const retrieveNft = async (
 
   // const nonEmptyDatumUtxo = contractUtxo.filter(utxo => utxo.origOutput.datum != null)
 
-  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(1_000_000)))
+  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(2_000_000)))
 
   const valRedeemer = new ConstrData(0, []);
   // const valRedeemer = (new (program.types.Redeemer.Admin)([]))._toUplcData()
@@ -204,7 +204,7 @@ export const retrieveNft = async (
     .addOutput(new TxOutput(walletBaseAddress, contractUtxo.value))
     .attachScript(raffleUplcProgram)
     .addSigner(walletBaseAddress.pubKeyHash)
-    .finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
+    .finalize(networkParams, await walletHelper.changeAddress)
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);

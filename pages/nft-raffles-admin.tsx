@@ -3,7 +3,6 @@ import { useWalletContext } from "../components/WalletProvider";
 import type { NextPage } from 'next'
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { mintNftInWallet, createNftRaffle, retrieveNft, selectWinner, stealPrize, rnd, getKeyUtxo, parseDatum } from "../components/Offchan/Raffle"
 import * as raffleV2 from "../components/Offchan/RaffleV2"
 import path, { basename } from 'path';
 import fs from 'fs';
@@ -59,7 +58,7 @@ const NftRaffles: NextPage = (props: any) => {
   const [walletApi, setWalletApi] = useWalletContext();
 
   useEffect(() => {
-    const nextSeed = rnd(seed)
+    const nextSeed = raffleV2.rnd(seed)
     setNextSeed(nextSeed.toString())
   }, [seed])
 
@@ -92,62 +91,10 @@ const NftRaffles: NextPage = (props: any) => {
   }
 
   const callMintScript = async () => {
-    mintNftInWallet(
+    raffleV2.mintNftInWallet(
       "Hello world!",
       walletApi
     )
-  }
-
-  const createRaffle = async () => {
-
-    const saltedSeed = `${seed}${salt}`
-
-    createNftRaffle(
-      policyId,
-      Buffer.from(assetName).toString("hex"),
-      numMaxParticipants,
-      numMaxTicketsPerPerson,
-      ticketPrice,
-      saltedSeed,
-      raffleScript,
-      vaultScript,
-      walletApi
-    ).then(async (createRaffle) => {
-
-      const body = JSON.stringify({
-        policy_id: policyId,
-        asset_name: Buffer.from(assetName).toString("hex"),
-        collection_name: collectionName,
-        nft_name: nftName,
-        main_img_url: mainImgUrl,
-        network,
-        admin_pkh: createRaffle.adminPkh,
-        ticket_price: ticketPrice,
-        num_max_tickets_per_wallet: numMaxTicketsPerPerson,
-        num_max_participants: numMaxParticipants,
-        seed_hash: createRaffle.seedHash,
-        vault_pkh: createRaffle.vaultPkh
-      })
-
-      console.log('body: ' + body)
-
-      let resp = await fetch(`${lotteryApi}/nft_raffles`, {
-        method: "POST",
-        headers: {
-          'content-type': "application/json",
-          accept: "application/json"
-        },
-        body
-      });
-
-      if (resp?.status == 200) {
-        toast.success('NFT Raffle successfully created!')
-      } else {
-        toast.error('Error while creating NFT Raffle')
-      }
-
-    })
-
   }
 
   const createRaffleV2 = async () => {
@@ -207,51 +154,12 @@ const NftRaffles: NextPage = (props: any) => {
   }
 
   const withdrawAll = async () => {
-    return retrieveNft(
+    return raffleV2.retrieveNft(
       policyId,
       Buffer.from(assetName).toString("hex"),
       raffleV2Script,
       walletApi
     )
-  }
-
-  const selectRaffleWinner = async () => {
-    selectWinner(
-      seed,
-      salt,
-      policyId,
-      Buffer.from(assetName).toString("hex"),
-      raffleScript,
-      vaultScript,
-      walletApi
-    ).then(async (winner) => {
-
-      const body = JSON.stringify({
-        policy_id: policyId,
-        asset_name: Buffer.from(assetName).toString("hex"),
-        network,
-        winner_pkh: winner.winnerPkh,
-        participants: winner.participants
-      })
-
-      console.log('body: ' + body)
-
-      let resp = await fetch(`${lotteryApi}/nft_raffles/close`, {
-        method: "POST",
-        headers: {
-          'content-type': "application/json",
-          accept: "application/json"
-        },
-        body
-      });
-
-      if (resp?.status == 200) {
-        toast.success('NFT Raffle successfully created!')
-      } else {
-        toast.error('Error while creating NFT Raffle')
-      }
-
-    })
   }
 
   const selectRaffleWinnerV2 = async () => {
@@ -404,9 +312,9 @@ const NftRaffles: NextPage = (props: any) => {
 
     const value = new Value(BigInt(1_000_000))
 
-    const raffleV1Utxo = await getKeyUtxo(raffleAddress.toBech32(), policyId, Buffer.from(assetName).toString("hex"))
+    const raffleV1Utxo = await (null as any).getKeyUtxo(raffleAddress.toBech32(), policyId, Buffer.from(assetName).toString("hex"))
 
-    const datumV1 = parseDatum(raffleV1Utxo.origOutput.datum.data, raffleProgram)
+    const datumV1 = (null as any).parseDatum(raffleV1Utxo.origOutput.datum.data, raffleProgram)
     console.log('datumV1', JSON.stringify(datumV1))
 
     const walletUtxos = await walletHelper.pickUtxos(value)
@@ -469,7 +377,7 @@ const NftRaffles: NextPage = (props: any) => {
       <button
         className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
         type="button"
-        onClick={() => stealPrize(policyId, Buffer.from(assetName).toString("hex"), vaultScript, walletApi)} >
+        onClick={() => raffleV2stealPrize(policyId, Buffer.from(assetName).toString("hex"), vaultScript, walletApi)} >
         Steal Prize
       </button>
       <button
@@ -531,20 +439,6 @@ const NftRaffles: NextPage = (props: any) => {
             <input type={'text'} value={nextSeed} disabled={true}></input>
           </div>
           <div>
-            <h2> Raffle V1</h2>
-            <button
-              className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
-              type="button"
-              onClick={() => createRaffle()} >
-              Create Raffle
-            </button>
-            <button
-              className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
-              type="button"
-              onClick={() => selectRaffleWinner()} >
-              Select Winner
-            </button>
-          </div><div>
             <h2> Raffle V2</h2>
             <button
               className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
