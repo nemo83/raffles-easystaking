@@ -35,10 +35,6 @@ const Nav: NextPage = (props: any) => {
 
     // Theme
     const { systemTheme, theme, setTheme } = useTheme();
-    console.log(systemTheme)
-    console.log(theme)
-
-    const currentTheme = theme === 'system' ? systemTheme : theme;
 
     const stakingAnalysis = false
     const faq = false
