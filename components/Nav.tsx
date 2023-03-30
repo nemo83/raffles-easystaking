@@ -294,13 +294,13 @@ const Nav: NextPage = (props: any) => {
 
             <div className="container flex flex-wrap items-center w-full pt-2 pb-3 mx-auto my-1 mt-0 lg:pb-0">
 
-                <div className="w-1/3 pl-2 md:w-1/2 md:pl-0">
+                <div className="flex justify-center w-full pl-2 sm:block sm:w-1/3 md:w-1/2 md:pl-0">
                     <a className="flex text-xl font-bold no-underline text-myblue dark:text-gray-100 xl:text-xl hover:no-underline text" href="#">
                         <Image src="easy1staking-logo.svg" width={35} height={25} alt="EASY1 Staking" />
                         <div className='ml-3'>EASY1 Staking</div>
                     </a>
                 </div>
-                <div className="w-2/3 pr-0 md:w-1/2">
+                <div className="w-full pr-0 sm:w-2/3 md:w-1/2">
                     <div className="relative flex inline-block float-right">
 
                         <div className="relative flex text-sm text-gray-100">
