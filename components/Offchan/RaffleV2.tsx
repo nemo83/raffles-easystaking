@@ -298,7 +298,7 @@ export const buyRaffleTickets = async (
   // Join raffle by paying 5 $ada
   const ticketsPrice = new Value(BigInt(numTicketsToBuy) * currentDatum.ticketPrice.lovelace)
   const walletUtxos = await walletHelper
-    .pickUtxos(ticketsPrice.add(new Value(BigInt(5_000_000))))
+    .pickUtxos(ticketsPrice)
     .catch(error => {
       console.error(error)
       throw new Error(' Insufficient Funds')
@@ -336,6 +336,7 @@ export const buyRaffleTickets = async (
     .attachScript(raffleUplcProgram)
     .validFrom(before)
     .validTo(after)
+    .addCollateral(await walletHelper.pickCollateral())
     .addSigner(walletBaseAddress.pubKeyHash)
 
   await tx.finalize(networkParams, await walletHelper.changeAddress)
@@ -469,7 +470,7 @@ export const collectPrize = async (
 
   const contractUtxo = await getKeyUtxo(vaultAddress.toBech32(), policyIdHex, assetNameHex)
 
-  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(5_000_000)))
+  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(2_000_000)))
     .catch(error => {
       console.error('error', error)
       throw new Error("Not enough funds!")
@@ -482,7 +483,7 @@ export const collectPrize = async (
     .addInputs(walletUtxos[0])
     .addOutput(new TxOutput(walletBaseAddress, contractUtxo.value))
     .attachScript(vaultUplcProgram)
-    .addSigner(walletBaseAddress.pubKeyHash)
+    .addCollateral(await walletHelper.pickCollateral())
 
 
   await tx.finalize(networkParams, await walletHelper.changeAddress)
