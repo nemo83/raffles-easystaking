@@ -301,7 +301,7 @@ const Nav: NextPage = (props: any) => {
                     </a>
                 </div>
                 <div className="w-full pr-0 sm:w-2/3 md:w-1/2">
-                    <div className="relative flex inline-block float-right">
+                    <div className="relative flex justify-between sm:float-right sm:justify-end">
 
                         <div className="relative flex text-sm text-gray-100">
 
@@ -423,7 +423,7 @@ const Nav: NextPage = (props: any) => {
                         </div>
 
 
-                        <div className="flex-grow block px-4 lg:hidden">
+                        <div className="flex-grow order-first block px-4 sm:order-none lg:hidden">
                             <button id="nav-toggle"
                                 className="flex items-center px-3 py-2 text-gray-300 border border-gray-300 rounded appearance-none hover:text-slate-50 hover:border-slate-50 focus:outline-none"
                                 onClick={() => setShowMenu(!showMenu)}>
