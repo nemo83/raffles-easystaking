@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 import { WalletProvider } from '../components/WalletProvider'
-
+import { ThemeProvider } from "next-themes"
 // fontawesome stuff
 import "@fortawesome/fontawesome-svg-core/styles.css"; // import Font Awesome CSS
 import { config } from "@fortawesome/fontawesome-svg-core";
@@ -15,7 +15,9 @@ export default function MyApp({ Component, pageProps }) {
 
   return (
     <WalletProvider>
-      <Component {...pageProps} />
+      <ThemeProvider attribute="class">
+        <Component {...pageProps} />
+      </ThemeProvider>
     </WalletProvider>
   )
 }

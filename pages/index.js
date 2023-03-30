@@ -2,7 +2,7 @@ import Layout from "../components/Layout";
 import { Distributions } from "../components/Distributions";
 import dynamic from 'next/dynamic';
 import Link from "next/link";
-import nigtsky from '../img/e1r/jpg/night-sky.jpg'
+import easy1staking from '../img/jpg/easy1staking-full.jpg'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -56,15 +56,15 @@ export default function Home() {
         </p>
       </div>
       <div
-        className="relative overflow-hidden text-center bg-no-repeat bg-cover rounded-lg"
-        style={{ height: 400 + 'px', backgroundImage: `url(${nigtsky.src})` }}>
+        className="relative overflow-hidden text-center bg-center bg-no-repeat bg-cover rounded-lg"
+        style={{ height: 400 + 'px', backgroundImage: `url(${easy1staking.src})` }}>
         <div
           className="absolute top-0 bottom-0 left-0 right-0 w-full h-full overflow-hidden bg-fixed"
         // style={{backgroundColor: `rgba(0, 0, 0, 0.6)`}}
         >
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-end justify-center h-full">
             <div className="text-white">
-              <h2 className="mb-4 text-4xl font-semibold">EASY1 Stake Pool</h2>
+              {/* <h2 className="mb-4 text-4xl font-semibold">EASY1 Stake Pool</h2> */}
               <h4 className="mb-6 text-xl font-semibold">Staking  | Airdrops | Raffles</h4>
               {/* <a
                 className="inline-block py-3 mb-1 text-sm font-medium leading-snug text-gray-200 uppercase transition duration-150 ease-in-out border-2 border-gray-200 rounded px-7 hover:bg-black hover:bg-opacity-5 focus:outline-none focus:ring-0"

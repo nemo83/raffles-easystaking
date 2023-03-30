@@ -8,7 +8,7 @@ import {
 export const Card = ({ title, text, icon, iconClassName, iconBackground }) => {
     return (
         <div className="w-full p-3 md:w-1/2 xl:w-1/4">
-            <div className="p-2 border border-black rounded shadow bg-sky-600">
+            <div className="p-2 border rounded shadow border-pink bg-sky-600">
                 <div className="flex flex-row items-center">
                     <div className="flex-shrink pr-4">
                         <div className={`p-3 rounded ${iconBackground}`}>
