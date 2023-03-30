@@ -298,7 +298,7 @@ export const buyRaffleTickets = async (
   // Join raffle by paying 5 $ada
   const ticketsPrice = new Value(BigInt(numTicketsToBuy) * currentDatum.ticketPrice.lovelace)
   const walletUtxos = await walletHelper
-    .pickUtxos(ticketsPrice.add(new Value(BigInt(2_000_000))))
+    .pickUtxos(ticketsPrice.add(new Value(BigInt(5_000_000))))
     .catch(error => {
       console.error(error)
       throw new Error(' Insufficient Funds')
