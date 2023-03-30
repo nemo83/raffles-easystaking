@@ -469,7 +469,7 @@ export const collectPrize = async (
 
   const contractUtxo = await getKeyUtxo(vaultAddress.toBech32(), policyIdHex, assetNameHex)
 
-  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(2_000_000)))
+  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(5_000_000)))
     .catch(error => {
       console.error('error', error)
       throw new Error("Not enough funds!")
