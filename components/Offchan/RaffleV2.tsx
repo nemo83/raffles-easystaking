@@ -335,11 +335,18 @@ export const buyRaffleTickets = async (
     .validTo(after)
     .addSigner(walletBaseAddress.pubKeyHash)
 
+  // console.log("tx before final", tx.dump());
+  // console.log("tx before final CBOR: ", bytesToHex(tx.toCbor()))
+
   await tx.finalize(networkParams, await walletHelper.changeAddress)
 
+  // console.log("tx after final", tx.dump());
+  // console.log("tx after final CBOR: ", bytesToHex(tx.toCbor()))
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
+
+  // console.log(bytesToHex(tx.toCbor()))
 
   const txHash = await walletApi.submitTx(tx);
 

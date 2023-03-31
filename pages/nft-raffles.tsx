@@ -282,20 +282,24 @@ const NftRaffles: NextPage = (props: any) => {
       throw console.error("NFT not found");
     }
 
-    const datum = ListData.fromCbor(hexToBytes(payload[0].inline_datum))
+    try {
+      const datum = ListData.fromCbor(hexToBytes(payload[0].inline_datum))
 
-    const adminPkh = PubKeyHash.fromUplcData(datum.list[0])
-    const winningPkh = PubKeyHash.fromUplcData(datum.list[1])
+      const winningPkh = PubKeyHash.fromUplcData(datum.list[1])
 
-    if (walletPkh == winningPkh.hex) {
-      const nft: WonNft = {
-        nftPolicyId: assetId.slice(0, 56),
-        nftAssetName: assetId.slice(56),
+      if (walletPkh == winningPkh.hex) {
+        const nft: WonNft = {
+          nftPolicyId: assetId.slice(0, 56),
+          nftAssetName: assetId.slice(56),
+        }
+        return nft
+      } else {
+        return null
       }
-      return nft
-    } else {
+    } catch (error) {
       return null
     }
+
   }
 
   const fetchRaffles = async () => {
