@@ -115,9 +115,6 @@ export const createNftRaffle = async (
   const vaultProgram = Program.new(nftVaultScript);
   const vaultUplcProgram = vaultProgram.compile(optimizeSmartContracts);
 
-  // Extract the validator script address
-  const vaultAddress = Address.fromValidatorHash(vaultUplcProgram.validatorHash);
-
   const walletHelper = new WalletHelper(walletApi);
   const walletBaseAddress = await walletHelper.baseAddress
 
@@ -149,12 +146,12 @@ export const createNftRaffle = async (
     deadline.getTime()
   )
 
-  const walletUtxos = await walletHelper.pickUtxos(nftValue)
+  const utxos = await walletHelper.pickUtxos(nftValue)
 
   await tx
-    .addInputs(walletUtxos[0])
+    .addInputs(utxos[0])
     .addOutput(new TxOutput(raffleAddress, nftValue, Datum.inline(raffleDatum._toUplcData())))
-    .finalize(networkParams, await walletHelper.changeAddress);
+    .finalize(networkParams, await walletHelper.changeAddress, utxos[1]);
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
@@ -552,7 +549,7 @@ export const mintNftInWallet = async (
   const changeAddr = await walletHelper.changeAddress;
 
   // Determine the UTXO used for collateral
-  const colatUtxo = await walletHelper.pickCollateral();
+  // const colatUtxo = await walletHelper.pickCollateral();
 
   // Start building the transaction
   const tx = new Tx();
@@ -610,7 +607,7 @@ export const mintNftInWallet = async (
   tx.addOutput(new TxOutput(changeAddr, lockedVal));
 
   // Add the collateral
-  tx.addCollateral(colatUtxo);
+  // tx.addCollateral(colatUtxo);
 
   const networkParams = new NetworkParams(
     await fetch(getNetworkParam(network))
@@ -618,7 +615,7 @@ export const mintNftInWallet = async (
   )
 
   // Send any change back to the buyer
-  await tx.finalize(networkParams, changeAddr);
+  await tx.finalize(networkParams, changeAddr, utxos[1]);
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
