@@ -3,14 +3,17 @@ import fs from "fs";
 import * as tester from './contractTesting.js'
 
 let contract = fs.readFileSync("../components/Contracts/raffle_v2.hl").toString();
+contract = contract.replace('context.get_current_validator_hash()', 'ValidatorHash::new(#01234567890123456789012345678901234567890123456789000001)')
+
 const fixtures = fs.readFileSync("./raffle_v2_fixtures.hl").toString();
 const program = helios.Program.new(contract + fixtures);
 const testContract = program.compile();
+console.log('validatorHash', testContract.validatorHash.hex)
 
 tester.setup(program, testContract);
 Promise.all([
 
-    tester.testApproval("Buy Tickets", "can buy tickets", ["datum", "admin", "sc_admin_signed"]),
+    tester.testApproval("Buy Tickets", "can buy tickets", ["new_raffle", "p1_1_tickets", "sc_new_raffle"]),
 
 ]).then(() => {
     tester.displayStats()

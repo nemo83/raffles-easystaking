@@ -39,7 +39,6 @@ const participant3_pkh = PubKeyHash::new(#01234567890123456789012345678901234567
 const participant4_pkh = PubKeyHash::new(#01234567890123456789012345678901234567890123456789000013)
 const participant5_pkh = PubKeyHash::new(#01234567890123456789012345678901234567890123456789000014)
 
-// Vault 
 const vault_hash_bytes = #01234567890123456789012345678901234567890123456789000001
 const vault_validator_hash: ValidatorHash = ValidatorHash::new(vault_hash_bytes)
 
@@ -56,20 +55,34 @@ func buildDatum(ticketPrice: Value, numMaxTicketsPerWallet: Int, participants: [
     }
 }
 
+// NFT
+const nft_mph_bytes = #01234567890123456789012345678901234567890123456789001000
+const nft_mph = MintingPolicyHash::new(nft_mph_bytes)
+const nft_asset = AssetClass::new(nft_mph, "nft".encode_utf8())
+const nft_value = Value::new(nft_asset, 1)
+
+// Deadline
+const deadline = Time::new(1001)
+const before_deadline_time_range = TimeRange::new(Time::new(900), Time::new(1000))
+const after_deadline_time_range = TimeRange::new(Time::new(1010), Time::new(1020))
+const during_deadline_time_range = TimeRange::new(Time::new(999), Time::new(1002))
+
 // Data
-const defaultDatum: Datum = buildDatum(Value::lovelace(5000000), 3, []PubKeyHash{}, 15, #123123, vault_validator_hash, Time::new(1001))
+const new_raffle: Datum = buildDatum(Value::lovelace(5000000), 3, []PubKeyHash{}, 15, #123123, vault_validator_hash, deadline)
 
 // Redeemers
 const admin = Redeemer::Admin
 
 func buildJoinRaffleRedeemer(participant: PubKeyHash, numTickets: Int) -> Redeemer { Redeemer::JoinRaffle {participant, numTickets} }
 
-const p1_3_tickets = buildJoinRaffleRedeemer(participant1_pkh, 3)
+const p1_1_tickets: Redeemer = buildJoinRaffleRedeemer(participant1_pkh, 1)
 
 // Script Hash
 const script_creds_bytes = #01234567890123456789012345678901234567890123456789000001
 const script_hash: ValidatorHash = ValidatorHash::new(script_creds_bytes)
 const script_tx_hash: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891234)
+
+const p1_wallet_hash: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891239)
 
 const tx_output_id: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891234)
 
@@ -82,7 +95,29 @@ const basic_input: TxInput = TxInput::new(TxOutputId::new(script_tx_hash, 0),
     )
 )
 
-func buildScriptContext(inputs: []TxInput, ref_inputs: []TxInput, outputs: []TxOutput, signers: []PubKeyHash) -> ScriptContext {
+const user_buy_ticket_input: TxInput = TxInput::new(TxOutputId::new(p1_wallet_hash, 0), 
+    TxOutput::new(
+        Address::new(Credential::new_pubkey(participant1_pkh), Option[StakingCredential]::None)
+        , Value::lovelace(5000000)
+        , OutputDatum::new_none()
+    )
+)
+
+const new_raffle_input: TxInput = TxInput::new(TxOutputId::new(script_tx_hash, 0), 
+    TxOutput::new(
+        Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
+        , Value::lovelace(2000000) + nft_value
+        , OutputDatum::new_inline(new_raffle)
+    )
+)
+
+const p1_buys_1_ticket = TxOutput::new(
+    Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
+        , Value::lovelace(7000000) + nft_value
+        , OutputDatum::new_inline(new_raffle.copy(participants: new_raffle.participants.prepend(participant1_pkh)))
+    )
+
+func buildScriptContext(inputs: []TxInput, ref_inputs: []TxInput, outputs: []TxOutput, signers: []PubKeyHash, time_range: TimeRange) -> ScriptContext {
     ScriptContext::new_spending(
         Tx::new(
             inputs,
@@ -92,7 +127,7 @@ func buildScriptContext(inputs: []TxInput, ref_inputs: []TxInput, outputs: []TxO
             Value::ZERO,
             []DCert{},
             Map[StakingCredential]Int{},
-            TimeRange::from(Time::new(1001)),
+            time_range,
             signers,
             Map[ScriptPurpose]Data{},
             Map[DatumHash]Data{}
@@ -105,5 +140,14 @@ const sc_admin_signed: ScriptContext = buildScriptContext(
     []TxInput{basic_input},
     []TxInput{},
     []TxOutput{basic_input.output},
-    []PubKeyHash{admin_pkh}
+    []PubKeyHash{admin_pkh},
+    before_deadline_time_range
+)
+
+const sc_new_raffle: ScriptContext = buildScriptContext(
+    []TxInput{new_raffle_input},
+    []TxInput{user_buy_ticket_input},
+    []TxOutput{p1_buys_1_ticket},
+    []PubKeyHash{participant1_pkh},
+    before_deadline_time_range
 )

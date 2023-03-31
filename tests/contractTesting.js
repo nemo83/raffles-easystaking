@@ -19,7 +19,7 @@ export async function testApproval(testGroup, testName, paramNames) {
   testCount++;
   const args = paramNames.map((p) => _program.evalParam(p));
   await _contract.runWithPrint(args).then((res) => {
-    // console.log('res', JSON.stringify(res))
+    console.log('res', JSON.stringify(res))
     const assertion = res[0].toString() == "()";
     //console.log(res[1]);
     if (assertion) {
