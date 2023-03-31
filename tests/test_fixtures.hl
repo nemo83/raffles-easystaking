@@ -1,0 +1,69 @@
+// HASHES
+const admin_pkh =  PubKeyHash::new(#01234567890123456789012345678901234567890123456789000001)
+const winner_pkh = PubKeyHash::new(#01234567890123456789012345678901234567890123456789000010)
+const loser_pkh =  PubKeyHash::new(#01234567890123456789012345678901234567890123456789000011)
+
+// DATUMS
+const datum = Datum { 
+    admin: admin_pkh,
+    winner: winner_pkh
+}
+
+const admin = Redeemer::Admin 
+const winner = Redeemer::Winner
+
+// Script Hash
+const script_creds_bytes = #01234567890123456789012345678901234567890123456789000001
+const script_hash: ValidatorHash = ValidatorHash::new(script_creds_bytes)
+const script_tx_hash: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891234)
+
+const tx_output_id: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891234)
+
+// INPUTS
+const basic_input: TxInput = TxInput::new(TxOutputId::new(script_tx_hash, 0), 
+    TxOutput::new(
+        Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
+        , Value::lovelace(10000000)
+        , OutputDatum::new_none()
+    )
+)
+
+func buildScriptContext(inputs: []TxInput, ref_inputs: []TxInput, outputs: []TxOutput, signers: []PubKeyHash) -> ScriptContext {
+    ScriptContext::new_spending(
+        Tx::new(
+            inputs,
+            ref_inputs,
+            outputs,
+            Value::lovelace(160000),
+            Value::ZERO,
+            []DCert{},
+            Map[StakingCredential]Int{},
+            TimeRange::from(Time::new(1001)),
+            signers,
+            Map[ScriptPurpose]Data{},
+            Map[DatumHash]Data{}
+        ),
+        TxOutputId::new(tx_output_id, 0)
+    )
+}
+
+const sc_admin_signed: ScriptContext = buildScriptContext(
+    []TxInput{basic_input},
+    []TxInput{},
+    []TxOutput{basic_input.output},
+    []PubKeyHash{admin_pkh}
+)
+
+const sc_winner_signed: ScriptContext = buildScriptContext(
+    []TxInput{basic_input},
+    []TxInput{},
+    []TxOutput{basic_input.output},
+    []PubKeyHash{winner_pkh}
+)
+
+const sc_loser_signed: ScriptContext = buildScriptContext(
+    []TxInput{basic_input},
+    []TxInput{},
+    []TxOutput{basic_input.output},
+    []PubKeyHash{loser_pkh}
+)

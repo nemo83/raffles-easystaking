@@ -1,0 +1,10 @@
+{
+  "name": "tests",
+  "version": "0.0.1",
+  "description": "",
+  "type": "module",
+  "scripts": {},
+  "dependencies": {
+    "@hyperionbt/helios": "0.13.7"
+  }
+}
