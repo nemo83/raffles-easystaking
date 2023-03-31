@@ -4,8 +4,6 @@ import * as tester from './contractTesting.js'
 
 let contract = fs.readFileSync("../components/Contracts/vault.hl").toString();
 contract = contract.replace('ctx.get_current_validator_hash()', 'ValidatorHash::new(#01234567890123456789012345678901234567890123456789000001)')
-// test helpers and fixtures can be loaded from different files and concatenated
-// const helpers = fs.readFileSync("./test_helpers.hl").toString();
 const fixtures = fs.readFileSync("./test_fixtures.hl").toString();
 const program = helios.Program.new(contract + fixtures);
 const testContract = program.compile();
