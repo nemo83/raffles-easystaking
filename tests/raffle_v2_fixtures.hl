@@ -43,27 +43,26 @@ const participant5_pkh = PubKeyHash::new(#01234567890123456789012345678901234567
 const vault_hash_bytes = #01234567890123456789012345678901234567890123456789000001
 const vault_validator_hash: ValidatorHash = ValidatorHash::new(vault_hash_bytes)
 
-
 func buildDatum(ticketPrice: Value, numMaxTicketsPerWallet: Int, participants: []PubKeyHash, numMaxParticipants: Int, seedHash: ByteArray, vaultPkh: ValidatorHash, deadline: Time) -> Datum {
     Datum {
-        admin: admin_pkh
-        ticketPrice: ticketPrice
-        numMaxTicketsPerWallet: numMaxTicketsPerWallet
-        participants: participants
-        numMaxParticipants: numMaxParticipants
-        seedHash: seedHash
-        vaultPkh: vaultPkh
+        admin: admin_pkh,
+        ticketPrice: ticketPrice,
+        numMaxTicketsPerWallet: numMaxTicketsPerWallet,
+        participants: participants,
+        numMaxParticipants: numMaxParticipants,
+        seedHash: seedHash,
+        vaultPkh: vaultPkh,
         deadline: deadline
     }
 }
 
 // Data
-const defaultDatum: Datum = buildDatum(Value::lovelace(5000000, 3, []PubKeyHash{}, 15, #123123, vault_validator_hash, Time::new(1001)))
+const defaultDatum: Datum = buildDatum(Value::lovelace(5000000), 3, []PubKeyHash{}, 15, #123123, vault_validator_hash, Time::new(1001))
 
 // Redeemers
 const admin = Redeemer::Admin
 
-const buildJoinRaffleRedeemer(participant: PubKeyHash, numTickets: Int) -> Redeemer { Redeemer.JoinRaffle(participant, numTickets) }
+func buildJoinRaffleRedeemer(participant: PubKeyHash, numTickets: Int) -> Redeemer { Redeemer::JoinRaffle {participant, numTickets} }
 
 const p1_3_tickets = buildJoinRaffleRedeemer(participant1_pkh, 3)
 
