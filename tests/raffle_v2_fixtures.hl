@@ -1,0 +1,110 @@
+
+//   struct Datum {
+//       admin: PubKeyHash
+//       ticketPrice: Value
+//       numMaxTicketsPerWallet: Int
+//       participants: []PubKeyHash
+//       numMaxParticipants: Int
+//       seedHash: ByteArray
+//       vaultPkh: ValidatorHash
+//       deadline: Time
+
+//       func is_admin(self, tx: Tx) -> Bool { tx.is_signed_by(self.admin) }
+
+//       func is_before_deadline(self, tx: Tx) -> Bool { tx.time_range.is_before(self.deadline) }
+
+//       func is_after_deadline(self, tx: Tx) -> Bool { tx.time_range.is_after(self.deadline) }
+//   }
+
+//   enum Redeemer {
+//     Admin
+//     JoinRaffle {
+//       pkh: PubKeyHash
+//       numTickets: Int
+//     }
+//     SelectWinner {
+//       seed: ByteArray
+//       salt: ByteArray
+//       index: Int
+//     }
+//   }
+
+// ------
+
+// Hashes
+const admin_pkh =  PubKeyHash::new(#01234567890123456789012345678901234567890123456789000001)
+const participant1_pkh = PubKeyHash::new(#01234567890123456789012345678901234567890123456789000010)
+const participant2_pkh = PubKeyHash::new(#01234567890123456789012345678901234567890123456789000011)
+const participant3_pkh = PubKeyHash::new(#01234567890123456789012345678901234567890123456789000012)
+const participant4_pkh = PubKeyHash::new(#01234567890123456789012345678901234567890123456789000013)
+const participant5_pkh = PubKeyHash::new(#01234567890123456789012345678901234567890123456789000014)
+
+// Vault 
+const vault_hash_bytes = #01234567890123456789012345678901234567890123456789000001
+const vault_validator_hash: ValidatorHash = ValidatorHash::new(vault_hash_bytes)
+
+
+func buildDatum(ticketPrice: Value, numMaxTicketsPerWallet: Int, participants: []PubKeyHash, numMaxParticipants: Int, seedHash: ByteArray, vaultPkh: ValidatorHash, deadline: Time) -> Datum {
+    Datum {
+        admin: admin_pkh
+        ticketPrice: ticketPrice
+        numMaxTicketsPerWallet: numMaxTicketsPerWallet
+        participants: participants
+        numMaxParticipants: numMaxParticipants
+        seedHash: seedHash
+        vaultPkh: vaultPkh
+        deadline: deadline
+    }
+}
+
+// Data
+const defaultDatum: Datum = buildDatum(Value::lovelace(5000000, 3, []PubKeyHash{}, 15, #123123, vault_validator_hash, Time::new(1001)))
+
+// Redeemers
+const admin = Redeemer::Admin
+
+const buildJoinRaffleRedeemer(participant: PubKeyHash, numTickets: Int) -> Redeemer { Redeemer.JoinRaffle(participant, numTickets) }
+
+const p1_3_tickets = buildJoinRaffleRedeemer(participant1_pkh, 3)
+
+// Script Hash
+const script_creds_bytes = #01234567890123456789012345678901234567890123456789000001
+const script_hash: ValidatorHash = ValidatorHash::new(script_creds_bytes)
+const script_tx_hash: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891234)
+
+const tx_output_id: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891234)
+
+// INPUTS
+const basic_input: TxInput = TxInput::new(TxOutputId::new(script_tx_hash, 0), 
+    TxOutput::new(
+        Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
+        , Value::lovelace(10000000)
+        , OutputDatum::new_none()
+    )
+)
+
+func buildScriptContext(inputs: []TxInput, ref_inputs: []TxInput, outputs: []TxOutput, signers: []PubKeyHash) -> ScriptContext {
+    ScriptContext::new_spending(
+        Tx::new(
+            inputs,
+            ref_inputs,
+            outputs,
+            Value::lovelace(160000),
+            Value::ZERO,
+            []DCert{},
+            Map[StakingCredential]Int{},
+            TimeRange::from(Time::new(1001)),
+            signers,
+            Map[ScriptPurpose]Data{},
+            Map[DatumHash]Data{}
+        ),
+        TxOutputId::new(tx_output_id, 0)
+    )
+}
+
+const sc_admin_signed: ScriptContext = buildScriptContext(
+    []TxInput{basic_input},
+    []TxInput{},
+    []TxOutput{basic_input.output},
+    []PubKeyHash{admin_pkh}
+)
