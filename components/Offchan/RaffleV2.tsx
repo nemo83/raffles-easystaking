@@ -485,6 +485,7 @@ export const collectPrize = async (
   tx.addInput(contractUtxo, valRedeemer)
     .addInputs(walletUtxos[0])
     .addOutput(new TxOutput(walletBaseAddress, contractUtxo.value))
+    .addSigner(walletBaseAddress.pubKeyHash)
     .attachScript(vaultUplcProgram)
 
   await tx.finalize(networkParams, await walletHelper.changeAddress)
