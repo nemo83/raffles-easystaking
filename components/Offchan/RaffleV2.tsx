@@ -205,7 +205,7 @@ export const retrieveNft = async (
     .addOutput(new TxOutput(walletBaseAddress, contractUtxo.value))
     .attachScript(raffleUplcProgram)
     .addSigner(walletBaseAddress.pubKeyHash)
-    .finalize(networkParams, await walletHelper.changeAddress)
+    .finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
@@ -295,7 +295,7 @@ export const buyRaffleTickets = async (
   // Join raffle by paying 5 $ada
   const ticketsPrice = new Value(BigInt(numTicketsToBuy) * currentDatum.ticketPrice.lovelace)
   const walletUtxos = await walletHelper
-    .pickUtxos(ticketsPrice.add(new Value(BigInt(10_000_000))))
+    .pickUtxos(ticketsPrice)
     .catch(error => {
       console.error(error)
       throw new Error(' Insufficient Funds')
@@ -338,7 +338,7 @@ export const buyRaffleTickets = async (
   // console.log("tx before final", tx.dump());
   // console.log("tx before final CBOR: ", bytesToHex(tx.toCbor()))
 
-  await tx.finalize(networkParams, await walletHelper.changeAddress)
+  await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
   // console.log("tx after final", tx.dump());
   // console.log("tx after final CBOR: ", bytesToHex(tx.toCbor()))
@@ -391,7 +391,7 @@ export const selectWinner = async (
 
   const contractUtxo = await getKeyUtxo(raffleAddress.toBech32(), policyIdHex, assetNameHex)
 
-  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(5_000_000)))
+  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(2_000_000)))
 
   const currentDatum = parseDatum(contractUtxo.origOutput.datum.data, raffleProgram)
 
@@ -434,7 +434,7 @@ export const selectWinner = async (
     .attachScript(raffleUplcProgram)
     .addSigner(walletBaseAddress.pubKeyHash)
 
-  await tx.finalize(networkParams, await walletHelper.changeAddress)
+  await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
@@ -473,7 +473,7 @@ export const collectPrize = async (
 
   const contractUtxo = await getKeyUtxo(vaultAddress.toBech32(), policyIdHex, assetNameHex)
 
-  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(5_000_000)))
+  const walletUtxos = await walletHelper.pickUtxos(new Value(BigInt(2_000_000)))
     .catch(error => {
       console.error('error', error)
       throw new Error("Not enough funds!")
@@ -488,7 +488,7 @@ export const collectPrize = async (
     .addSigner(walletBaseAddress.pubKeyHash)
     .attachScript(vaultUplcProgram)
 
-  await tx.finalize(networkParams, await walletHelper.changeAddress)
+  await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
@@ -533,7 +533,7 @@ export const stealPrize = async (
     .addSigner(walletBaseAddress.pubKeyHash)
 
 
-  await tx.finalize(networkParams, await walletHelper.changeAddress)
+  await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
   const signatures = await walletApi.signTx(tx);
   tx.addSignatures(signatures);
