@@ -1,36 +1,3 @@
-
-//   struct Datum {
-//       admin: PubKeyHash
-//       ticketPrice: Value
-//       numMaxTicketsPerWallet: Int
-//       participants: []PubKeyHash
-//       numMaxParticipants: Int
-//       seedHash: ByteArray
-//       vaultPkh: ValidatorHash
-//       deadline: Time
-
-//       func is_admin(self, tx: Tx) -> Bool { tx.is_signed_by(self.admin) }
-
-//       func is_before_deadline(self, tx: Tx) -> Bool { tx.time_range.is_before(self.deadline) }
-
-//       func is_after_deadline(self, tx: Tx) -> Bool { tx.time_range.is_after(self.deadline) }
-//   }
-
-//   enum Redeemer {
-//     Admin
-//     JoinRaffle {
-//       pkh: PubKeyHash
-//       numTickets: Int
-//     }
-//     SelectWinner {
-//       seed: ByteArray
-//       salt: ByteArray
-//       index: Int
-//     }
-//   }
-
-// ------
-
 // Hashes
 const admin_pkh =  PubKeyHash::new(#01234567890123456789012345678901234567890123456789000001)
 const participant1_pkh = PubKeyHash::new(#01234567890123456789012345678901234567890123456789000010)
