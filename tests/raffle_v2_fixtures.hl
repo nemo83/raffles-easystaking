@@ -70,12 +70,16 @@ const during_deadline_time_range = TimeRange::new(Time::new(999), Time::new(1002
 // Data
 const new_raffle: Datum = buildDatum(Value::lovelace(5000000), 3, []PubKeyHash{}, 15, #123123, vault_validator_hash, deadline)
 
+const raffle_p1_1_ticket: Datum = new_raffle.copy(participants: new_raffle.participants.prepend(participant1_pkh))
+
 // Redeemers
 const admin = Redeemer::Admin
 
 func buildJoinRaffleRedeemer(participant: PubKeyHash, numTickets: Int) -> Redeemer { Redeemer::JoinRaffle {participant, numTickets} }
 
 const p1_1_tickets: Redeemer = buildJoinRaffleRedeemer(participant1_pkh, 1)
+
+const p2_2_tickets: Redeemer = buildJoinRaffleRedeemer(participant2_pkh, 2)
 
 // Script Hash
 const script_creds_bytes = #01234567890123456789012345678901234567890123456789000001
@@ -84,36 +88,71 @@ const script_tx_hash: TxId = TxId::new(#0123456789012345678901234567890123456789
 
 const p1_wallet_hash: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891239)
 
-const tx_output_id: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891234)
+const tx_id: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891234)
+
+const dummy_tx_output_id = TxOutputId::new(script_tx_hash, 0)
+
+func build_tx_output(value: Value, datum: OutputDatum) -> TxOutput { 
+    TxOutput::new(
+        Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
+        , value
+        , datum
+    )
+ }
+
+/**
+ * IT's better to build inputs, whose outputs can be used for "previous" tests of the SC.
+ * eg. input.output
+ * Same for value and datum
+ * It should be easy to build complex input
+ * Autogenerate less important data, like script hashes etc.
+ */
+func build_tx_input(tx_output_id: TxOutputId, tx_output: TxOutput) -> TxInput { TxInput::new(tx_output_id, tx_output) }
 
 // INPUTS
-const basic_input: TxInput = TxInput::new(TxOutputId::new(script_tx_hash, 0), 
-    TxOutput::new(
-        Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
-        , Value::lovelace(10000000)
-        , OutputDatum::new_none()
+// const basic_input: TxInput = TxInput::new(dummy_tx_output_id, 
+//     TxOutput::new(
+//         Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
+//         , Value::lovelace(10000000)
+//         , OutputDatum::new_none()
+//     )
+// )
+const basic_input: TxInput = build_tx_input(dummy_tx_output_id, build_tx_output(Value::lovelace(10000000), OutputDatum::new_none()))
+
+const user_buy_ticket_input: TxInput = build_tx_input(
+    TxOutputId::new(p1_wallet_hash, 0),
+    build_tx_output(
+        Value::lovelace(5000000),
+        OutputDatum::new_none()
     )
 )
 
-const user_buy_ticket_input: TxInput = TxInput::new(TxOutputId::new(p1_wallet_hash, 0), 
-    TxOutput::new(
-        Address::new(Credential::new_pubkey(participant1_pkh), Option[StakingCredential]::None)
-        , Value::lovelace(5000000)
-        , OutputDatum::new_none()
+const new_raffle_input: TxInput =  build_tx_input(
+    dummy_tx_output_id,
+    build_tx_output(
+        Value::lovelace(2000000) + nft_value,
+        OutputDatum::new_inline(new_raffle)
     )
 )
 
-const new_raffle_input: TxInput = TxInput::new(TxOutputId::new(script_tx_hash, 0), 
-    TxOutput::new(
-        Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
-        , Value::lovelace(2000000) + nft_value
-        , OutputDatum::new_inline(new_raffle)
+const raffle_1_ticket_input: TxInput =  build_tx_input(
+    dummy_tx_output_id,
+    build_tx_output(
+        Value::lovelace(7000000) + nft_value,
+        OutputDatum::new_inline(raffle_p1_1_ticket)
     )
 )
 
-const p1_buys_1_ticket = TxOutput::new(
+
+const p1_buys_first_ticket = TxOutput::new(
     Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
         , Value::lovelace(7000000) + nft_value
+        , OutputDatum::new_inline(new_raffle.copy(participants: new_raffle.participants.prepend(participant1_pkh)))
+    )
+
+const p2_buys_second_third_tickets_not_enough_ada = TxOutput::new(
+    Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
+        , Value::lovelace(12000000) + nft_value
         , OutputDatum::new_inline(new_raffle.copy(participants: new_raffle.participants.prepend(participant1_pkh)))
     )
 
@@ -132,7 +171,7 @@ func buildScriptContext(inputs: []TxInput, ref_inputs: []TxInput, outputs: []TxO
             Map[ScriptPurpose]Data{},
             Map[DatumHash]Data{}
         ),
-        TxOutputId::new(tx_output_id, 0)
+        TxOutputId::new(tx_id, 0)
     )
 }
 
@@ -147,7 +186,21 @@ const sc_admin_signed: ScriptContext = buildScriptContext(
 const sc_new_raffle: ScriptContext = buildScriptContext(
     []TxInput{new_raffle_input},
     []TxInput{user_buy_ticket_input},
-    []TxOutput{p1_buys_1_ticket},
+    []TxOutput{raffle_1_ticket_input.output},
     []PubKeyHash{participant1_pkh},
+    before_deadline_time_range
+)
+
+const sc_1_ticket: ScriptContext = buildScriptContext(
+    []TxInput{raffle_1_ticket_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(5000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{p2_buys_second_third_tickets_not_enough_ada},
+    []PubKeyHash{participant2_pkh},
     before_deadline_time_range
 )

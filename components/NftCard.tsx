@@ -84,8 +84,12 @@ const NftCard = ({
                 }
             }, 1000);
 
+        } else if (userWon) {
+            setCDValue("Expired")
+            setExpired(true)
+
         }
-    }, [deadline]);
+    }, [deadline, userWon]);
 
     useEffect(() => {
         const options = []

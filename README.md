@@ -39,3 +39,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 * All about flex https://css-tricks.com/snippets/css/a-guide-to-flexbox/
 * NextJS Crash Course https://www.youtube.com/watch?v=mTz0GXj8NN0
 * TailwindCSS Crash Course https://www.youtube.com/watch?v=dFgzHOX84xQ
+* https://trueq.io/q/56

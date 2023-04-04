@@ -14,6 +14,7 @@ tester.setup(program, testContract);
 Promise.all([
 
     tester.testApproval("Buy Tickets", "can buy tickets", ["new_raffle", "p1_1_tickets", "sc_new_raffle"]),
+    tester.testDenial("Buy Tickets", "p2 tries buy 2 tickets, not enough ada", ["raffle_p1_1_ticket", "p2_2_tickets", "sc_1_ticket"]),
 
 ]).then(() => {
     tester.displayStats()
