@@ -88,9 +88,9 @@ spending raffle
 
   func valid_num_tickets(datum: Datum, participantPkh: PubKeyHash, numTickets: Int) -> Bool {
     // User buying up to max num ticket per wallet
-    datum.participants.filter((pkh: PubKeyHash) -> { pkh == participantPkh }).length + numTickets <= datum.numMaxTicketsPerWallet &&
+    (datum.participants.filter((pkh: PubKeyHash) -> { pkh == participantPkh }).length + numTickets <= datum.numMaxTicketsPerWallet).trace("PARTICIPANTS_TOO_MANY_TICKETS: ") &&
     // Not exceeding max num total tickets
-    datum.participants.length + numTickets <= datum.numMaxParticipants
+    (datum.participants.length + numTickets <= datum.numMaxParticipants).trace("TOO_MANY_TICKETS: ")
   }
 
 
