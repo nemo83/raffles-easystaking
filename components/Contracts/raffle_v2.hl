@@ -123,9 +123,10 @@ spending raffle
 
             // Buy at least 1 ticket
             expectedTargetValue: Value = input.value + datum.ticketPrice * joinRaffle.numTickets;
+            print("expectedTargetValue: " + expectedTargetValue.show());
 
             // User/Participant is actually paying for at least 1 ticket
-            (actualTargetValue >= expectedTargetValue).trace("TRACE_ALL_GOOD? ") &&
+            (actualTargetValue >= expectedTargetValue).trace("VALUE_OK? ") &&
             valid_num_tickets(datum, joinRaffle.pkh, joinRaffle.numTickets)
 
           } else {

@@ -144,7 +144,7 @@ const p2_buys_second_third_tickets_not_enough_ada = TxOutput::new(
 const p2_attempts_buy_4th_ticket = TxOutput::new(
     Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
         , Value::lovelace(22000000) + nft_value
-        , OutputDatum::new_inline(raffle_p2_3_tickets.copy(participants: new_raffle.participants.prepend(participant2_pkh)))
+        , OutputDatum::new_inline(raffle_p2_3_tickets.copy(participants: raffle_p2_3_tickets.participants.prepend(participant2_pkh)))
     )
 
 func buildScriptContext(inputs: []TxInput, ref_inputs: []TxInput, outputs: []TxOutput, signers: []PubKeyHash, time_range: TimeRange) -> ScriptContext {
