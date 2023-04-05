@@ -5,7 +5,6 @@ import fs from "fs";
 let program;
 let testContract;
 
-
 describe('Participants buy Raffle (v2) tickets', () => {
 
 
@@ -58,7 +57,7 @@ describe('Participants buy Raffle (v2) tickets', () => {
         return await testContract
             .runWithPrint(args)
             .then((res) => {
-                console.log('res', JSON.stringify(res))
+                expect(res[1]).toContain('VALUE_OK: false')
                 expect(res[0].toString()).not.toBe("()");
             })
     })
@@ -68,8 +67,8 @@ describe('Participants buy Raffle (v2) tickets', () => {
         return await testContract
             .runWithPrint(args)
             .then((res) => {
-                console.log('res', JSON.stringify(res))
-                expect(res[0].toString()).not.toBe("()");
+                expect(res[1]).toContain('PARTICIPANTS_TOO_MANY_TICKETS: false')
+                expect(res[0].toString()).not.toBe("()")
             })
     })
 
