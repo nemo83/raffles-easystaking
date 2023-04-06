@@ -137,6 +137,7 @@ spending raffle
 
           print("seed: " + selectWinner.seed.show());
           print("salt: " + selectWinner.salt.show());
+          print("index: " + selectWinner.index.show());
 
           // Build seed/salt hash to verify signature
           concatSha: ByteArray = (selectWinner.seed + selectWinner.salt).sha2();
