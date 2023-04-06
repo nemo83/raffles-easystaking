@@ -40,8 +40,6 @@ describe('Participants buy Raffle (v2) tickets', () => {
     })
 
 
-
-
     it(`should allow buying 1 ticket for enough ada`, async () => {
         const args = ["raffle_new", "p1_buys_1_ticket", "sc_new_raffle"].map((p) => program.evalParam(p))
         return await testContract
@@ -70,6 +68,34 @@ describe('Participants buy Raffle (v2) tickets', () => {
                 expect(res[1]).toContain('PARTICIPANTS_TOO_MANY_TICKETS: false')
                 expect(res[0].toString()).not.toBe("()")
             })
+    })
+
+    it(`should fail if participant wrong signature`, async () => {
+        const args = ["raffle_new", "p2_buys_1_ticket", "sc_new_raffle"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                expect(res[1]).toContain('TRACE_SIGNED_BY_PARTICIPANT: false')
+                expect(res[0].toString()).not.toBe("()")
+            })
+    })
+
+    it(`should fail if raffle is full`, async () => {
+        const args = ["raffle_full", "p5_buys_1_ticket", "sc_full_ticket"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                expect(res[1]).toContain('RAFFLE_NOT_FULL: false')
+                expect(res[0].toString()).not.toBe("()")
+            })
+    })
+
+    it(`should fail if deadline passed`, async () => {
+
+    })
+
+    it(`should fail if too many total tickets`, async () => {
+
     })
 
 
