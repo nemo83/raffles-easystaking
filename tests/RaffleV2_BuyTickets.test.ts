@@ -90,8 +90,24 @@ describe('Participants buy Raffle (v2) tickets', () => {
             })
     })
 
-    it(`should fail if deadline passed`, async () => {
+    it(`should fail if deadline during`, async () => {
+        const args = ["raffle_new", "p1_buys_1_ticket", "sc_raffle_expired_during"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                expect(res[1]).toContain('BEFORE_DEADLINE: false')
+                expect(res[0].toString()).not.toBe("()")
+            })
+    })
 
+    it(`should fail if deadline after`, async () => {
+        const args = ["raffle_new", "p1_buys_1_ticket", "sc_raffle_expired_after"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                expect(res[1]).toContain('BEFORE_DEADLINE: false')
+                expect(res[0].toString()).not.toBe("()")
+            })
     })
 
     it(`should fail if too many total tickets`, async () => {

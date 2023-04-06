@@ -252,3 +252,19 @@ const sc_full_ticket: ScriptContext = buildScriptContext(
     []PubKeyHash{participant5_pkh},
     before_deadline_time_range
 )
+
+const sc_raffle_expired_during: ScriptContext = buildScriptContext(
+    []TxInput{new_raffle_input},
+    []TxInput{user_buy_ticket_input},
+    []TxOutput{raffle_1_ticket_input.output},
+    []PubKeyHash{participant1_pkh},
+    during_deadline_time_range
+)
+
+const sc_raffle_expired_after: ScriptContext = buildScriptContext(
+    []TxInput{new_raffle_input},
+    []TxInput{user_buy_ticket_input},
+    []TxOutput{raffle_1_ticket_input.output},
+    []PubKeyHash{participant1_pkh},
+    after_deadline_time_range
+)
