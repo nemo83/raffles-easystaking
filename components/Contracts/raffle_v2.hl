@@ -135,11 +135,17 @@ spending raffle
         },
         selectWinner: SelectWinner => {
 
+          print("seed: " + selectWinner.seed.show());
+          print("salt: " + selectWinner.salt.show());
+
           // Build seed/salt hash to verify signature
           concatSha: ByteArray = (selectWinner.seed + selectWinner.salt).sha2();
           
           decodedSeed: String = selectWinner.seed.decode_utf8();
+          print("decodedSeed: " + decodedSeed);
+
           seed: Int = Int::parse(decodedSeed);
+          print("seed: " + seed.show());
 
           // 2 ada + NFT sent to winner address
           // Reminder of the ada sent to admin wallet.

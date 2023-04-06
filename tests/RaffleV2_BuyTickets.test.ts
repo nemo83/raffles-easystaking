@@ -1,9 +1,9 @@
 import { describe, it, beforeAll, expect } from 'vitest'
-import { Program } from "@hyperionbt/helios"
+import { Program, UplcProgram } from "@hyperionbt/helios"
 import fs from "fs";
 
-let program;
-let testContract;
+let program: Program;
+let testContract: UplcProgram;
 
 describe('Participants buy Raffle (v2) tickets', () => {
 

@@ -6,10 +6,11 @@ import { useState, useEffect } from 'react';
 import * as raffleV2 from "../components/Offchan/RaffleV2"
 import path, { basename } from 'path';
 import fs from 'fs';
-import { Program, Address, PubKeyHash, NetworkParams, WalletHelper, Tx, Assets, MintingPolicyHash, hexToBytes, Value, TxOutput, Datum, ConstrData } from '@hyperionbt/helios';
+import { Program, Address, PubKeyHash, NetworkParams, WalletHelper, Tx, Assets, MintingPolicyHash, hexToBytes, Value, TxOutput, Datum, ConstrData, bytesToHex, ByteArray } from '@hyperionbt/helios';
 import { getNetworkParam, network } from '../constants/blockfrost'
 import { lotteryApi, optimizeSmartContracts } from '../constants/lottery'
 import toast from 'react-hot-toast'
+import { sha256 } from 'js-sha256';
 
 export async function getStaticProps() {
 
@@ -87,6 +88,19 @@ const NftRaffles: NextPage = (props: any) => {
     const vaultProgram = Program.new(vaultScript).compile(optimizeSmartContracts)
     const vaultAddress = Address.fromValidatorHash(vaultProgram.validatorHash);
     console.log('vaultAddress: ' + vaultAddress.toBech32())
+
+    const saltedSeed = `${seed}${salt}`
+    const seedHash = sha256(new TextEncoder().encode(saltedSeed))
+    const foo = new ByteArray(Array.from(new TextEncoder().encode(seed)))
+    const bar = new ByteArray(Array.from(new TextEncoder().encode(salt)))
+
+    console.log('foo', foo.hex)
+    console.log('bar', bar.hex)
+
+    console.log('seedHex', Array.from(new TextEncoder().encode(seed)))
+    console.log('saltHex', Array.from(new TextEncoder().encode(salt)))
+    console.log('saltedSeed', seedHash)
+    console.log('saltedSeed', Buffer.from(seedHash).toString("hex"))
 
   }
 
