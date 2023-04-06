@@ -43,7 +43,7 @@ describe('Participants buy Raffle (v2) tickets', () => {
 
 
     it(`should allow buying 1 ticket for enough ada`, async () => {
-        const args = ["new_raffle", "p1_1_tickets", "sc_new_raffle"].map((p) => program.evalParam(p))
+        const args = ["raffle_new", "p1_buys_1_ticket", "sc_new_raffle"].map((p) => program.evalParam(p))
         return await testContract
             .runWithPrint(args)
             .then((res) => {
@@ -53,7 +53,7 @@ describe('Participants buy Raffle (v2) tickets', () => {
     })
 
     it(`should fail if not enough ada`, async () => {
-        const args = ["raffle_p1_1_ticket", "p2_2_tickets", "sc_1_ticket"].map((p) => program.evalParam(p))
+        const args = ["raffle_p1_1_ticket", "p2_buys_2_tickets", "sc_1_ticket"].map((p) => program.evalParam(p))
         return await testContract
             .runWithPrint(args)
             .then((res) => {
@@ -63,7 +63,7 @@ describe('Participants buy Raffle (v2) tickets', () => {
     })
 
     it(`should fail if too many tickets per participants`, async () => {
-        const args = ["raffle_p2_3_tickets", "p2_1_ticket", "sc_3_ticket"].map((p) => program.evalParam(p))
+        const args = ["raffle_p2_3_tickets", "p2_buys_1_ticket", "sc_3_ticket"].map((p) => program.evalParam(p))
         return await testContract
             .runWithPrint(args)
             .then((res) => {
