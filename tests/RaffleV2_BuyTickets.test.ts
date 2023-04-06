@@ -111,7 +111,13 @@ describe('Participants buy Raffle (v2) tickets', () => {
     })
 
     it(`should fail if too many total tickets`, async () => {
-
+        const args = ["raffle_almost_full", "p5_buys_2_ticket", "sc_almost_full_ticket"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                expect(res[1]).toContain('TOO_MANY_TICKETS: false')
+                expect(res[0].toString()).not.toBe("()")
+            })
     })
 
 
