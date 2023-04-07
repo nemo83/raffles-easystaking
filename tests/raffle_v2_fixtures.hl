@@ -375,3 +375,20 @@ const sc_select_winner_almost_full_after_deadline: ScriptContext = buildScriptCo
     []PubKeyHash{},
     after_deadline_time_range
 )
+
+const sc_select_winner_almost_full_before_deadline: ScriptContext = buildScriptContext(
+    []TxInput{raffle_almost_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant3_pkh),
+        buildAdminOutput(Value::lovelace(50000000))
+    },
+    []PubKeyHash{},
+    before_deadline_time_range
+)

@@ -60,15 +60,17 @@ describe('Raffle Winner Selection', () => {
             })
     })
 
-    // it(`should fail if not enough ada`, async () => {
-    //     const args = ["raffle_p1_1_ticket", "p2_buys_2_tickets", "sc_1_ticket"].map((p) => program.evalParam(p))
-    //     return await testContract
-    //         .runWithPrint(args)
-    //         .then((res) => {
-    //             expect(res[1]).toContain('VALUE_OK: false')
-    //             expect(res[0].toString()).not.toBe("()");
-    //         })
-    // })
+    it(`should fail if not full or deadline not passed`, async () => {
+        console.log('asd')
+        const args = ["raffle_almost_full", "select_winner_1", "sc_select_winner_almost_full_before_deadline"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                expect(res[1]).toContain('DEADLINE_NOT_PASSED: false')
+                expect(res[1]).toContain('TRACE_RAFFLE_FULL: false')
+                expect(res[0].toString()).not.toBe("()");
+            })
+    })
 
 
 })
