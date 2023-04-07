@@ -89,18 +89,8 @@ const NftRaffles: NextPage = (props: any) => {
     const vaultAddress = Address.fromValidatorHash(vaultProgram.validatorHash);
     console.log('vaultAddress: ' + vaultAddress.toBech32())
 
-    const saltedSeed = `${seed}${salt}`
-    const seedHash = sha256(new TextEncoder().encode(saltedSeed))
-    const foo = new ByteArray(Array.from(new TextEncoder().encode(seed)))
-    const bar = new ByteArray(Array.from(new TextEncoder().encode(salt)))
-
-    console.log('foo', foo.hex)
-    console.log('bar', bar.hex)
-
-    console.log('seedHex', Array.from(new TextEncoder().encode(seed)))
-    console.log('saltHex', Array.from(new TextEncoder().encode(salt)))
-    console.log('saltedSeed', seedHash)
-    console.log('saltedSeed', Buffer.from(seedHash).toString("hex"))
+    const winningIndex = raffleV2.calculateWinningIndex(seed, '9')
+    console.log('winningIndex', winningIndex)
 
   }
 

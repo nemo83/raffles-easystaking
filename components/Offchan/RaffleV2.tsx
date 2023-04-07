@@ -77,7 +77,7 @@ export const rnd = (seed: string) => {
   return ((BigInt("1103515245") * BigInt(seed) + BigInt(12345)) % BigInt("2147483648"))
 }
 
-const calculateWinningIndex = (seed: string, numParticipants: string) => {
+export const calculateWinningIndex = (seed: string, numParticipants: string) => {
   return rnd(seed) % BigInt(numParticipants)
 }
 

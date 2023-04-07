@@ -5,7 +5,7 @@ import fs from "fs";
 let program;
 let testContract;
 
-describe('Participants buy Raffle (v2) tickets', () => {
+describe('Raffle Winner Selection', () => {
 
 
     beforeAll(() => {
@@ -41,7 +41,17 @@ describe('Participants buy Raffle (v2) tickets', () => {
 
 
     it(`should select winner of a full raffle`, async () => {
-        const args = ["raffle_full", "select_winner", "sc_select_winner_full_before_deadline"].map((p) => program.evalParam(p))
+        const args = ["raffle_full", "select_winner_6", "sc_select_winner_full_before_deadline"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                console.log('res', JSON.stringify(res))
+                expect(res[0].toString()).toBe("()");
+            })
+    })
+
+    it(`should select winner of a non-full raffle after deadline`, async () => {
+        const args = ["raffle_almost_full", "select_winner_1", "sc_select_winner_almost_full_after_deadline"].map((p) => program.evalParam(p))
         return await testContract
             .runWithPrint(args)
             .then((res) => {

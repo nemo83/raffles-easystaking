@@ -93,10 +93,16 @@ const p2_buys_1_ticket: Redeemer = buildJoinRaffleRedeemer(participant2_pkh, 1)
 const p5_buys_1_ticket: Redeemer = buildJoinRaffleRedeemer(participant5_pkh, 1)
 const p5_buys_2_ticket: Redeemer = buildJoinRaffleRedeemer(participant5_pkh, 2)
 
-const select_winner = Redeemer::SelectWinner {
+const select_winner_6 = Redeemer::SelectWinner {
     #313233313233,
     #617364617364,
     6
+}
+
+const select_winner_1 = Redeemer::SelectWinner {
+    #313233313233,
+    #617364617364,
+    1
 }
 
 // Script Hash
@@ -351,4 +357,21 @@ const sc_select_winner_full_before_deadline: ScriptContext = buildScriptContext(
     },
     []PubKeyHash{},
     before_deadline_time_range
+)
+
+const sc_select_winner_almost_full_after_deadline: ScriptContext = buildScriptContext(
+    []TxInput{raffle_almost_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant3_pkh),
+        buildAdminOutput(Value::lovelace(50000000))
+    },
+    []PubKeyHash{},
+    after_deadline_time_range
 )
