@@ -155,7 +155,7 @@ spending raffle
           // the seed is valid
           (datum.seedHash == concatSha).trace("SEED_MATCH: ") &&
           // There's at least 1 participant
-          (datum.participants.length >= 0).trace("NO_PARTICIPANTS: ") &&
+          (datum.participants.length > 0).trace("NO_PARTICIPANTS: ") &&
           // The winning index is correct (tmp)
           (select_winning_index(seed, datum.participants.length) == selectWinner.index).trace("TRACE_INDEX: ") &&
           // Check correct values sent to admin and vault

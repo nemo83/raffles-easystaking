@@ -61,13 +61,32 @@ describe('Raffle Winner Selection', () => {
     })
 
     it(`should fail if not full or deadline not passed`, async () => {
-        console.log('asd')
         const args = ["raffle_almost_full", "select_winner_1", "sc_select_winner_almost_full_before_deadline"].map((p) => program.evalParam(p))
         return await testContract
             .runWithPrint(args)
             .then((res) => {
                 expect(res[1]).toContain('DEADLINE_NOT_PASSED: false')
                 expect(res[1]).toContain('TRACE_RAFFLE_FULL: false')
+                expect(res[0].toString()).not.toBe("()");
+            })
+    })
+
+    it(`should fail if seed is not matching`, async () => {
+        const args = ["raffle_full", "select_winner_bad_hash", "sc_select_winner_full_before_deadline"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                expect(res[1]).toContain('SEED_MATCH: false')
+                expect(res[0].toString()).not.toBe("()");
+            })
+    })
+
+    it(`should fail if no participants`, async () => {
+        const args = ["raffle_new", "select_winner_1", "sc_new_raffle_after_deadline"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                expect(res[1]).toContain('NO_PARTICIPANTS: false')
                 expect(res[0].toString()).not.toBe("()");
             })
     })
