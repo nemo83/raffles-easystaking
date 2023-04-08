@@ -91,6 +91,16 @@ describe('Raffle Winner Selection', () => {
             })
     })
 
+    it(`should fail if wrong index`, async () => {
+        const args = ["raffle_full", "select_winner_wrong_index", "sc_select_winner_full_before_deadline"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                expect(res[1]).toContain('TRACE_INDEX: false')
+                expect(res[0].toString()).not.toBe("()");
+            })
+    })
+
 
 })
 

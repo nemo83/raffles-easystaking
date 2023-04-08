@@ -111,6 +111,12 @@ const select_winner_bad_hash = Redeemer::SelectWinner {
     1
 }
 
+const select_winner_wrong_index = Redeemer::SelectWinner {
+    #313233313233,
+    #617364617364,
+    1
+}
+
 // Script Hash
 const script_creds_bytes = #01234567890123456789012345678901234567890123456789000001
 const script_hash: ValidatorHash = ValidatorHash::new(script_creds_bytes)
