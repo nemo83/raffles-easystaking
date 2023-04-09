@@ -68,9 +68,11 @@ spending raffle
     
     adminValue: Value = totalValueLocked - vaultValue;
     
+    // Right this is bad, we need ticket price, num tickets, and should compute value
     valueSentToAdmin: Value = tx.value_sent_to(adminPkh);
     print("valueSentToAdmin.lovelace: " + valueSentToAdmin.get_lovelace().show());
 
+    // Once computed the diff, the rest is sent to vault.
     valueSentToVault: Value = tx.value_locked_by_datum(vaultPkh, VaultDatum{adminPkh, winnerPkh}, true);
     print("valueSentToVault.lovelace: " + valueSentToVault.get_lovelace().show());
 

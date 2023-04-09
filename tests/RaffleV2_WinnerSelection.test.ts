@@ -101,6 +101,20 @@ describe('Raffle Winner Selection', () => {
             })
     })
 
+    it(`should fail if not enough value sent to admin`, async () => {
+        const args = ["raffle_full", "select_winner_6", "sc_select_winner_wrong_admin_value"].map((p) => program.evalParam(p))
+        return await testContract
+            .runWithPrint(args)
+            .then((res) => {
+                console.log('res[1]', JSON.stringify(res[1]))
+                // expect(res[1]).toContain('TRACE_INDEX: false')
+                expect(res[0].toString()).not.toBe("()");
+            })
+    })
+
+    // If value sent not to admin pkh (not enough value sent to admin)
+    // If not enough value sent to vault
+
 
 })
 

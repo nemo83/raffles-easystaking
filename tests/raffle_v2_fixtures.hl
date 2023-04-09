@@ -224,10 +224,14 @@ const p2_attempts_buy_4th_ticket = TxOutput::new(
         , OutputDatum::new_inline(raffle_p2_3_tickets.copy(participants: raffle_p2_3_tickets.participants.prepend(participant2_pkh)))
     )
 
-func buildVaultOutput(winner: PubKeyHash) -> TxOutput {
+func buildVaultOutput(winner: PubKeyHash, valueOpt: Option[Value]) -> TxOutput {
+    actualValue: Value = valueOpt.switch {
+        someValue: Some => someValue.some,
+        None => Value::lovelace(2000000)
+    };
     TxOutput::new(
         Address::new(Credential::new_validator(vault_hash), Option[StakingCredential]::None)
-            , Value::lovelace(2000000) + nft_value
+            , actualValue + nft_value
             , OutputDatum::new_inline(VaultDatum{admin_pkh, winner})
         )
 }
@@ -364,7 +368,7 @@ const sc_select_winner_full_before_deadline: ScriptContext = buildScriptContext(
         )
     )},
     []TxOutput{
-        buildVaultOutput(participant2_pkh),
+        buildVaultOutput(participant2_pkh, Option[Value]::None),
         buildAdminOutput(Value::lovelace(50000000))
     },
     []PubKeyHash{},
@@ -381,7 +385,7 @@ const sc_select_winner_almost_full_after_deadline: ScriptContext = buildScriptCo
         )
     )},
     []TxOutput{
-        buildVaultOutput(participant3_pkh),
+        buildVaultOutput(participant3_pkh, Option[Value]::None),
         buildAdminOutput(Value::lovelace(50000000))
     },
     []PubKeyHash{},
@@ -398,7 +402,7 @@ const sc_select_winner_almost_full_before_deadline: ScriptContext = buildScriptC
         )
     )},
     []TxOutput{
-        buildVaultOutput(participant3_pkh),
+        buildVaultOutput(participant3_pkh, Option[Value]::None),
         buildAdminOutput(Value::lovelace(50000000))
     },
     []PubKeyHash{},
@@ -415,9 +419,26 @@ const sc_new_raffle_after_deadline: ScriptContext = buildScriptContext(
         )
     )},
     []TxOutput{
-        buildVaultOutput(participant3_pkh),
+        buildVaultOutput(participant3_pkh, Option[Value]::None),
         buildAdminOutput(Value::lovelace(50000000))
     },
     []PubKeyHash{},
     after_deadline_time_range
+)
+
+const sc_select_winner_wrong_admin_value: ScriptContext = buildScriptContext(
+    []TxInput{raffle_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant2_pkh, Option[Value]::Some{Value::lovelace(3000000)}),
+        buildAdminOutput(Value::lovelace(49000000))
+    },
+    []PubKeyHash{},
+    before_deadline_time_range
 )
