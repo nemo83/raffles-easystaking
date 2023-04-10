@@ -227,11 +227,11 @@ const p2_attempts_buy_4th_ticket = TxOutput::new(
 func buildVaultOutput(winner: PubKeyHash, valueOpt: Option[Value]) -> TxOutput {
     actualValue: Value = valueOpt.switch {
         someValue: Some => someValue.some,
-        None => Value::lovelace(2000000)
+        None => Value::lovelace(2000000) + nft_value
     };
     TxOutput::new(
         Address::new(Credential::new_validator(vault_hash), Option[StakingCredential]::None)
-            , actualValue + nft_value
+            , actualValue
             , OutputDatum::new_inline(VaultDatum{admin_pkh, winner})
         )
 }
@@ -436,8 +436,42 @@ const sc_select_winner_wrong_admin_value: ScriptContext = buildScriptContext(
         )
     )},
     []TxOutput{
-        buildVaultOutput(participant2_pkh, Option[Value]::Some{Value::lovelace(3000000)}),
+        buildVaultOutput(participant2_pkh, Option[Value]::Some{Value::lovelace(3000000) + nft_value}),
         buildAdminOutput(Value::lovelace(49000000))
+    },
+    []PubKeyHash{},
+    before_deadline_time_range
+)
+
+const sc_select_winner_wrong_vault_value: ScriptContext = buildScriptContext(
+    []TxInput{raffle_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant2_pkh, Option[Value]::Some{Value::lovelace(1900000) + nft_value}),
+        buildAdminOutput(Value::lovelace(51100000))
+    },
+    []PubKeyHash{},
+    before_deadline_time_range
+)
+
+const sc_select_winner_no_vault_nft: ScriptContext = buildScriptContext(
+    []TxInput{raffle_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant2_pkh, Option[Value]::Some{Value::lovelace(1900000) + nft_value}),
+        buildAdminOutput(Value::lovelace(51100000))
     },
     []PubKeyHash{},
     before_deadline_time_range
