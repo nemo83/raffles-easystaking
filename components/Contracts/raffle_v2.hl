@@ -68,7 +68,6 @@ spending raffle
     
     adminValue: Value = totalValueLocked - vaultValue;
     
-    // Right this is bad, we need ticket price, num tickets, and should compute value
     valueSentToAdmin: Value = tx.value_sent_to(adminPkh);
     print("valueSentToAdmin.lovelace: " + valueSentToAdmin.get_lovelace().show());
 
