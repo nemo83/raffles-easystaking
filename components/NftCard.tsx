@@ -270,7 +270,7 @@ const NftCard = ({
 
                             <div className="flex items-center justify-center gap-1">
                                 <span className="text-sm text-gray-900">
-                                    <FontAwesomeIcon icon={faStar} size="sm" /> My Entries: {numWalletPurchasedTickets != undefined ? numWalletPurchasedTickets : "N/A"}
+                                    <FontAwesomeIcon icon={faStar} size="sm" /> My Entries: {numWalletPurchasedTickets != undefined ? numWalletPurchasedTickets : "N/A"}/{maxNumTicketsPerWallet ? maxNumTicketsPerWallet : "N/A"}
                                 </span>
 
                             </div>
