@@ -71,6 +71,7 @@ spending raffle
     valueSentToAdmin: Value = tx.value_sent_to(adminPkh);
     print("valueSentToAdmin.lovelace: " + valueSentToAdmin.get_lovelace().show());
 
+    // Once computed the diff, the rest is sent to vault.
     valueSentToVault: Value = tx.value_locked_by_datum(vaultPkh, VaultDatum{adminPkh, winnerPkh}, true);
     print("valueSentToVault.lovelace: " + valueSentToVault.get_lovelace().show());
 
@@ -88,9 +89,9 @@ spending raffle
 
   func valid_num_tickets(datum: Datum, participantPkh: PubKeyHash, numTickets: Int) -> Bool {
     // User buying up to max num ticket per wallet
-    datum.participants.filter((pkh: PubKeyHash) -> { pkh == participantPkh }).length + numTickets <= datum.numMaxTicketsPerWallet &&
+    (datum.participants.filter((pkh: PubKeyHash) -> { pkh == participantPkh }).length + numTickets <= datum.numMaxTicketsPerWallet).trace("PARTICIPANTS_TOO_MANY_TICKETS: ") &&
     // Not exceeding max num total tickets
-    datum.participants.length + numTickets <= datum.numMaxParticipants
+    (datum.participants.length + numTickets <= datum.numMaxParticipants).trace("TOO_MANY_TICKETS: ")
   }
 
 
@@ -123,9 +124,10 @@ spending raffle
 
             // Buy at least 1 ticket
             expectedTargetValue: Value = input.value + datum.ticketPrice * joinRaffle.numTickets;
+            print("expectedTargetValue: " + expectedTargetValue.show());
 
             // User/Participant is actually paying for at least 1 ticket
-            (actualTargetValue >= expectedTargetValue).trace("TRACE_ALL_GOOD? ") &&
+            (actualTargetValue >= expectedTargetValue).trace("VALUE_OK: ") &&
             valid_num_tickets(datum, joinRaffle.pkh, joinRaffle.numTickets)
 
           } else {
@@ -134,11 +136,18 @@ spending raffle
         },
         selectWinner: SelectWinner => {
 
+          print("seed: " + selectWinner.seed.show());
+          print("salt: " + selectWinner.salt.show());
+          print("index: " + selectWinner.index.show());
+
           // Build seed/salt hash to verify signature
           concatSha: ByteArray = (selectWinner.seed + selectWinner.salt).sha2();
           
           decodedSeed: String = selectWinner.seed.decode_utf8();
+          print("decodedSeed: " + decodedSeed);
+
           seed: Int = Int::parse(decodedSeed);
+          print("seed: " + seed.show());
 
           // 2 ada + NFT sent to winner address
           // Reminder of the ada sent to admin wallet.
@@ -147,7 +156,7 @@ spending raffle
           // the seed is valid
           (datum.seedHash == concatSha).trace("SEED_MATCH: ") &&
           // There's at least 1 participant
-          (datum.participants.length >= 0).trace("NO_PARTICIPANTS: ") &&
+          (datum.participants.length > 0).trace("NO_PARTICIPANTS: ") &&
           // The winning index is correct (tmp)
           (select_winning_index(seed, datum.participants.length) == selectWinner.index).trace("TRACE_INDEX: ") &&
           // Check correct values sent to admin and vault

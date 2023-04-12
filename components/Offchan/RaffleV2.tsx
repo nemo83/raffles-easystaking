@@ -22,6 +22,7 @@ import {
   UplcData,
   Time,
   bytesToHex,
+  TxRefInput,
 } from "@hyperionbt/helios";
 import {
   network,
@@ -29,8 +30,10 @@ import {
   getNetworkParam,
   getBlockfrostUrl
 } from "../../constants/blockfrost"
-import { optimizeSmartContracts } from "../../constants/lottery"
+import { optimizeSmartContracts, useRaffleRefScript, raffleRefScriptAddress, raffleRefScriptHash, raffleRefScriptIndex } from "../../constants/lottery"
 import { sha256 } from 'js-sha256';
+import BitSet from "next/dist/shared/lib/bloom-filter/bit-set";
+import { faBitcoinSign } from "@fortawesome/free-solid-svg-icons";
 
 export const getKeyUtxo = async (scriptAddress: string, keyMPH: string, keyName: string) => {
 
@@ -77,7 +80,7 @@ export const rnd = (seed: string) => {
   return ((BigInt("1103515245") * BigInt(seed) + BigInt(12345)) % BigInt("2147483648"))
 }
 
-const calculateWinningIndex = (seed: string, numParticipants: string) => {
+export const calculateWinningIndex = (seed: string, numParticipants: string) => {
   return rnd(seed) % BigInt(numParticipants)
 }
 
@@ -330,10 +333,24 @@ export const buyRaffleTickets = async (
   tx.addInput(contractUtxo, valRedeemer)
     .addInputs(walletUtxos[0])
     .addOutput(new TxOutput(raffleAddress, targetValue, Datum.inline(newDatum)))
-    .attachScript(raffleUplcProgram)
     .validFrom(before)
     .validTo(after)
     .addSigner(walletBaseAddress.pubKeyHash)
+
+  if (useRaffleRefScript) {
+    const refInputValue = new Value(BigInt(0));
+    const scriptInput = new TxRefInput(
+      TxId.fromHex(raffleRefScriptHash),
+      BigInt(raffleRefScriptIndex),
+      new TxOutput(
+        Address.fromBech32(raffleRefScriptAddress),
+        refInputValue
+      )
+    );
+    tx.addRefInput(scriptInput, raffleUplcProgram);
+  } else {
+    tx.attachScript(raffleUplcProgram)
+  }
 
   // console.log("tx before final", tx.dump());
   // console.log("tx before final CBOR: ", bytesToHex(tx.toCbor()))
@@ -431,8 +448,22 @@ export const selectWinner = async (
     .addOutput(new TxOutput(vaultAddress, vaultValue, Datum.inline(vaultDatum)))
     .validFrom(before)
     .validTo(after)
-    .attachScript(raffleUplcProgram)
     .addSigner(walletBaseAddress.pubKeyHash)
+
+  if (useRaffleRefScript) {
+    const refInputValue = new Value(BigInt(0));
+    const scriptInput = new TxRefInput(
+      TxId.fromHex(raffleRefScriptHash),
+      BigInt(raffleRefScriptIndex),
+      new TxOutput(
+        Address.fromBech32(raffleRefScriptAddress),
+        refInputValue
+      )
+    );
+    tx.addRefInput(scriptInput, raffleUplcProgram);
+  } else {
+    tx.attachScript(raffleUplcProgram)
+  }
 
   await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 

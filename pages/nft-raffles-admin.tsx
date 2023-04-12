@@ -4,12 +4,14 @@ import type { NextPage } from 'next'
 import React from 'react';
 import { useState, useEffect } from 'react';
 import * as raffleV2 from "../components/Offchan/RaffleV2"
+import * as offchain from "../components/Offchan/CommonOffchain"
 import path, { basename } from 'path';
 import fs from 'fs';
-import { Program, Address, PubKeyHash, NetworkParams, WalletHelper, Tx, Assets, MintingPolicyHash, hexToBytes, Value, TxOutput, Datum, ConstrData } from '@hyperionbt/helios';
+import { Program, Address, PubKeyHash, NetworkParams, WalletHelper, Tx, Assets, MintingPolicyHash, hexToBytes, Value, TxOutput, Datum, ConstrData, bytesToHex, ByteArray } from '@hyperionbt/helios';
 import { getNetworkParam, network } from '../constants/blockfrost'
-import { lotteryApi, optimizeSmartContracts } from '../constants/lottery'
+import { lotteryApi, optimizeSmartContracts, useRaffleRefScript, raffleRefScriptAddress, raffleRefScriptHash, raffleRefScriptIndex } from '../constants/lottery'
 import toast from 'react-hot-toast'
+import { sha256 } from 'js-sha256';
 
 export async function getStaticProps() {
 
@@ -87,6 +89,19 @@ const NftRaffles: NextPage = (props: any) => {
     const vaultProgram = Program.new(vaultScript).compile(optimizeSmartContracts)
     const vaultAddress = Address.fromValidatorHash(vaultProgram.validatorHash);
     console.log('vaultAddress: ' + vaultAddress.toBech32())
+
+    const saltedSeed = `${seed}${salt}`
+    const seedHash = sha256(new TextEncoder().encode(saltedSeed))
+    const foo = new ByteArray(Array.from(new TextEncoder().encode(seed)))
+    const bar = new ByteArray(Array.from(new TextEncoder().encode(salt)))
+
+    console.log('foo', foo.hex)
+    console.log('bar', bar.hex)
+
+    console.log('seedHex', Array.from(new TextEncoder().encode(seed)))
+    console.log('saltHex', Array.from(new TextEncoder().encode(salt)))
+    console.log('saltedSeed', seedHash)
+    console.log('saltedSeed', Buffer.from(seedHash).toString("hex"))
 
   }
 
@@ -346,6 +361,13 @@ const NftRaffles: NextPage = (props: any) => {
 
   }
 
+  const deployRefScript = async () => {
+    return offchain.createReferenceScript(
+      raffleRefScriptAddress,
+      raffleV2Script,
+      walletApi
+    )
+  }
 
   return (
     <Layout >
@@ -385,6 +407,12 @@ const NftRaffles: NextPage = (props: any) => {
         type="button"
         onClick={() => updateDbRaffles()} >
         Update DB Raffles
+      </button>
+      <button
+        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+        type="button"
+        onClick={() => deployRefScript()} >
+        Deploy Ref Script
       </button>
       <div className="block w-full max-w-sm p-6 rounded-lg shadow-lg ">
         <form>

@@ -7,7 +7,7 @@ const participant4_pkh = PubKeyHash::new(#01234567890123456789012345678901234567
 const participant5_pkh = PubKeyHash::new(#01234567890123456789012345678901234567890123456789000014)
 
 const vault_hash_bytes = #01234567890123456789012345678901234567890123456789000001
-const vault_validator_hash: ValidatorHash = ValidatorHash::new(vault_hash_bytes)
+const vault_hash: ValidatorHash = ValidatorHash::new(vault_hash_bytes)
 
 func buildDatum(ticketPrice: Value, numMaxTicketsPerWallet: Int, participants: []PubKeyHash, numMaxParticipants: Int, seedHash: ByteArray, vaultPkh: ValidatorHash, deadline: Time) -> Datum {
     Datum {
@@ -35,18 +35,87 @@ const after_deadline_time_range = TimeRange::new(Time::new(1010), Time::new(1020
 const during_deadline_time_range = TimeRange::new(Time::new(999), Time::new(1002))
 
 // Data
-const new_raffle: Datum = buildDatum(Value::lovelace(5000000), 3, []PubKeyHash{}, 15, #123123, vault_validator_hash, deadline)
+const raffle_new: Datum = buildDatum(
+    Value::lovelace(5000000), 
+    3, 
+    []PubKeyHash{}, 
+    10, 
+    #2bd9f0f6292e9f7cef15b8ada1b0a44eb09643e0f9c49cf41a81192c19ce09c6, 
+    vault_hash, 
+    deadline
+)
 
-const raffle_p1_1_ticket: Datum = new_raffle.copy(participants: new_raffle.participants.prepend(participant1_pkh))
+const raffle_p1_1_ticket: Datum = raffle_new.copy(participants: raffle_new.participants.prepend(participant1_pkh))
+
+const raffle_p2_3_tickets: Datum = raffle_new.copy(participants: raffle_new
+    .participants
+    .prepend(participant2_pkh)
+    .prepend(participant2_pkh)
+    .prepend(participant2_pkh)
+)
+
+const raffle_full: Datum = raffle_new.copy(participants: raffle_new
+    .participants
+    .prepend(participant1_pkh)
+    .prepend(participant1_pkh)
+    .prepend(participant1_pkh)
+    .prepend(participant2_pkh)
+    .prepend(participant2_pkh)
+    .prepend(participant2_pkh)
+    .prepend(participant3_pkh)
+    .prepend(participant3_pkh)
+    .prepend(participant3_pkh)
+    .prepend(participant4_pkh)
+)
+
+const raffle_almost_full: Datum = raffle_new.copy(participants: raffle_new
+    .participants
+    .prepend(participant1_pkh)
+    .prepend(participant1_pkh)
+    .prepend(participant1_pkh)
+    .prepend(participant2_pkh)
+    .prepend(participant2_pkh)
+    .prepend(participant2_pkh)
+    .prepend(participant3_pkh)
+    .prepend(participant3_pkh)
+    .prepend(participant3_pkh)
+)
 
 // Redeemers
 const admin = Redeemer::Admin
 
 func buildJoinRaffleRedeemer(participant: PubKeyHash, numTickets: Int) -> Redeemer { Redeemer::JoinRaffle {participant, numTickets} }
 
-const p1_1_tickets: Redeemer = buildJoinRaffleRedeemer(participant1_pkh, 1)
+const p1_buys_1_ticket: Redeemer = buildJoinRaffleRedeemer(participant1_pkh, 1)
 
-const p2_2_tickets: Redeemer = buildJoinRaffleRedeemer(participant2_pkh, 2)
+const p2_buys_2_tickets: Redeemer = buildJoinRaffleRedeemer(participant2_pkh, 2)
+const p2_buys_1_ticket: Redeemer = buildJoinRaffleRedeemer(participant2_pkh, 1)
+const p5_buys_1_ticket: Redeemer = buildJoinRaffleRedeemer(participant5_pkh, 1)
+const p5_buys_2_ticket: Redeemer = buildJoinRaffleRedeemer(participant5_pkh, 2)
+
+const select_winner_6 = Redeemer::SelectWinner {
+    #313233313233,
+    #617364617364,
+    6
+}
+
+const select_winner_1 = Redeemer::SelectWinner {
+    #313233313233,
+    #617364617364,
+    1
+}
+
+const select_winner_bad_hash = Redeemer::SelectWinner {
+    #313131313131,
+    #617364617364,
+    1
+}
+
+const select_winner_wrong_index = Redeemer::SelectWinner {
+    #313233313233,
+    #617364617364,
+    1
+}
 
 // Script Hash
 const script_creds_bytes = #01234567890123456789012345678901234567890123456789000001
@@ -54,6 +123,8 @@ const script_hash: ValidatorHash = ValidatorHash::new(script_creds_bytes)
 const script_tx_hash: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891234)
 
 const p1_wallet_hash: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891239)
+const p2_wallet_hash: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891240)
+const p5_wallet_hash: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891245)
 
 const tx_id: TxId = TxId::new(#0123456789012345678901234567890123456789012345678901234567891234)
 
@@ -98,7 +169,7 @@ const new_raffle_input: TxInput =  build_tx_input(
     dummy_tx_output_id,
     build_tx_output(
         Value::lovelace(2000000) + nft_value,
-        OutputDatum::new_inline(new_raffle)
+        OutputDatum::new_inline(raffle_new)
     )
 )
 
@@ -110,18 +181,68 @@ const raffle_1_ticket_input: TxInput =  build_tx_input(
     )
 )
 
+const raffle_3_tickets_input: TxInput =  build_tx_input(
+    dummy_tx_output_id,
+    build_tx_output(
+        Value::lovelace(17000000) + nft_value,
+        OutputDatum::new_inline(raffle_p2_3_tickets)
+    )
+)
 
+const raffle_full_input: TxInput =  build_tx_input(
+    dummy_tx_output_id,
+    build_tx_output(
+        Value::lovelace(52000000) + nft_value,
+        OutputDatum::new_inline(raffle_full)
+    )
+)
+
+const raffle_almost_full_input: TxInput =  build_tx_input(
+    dummy_tx_output_id,
+    build_tx_output(
+        Value::lovelace(47000000) + nft_value,
+        OutputDatum::new_inline(raffle_almost_full)
+    )
+)
+
+// Outputs 
 const p1_buys_first_ticket = TxOutput::new(
     Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
         , Value::lovelace(7000000) + nft_value
-        , OutputDatum::new_inline(new_raffle.copy(participants: new_raffle.participants.prepend(participant1_pkh)))
+        , OutputDatum::new_inline(raffle_new.copy(participants: raffle_new.participants.prepend(participant1_pkh)))
     )
 
 const p2_buys_second_third_tickets_not_enough_ada = TxOutput::new(
     Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
         , Value::lovelace(12000000) + nft_value
-        , OutputDatum::new_inline(new_raffle.copy(participants: new_raffle.participants.prepend(participant1_pkh)))
+        , OutputDatum::new_inline(raffle_new.copy(participants: raffle_new.participants.prepend(participant1_pkh)))
     )
+    
+const p2_attempts_buy_4th_ticket = TxOutput::new(
+    Address::new(Credential::new_validator(script_hash), Option[StakingCredential]::None)
+        , Value::lovelace(22000000) + nft_value
+        , OutputDatum::new_inline(raffle_p2_3_tickets.copy(participants: raffle_p2_3_tickets.participants.prepend(participant2_pkh)))
+    )
+
+func buildVaultOutput(winner: PubKeyHash, valueOpt: Option[Value]) -> TxOutput {
+    actualValue: Value = valueOpt.switch {
+        someValue: Some => someValue.some,
+        None => Value::lovelace(2000000) + nft_value
+    };
+    TxOutput::new(
+        Address::new(Credential::new_validator(vault_hash), Option[StakingCredential]::None)
+            , actualValue
+            , OutputDatum::new_inline(VaultDatum{admin_pkh, winner})
+        )
+}
+
+func buildAdminOutput(value: Value) -> TxOutput {
+    TxOutput::new(
+        Address::new(Credential::new_pubkey(admin_pkh), Option[StakingCredential]::None)
+            , value
+            , OutputDatum::new_none()
+        )
+}
 
 func buildScriptContext(inputs: []TxInput, ref_inputs: []TxInput, outputs: []TxOutput, signers: []PubKeyHash, time_range: TimeRange) -> ScriptContext {
     ScriptContext::new_spending(
@@ -158,6 +279,7 @@ const sc_new_raffle: ScriptContext = buildScriptContext(
     before_deadline_time_range
 )
 
+
 const sc_1_ticket: ScriptContext = buildScriptContext(
     []TxInput{raffle_1_ticket_input},
     []TxInput{build_tx_input(
@@ -169,5 +291,188 @@ const sc_1_ticket: ScriptContext = buildScriptContext(
     )},
     []TxOutput{p2_buys_second_third_tickets_not_enough_ada},
     []PubKeyHash{participant2_pkh},
+    before_deadline_time_range
+)
+
+const sc_3_ticket: ScriptContext = buildScriptContext(
+    []TxInput{raffle_3_tickets_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p2_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(5000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{p2_attempts_buy_4th_ticket},
+    []PubKeyHash{participant2_pkh},
+    before_deadline_time_range
+)
+
+const sc_full_ticket: ScriptContext = buildScriptContext(
+    []TxInput{raffle_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p5_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(5000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{build_tx_output(
+        Value::lovelace(57000000) + nft_value,
+        OutputDatum::new_inline(raffle_full.copy(participants: raffle_full.participants.prepend(participant5_pkh)))
+    )},
+    []PubKeyHash{participant5_pkh},
+    before_deadline_time_range
+)
+
+const sc_almost_full_ticket: ScriptContext = buildScriptContext(
+    []TxInput{raffle_almost_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p5_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(5000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{build_tx_output(
+        Value::lovelace(57000000) + nft_value,
+        OutputDatum::new_inline(raffle_almost_full.copy(participants: raffle_almost_full.participants.prepend(participant5_pkh).prepend(participant5_pkh)))
+    )},
+    []PubKeyHash{participant5_pkh},
+    before_deadline_time_range
+)
+
+const sc_raffle_expired_during: ScriptContext = buildScriptContext(
+    []TxInput{new_raffle_input},
+    []TxInput{user_buy_ticket_input},
+    []TxOutput{raffle_1_ticket_input.output},
+    []PubKeyHash{participant1_pkh},
+    during_deadline_time_range
+)
+
+const sc_raffle_expired_after: ScriptContext = buildScriptContext(
+    []TxInput{raffle_full_input},
+    []TxInput{user_buy_ticket_input},
+    []TxOutput{raffle_1_ticket_input.output},
+    []PubKeyHash{participant1_pkh},
+    after_deadline_time_range
+)
+
+const sc_select_winner_full_before_deadline: ScriptContext = buildScriptContext(
+    []TxInput{raffle_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant2_pkh, Option[Value]::None),
+        buildAdminOutput(Value::lovelace(50000000))
+    },
+    []PubKeyHash{},
+    before_deadline_time_range
+)
+
+const sc_select_winner_almost_full_after_deadline: ScriptContext = buildScriptContext(
+    []TxInput{raffle_almost_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant3_pkh, Option[Value]::None),
+        buildAdminOutput(Value::lovelace(50000000))
+    },
+    []PubKeyHash{},
+    after_deadline_time_range
+)
+
+const sc_select_winner_almost_full_before_deadline: ScriptContext = buildScriptContext(
+    []TxInput{raffle_almost_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant3_pkh, Option[Value]::None),
+        buildAdminOutput(Value::lovelace(50000000))
+    },
+    []PubKeyHash{},
+    before_deadline_time_range
+)
+
+const sc_new_raffle_after_deadline: ScriptContext = buildScriptContext(
+    []TxInput{new_raffle_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant3_pkh, Option[Value]::None),
+        buildAdminOutput(Value::lovelace(50000000))
+    },
+    []PubKeyHash{},
+    after_deadline_time_range
+)
+
+const sc_select_winner_wrong_admin_value: ScriptContext = buildScriptContext(
+    []TxInput{raffle_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant2_pkh, Option[Value]::Some{Value::lovelace(3000000) + nft_value}),
+        buildAdminOutput(Value::lovelace(49000000))
+    },
+    []PubKeyHash{},
+    before_deadline_time_range
+)
+
+const sc_select_winner_wrong_vault_value: ScriptContext = buildScriptContext(
+    []TxInput{raffle_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant2_pkh, Option[Value]::Some{Value::lovelace(1900000) + nft_value}),
+        buildAdminOutput(Value::lovelace(51100000))
+    },
+    []PubKeyHash{},
+    before_deadline_time_range
+)
+
+const sc_select_winner_no_vault_nft: ScriptContext = buildScriptContext(
+    []TxInput{raffle_full_input},
+    []TxInput{build_tx_input(
+        TxOutputId::new(p1_wallet_hash, 0),
+        build_tx_output(
+            Value::lovelace(2000000),
+            OutputDatum::new_none()
+        )
+    )},
+    []TxOutput{
+        buildVaultOutput(participant2_pkh, Option[Value]::Some{Value::lovelace(1900000) + nft_value}),
+        buildAdminOutput(Value::lovelace(51100000))
+    },
+    []PubKeyHash{},
     before_deadline_time_range
 )
