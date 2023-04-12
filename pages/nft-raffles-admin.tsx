@@ -363,7 +363,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   const deployRefScript = async () => {
     return offchain.createReferenceScript(
-      "addr_test1qqg2rlve4ufdvkqtjr8403nwh0fjl03fuw7ql7uprumq3t7kaktnd0qr4dnrr0werwwazxeyjh0uzh2tevvlv39ldpfsdagytu",
+      raffleRefScriptAddress,
       raffleV2Script,
       walletApi
     )
