@@ -12,6 +12,8 @@ import { getNetworkParam, network } from '../constants/blockfrost'
 import { lotteryApi, optimizeSmartContracts, useRaffleRefScript, raffleRefScriptAddress, raffleRefScriptHash, raffleRefScriptIndex } from '../constants/lottery'
 import toast from 'react-hot-toast'
 import { sha256 } from 'js-sha256';
+import Spinner from '../components/Spinner'
+import { faL } from '@fortawesome/free-solid-svg-icons';
 
 export async function getStaticProps() {
 
@@ -54,6 +56,8 @@ const NftRaffles: NextPage = (props: any) => {
   const [seed, setSeed] = useState('');
   const [salt, setSalt] = useState('');
   const [nextSeed, setNextSeed] = useState('')
+
+  const [showSpinner, setShowSpinner] = useState(false)
 
   const [mainImgUrl, setMainImgUrl] = useState('https://ipfs.io/ipfs/QmdHiHmWdt2gonmViGwJcvp4gfZiuVyrtub7H7iCc5QSmf');
 
@@ -106,10 +110,14 @@ const NftRaffles: NextPage = (props: any) => {
   }
 
   const callMintScript = async () => {
-    raffleV2.mintNftInWallet(
-      "Hello world!",
-      walletApi
-    )
+    setShowSpinner(true)
+    return raffleV2
+      .mintNftInWallet(
+        "Hello world!",
+        walletApi
+      )
+      .finally(() => setShowSpinner(false))
+
   }
 
   const createRaffleV2 = async () => {
@@ -371,6 +379,9 @@ const NftRaffles: NextPage = (props: any) => {
 
   return (
     <Layout >
+      {showSpinner ? (
+        <Spinner />
+      ) : null}
 
       <button
         className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"

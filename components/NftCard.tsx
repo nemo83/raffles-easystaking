@@ -8,6 +8,7 @@ import { useWalletContext } from "../components/WalletProvider";
 import * as raffleV2 from './Offchan/RaffleV2'
 import { toast } from 'react-hot-toast';
 import { network } from '../constants/blockfrost';
+import Spinner from '../components/Spinner'
 
 interface NftCard {
     policyIdHex: string,
@@ -60,6 +61,8 @@ const NftCard = ({
 
     const [expired, setExpired] = useState(false)
     const [cdValue, setCDValue] = useState('')
+
+    const [showSpinner, setShowSpinner] = useState(false)
 
     useEffect(() => {
         if (deadline) {
@@ -121,6 +124,7 @@ const NftCard = ({
 
 
     const buyTicket = async () => {
+        setShowSpinner(true)
         return raffleV2.buyRaffleTickets(
             policyIdHex,
             assetNameHex,
@@ -134,7 +138,7 @@ const NftCard = ({
         }).catch(errorMessage => {
             console.log('error', errorMessage)
             toast.error(errorMessage.message)
-        })
+        }).finally(() => setShowSpinner(false))
     }
 
     const collectNft = async () => {
@@ -211,6 +215,11 @@ const NftCard = ({
                     </div>
                 </div>
             </div >
+
+            {showSpinner ? (
+                <Spinner />
+            ) : null}
+
             <div className="flex w-full my-6 md:mx-2 md:justify-center md:w-auto">
 
                 <div className="flex w-full bg-white rounded-lg shadow-lg md:flex-col md:w-auto">
