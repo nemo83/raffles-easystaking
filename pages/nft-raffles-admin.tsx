@@ -383,6 +383,14 @@ const NftRaffles: NextPage = (props: any) => {
         <Spinner />
       ) : null}
 
+      <div>
+        <p>Optimize Smart Contract: {optimizeSmartContracts ? 'true' : 'false'}</p>
+        <p>Network: {network}</p>
+        <p>Use Ref Script: {useRaffleRefScript ? 'true' : 'false'}</p>
+        <p>Script Address: {raffleRefScriptAddress}</p>
+        <p>Script Hash: {raffleRefScriptHash}</p>
+        <p>Script Index: {raffleRefScriptIndex}</p>
+      </div>
       <button
         className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
         type="button"
