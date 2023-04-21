@@ -108,9 +108,8 @@ const Nav: NextPage = (props: any) => {
 
                 if (eternl.name === 'eternl') {
                     console.log('eternl!')
-                    const handle: Cip30Handle = await eternl.enable();
-                    const walletApi = new Cip30Wallet(handle);
-                    setWalletApi(walletApi)
+                    const handle: Cip30Handle = await eternl.enable()
+                    setWalletApi(handle)
 
                 } else {
                     console.log('not eternl!')
@@ -126,7 +125,7 @@ const Nav: NextPage = (props: any) => {
 
             if (walletApi) {
 
-                const walletHelper = new WalletHelper(walletApi)
+                const walletHelper = new WalletHelper(new Cip30Wallet(walletApi))
                 const baseAddress = await walletHelper.baseAddress
                 setBaseAddress(baseAddress.toBech32())
 
@@ -179,9 +178,8 @@ const Nav: NextPage = (props: any) => {
     async function connect(walletName: string) {
 
         const handle: Cip30Handle = await window.cardano[walletName].enable();
-        const walletApi = new Cip30Wallet(handle);
 
-        setWalletApi(walletApi)
+        setWalletApi(handle)
 
         const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
         if (!isReconnect) {

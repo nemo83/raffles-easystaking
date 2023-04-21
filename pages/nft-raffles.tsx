@@ -20,7 +20,8 @@ import {
   IntData,
   Program,
   WalletHelper,
-  Time
+  Time,
+  Cip30Wallet
 } from "@hyperionbt/helios"
 import path from 'path';
 import fs from 'fs';
@@ -71,7 +72,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   const updatePkh = async () => {
     if (walletApi) {
-      const walletPkh = await new WalletHelper(walletApi).baseAddress
+      const walletPkh = await new WalletHelper(new Cip30Wallet(walletApi)).baseAddress
 
       setWalletPkh(walletPkh.pubKeyHash.hex)
     } else {

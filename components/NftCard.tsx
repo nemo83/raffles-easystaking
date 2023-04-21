@@ -126,7 +126,7 @@ const NftCard = ({
 
     const buyTicket = async () => {
         setShowSpinner(true)
-        return raffleV2Lucid.buyRaffleTickets(
+        return raffleV2Lucid.buyRaffleTicketsV2(
             policyIdHex,
             assetNameHex,
             numTickets,

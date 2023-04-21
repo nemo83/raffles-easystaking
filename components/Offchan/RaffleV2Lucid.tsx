@@ -39,8 +39,11 @@ import {
   Data,
   SpendingValidator,
   Assets as LucidAssets,
-  WalletApi
+  WalletApi,
+  Utils,
+  Constr
 } from "lucid-cardano"
+import { layer } from "@fortawesome/fontawesome-svg-core";
 
 // const raffleV2Script: SpendingValidator = {
 //   type: "PlutusV2",
@@ -160,7 +163,7 @@ export const buyRaffleTicketsV2 = async (
   assetNameHex: string,
   numTicketsToBuy: number,
   raffleScript: string,
-  walletApi: Cip30Wallet
+  walletApi: any
 ) => {
 
   const networkParams = new NetworkParams(
@@ -175,7 +178,7 @@ export const buyRaffleTicketsV2 = async (
   // Extract the validator script address
   const raffleAddress = Address.fromValidatorHash(raffleUplcProgram.validatorHash);
 
-  const walletHelper = new WalletHelper(walletApi);
+  const walletHelper = new WalletHelper(new Cip30Wallet(walletApi))
   const walletBaseAddress = await walletHelper.baseAddress
 
   const contractUtxo = await getKeyUtxo(raffleAddress.toBech32(), policyIdHex, assetNameHex)
@@ -213,7 +216,7 @@ export const buyRaffleTicketsV2 = async (
   const valRedeemer = (new (raffleProgram.types.Redeemer as any).JoinRaffle(
     walletBaseAddress.pubKeyHash,
     BigInt(numTicketsToBuy)
-  ))._toUplcData()
+  ))
 
   const now = new Date()
   const before = new Date(now.getTime())
@@ -229,43 +232,41 @@ export const buyRaffleTicketsV2 = async (
     script: scriptCbor
   }
 
-  getLucid()
-    .then(lucid => {
+  var buyTickets = Data.to(new Constr(1, [walletBaseAddress.pubKeyHash.hex, BigInt(numTicketsToBuy)]))
 
-      lucid
-        .utxosAt(raffleAddress.toBech32())
-        .then(utxos => {
-          const utxo = utxos.find(utxo => utxo.assets[`${policyIdHex}${assetNameHex}`] == BigInt(1))
+  const lucid = await getLucid()
 
-          if (!utxo) throw new Error("Utxo not found")
+  const address = lucid.utils.validatorToAddress(raffleV2Script);
 
-          console.log('assets before', utxo.assets)
+  const utxos = await lucid.utxosAt(raffleAddress.toBech32())
 
-          const pay = utxo.assets
+  const utxo = utxos.find(utxo => utxo.assets[`${policyIdHex}${assetNameHex}`] == BigInt(1))
 
-          pay["lovelace"] = pay["lovelace"] + ticketsPrice.lovelace
+  if (!utxo) throw new Error("Utxo not found")
 
-          console.log('assets after', utxo.assets)
+  console.log('assets before', utxo.assets)
 
-          lucid
-            .selectWallet(walletApi as unknown as WalletApi)
-            .newTx()
-            .collectFrom([utxo], Data.to(Data.fromJson(valRedeemer.toSchemaJson())))
-            .payToContract(raffleAddress.toBech32(), { inline: Data.to(Data.from(newDatum.toSchemaJson())) }, pay)
-            .validFrom(before.getTime())
-            .validTo(after.getTime())
-            .attachSpendingValidator(raffleV2Script)
-            .addSignerKey(walletBaseAddress.pubKeyHash.hex)
-            .complete()
+  const pay = Object.assign({}, utxo.assets);
 
+  pay["lovelace"] = pay["lovelace"] + ticketsPrice.lovelace
 
-        })
+  console.log('assets after', utxo.assets)
 
+  const tx = lucid
+    .selectWallet(walletApi as WalletApi)
+    .newTx()
+    .collectFrom([utxo], buyTickets)
+    .payToContract(raffleAddress.toBech32(), { inline: Data.to(Data.fromJson(newDatum.toSchemaJson())) }, pay)
+    .validFrom(before.getTime())
+    .validTo(after.getTime())
+    .addSignerKey(walletBaseAddress.pubKeyHash.hex)
+    .attachSpendingValidator(raffleV2Script)
 
-    })
+  console.log('tx', tx.toString)
 
+  const completedTx = await tx.complete()
 
-
+  completedTx.sign().complete().then(signed => signed.submit())
 
 
 

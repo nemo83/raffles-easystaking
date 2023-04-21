@@ -14,12 +14,12 @@
     "@fortawesome/free-regular-svg-icons": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "@hyperionbt/helios": "0.13.21",
-    "lucid-cardano": "0.10.1",
+    "@hyperionbt/helios": "0.13.22",
     "@types/react": "^18.0.28",
     "chart.js": "^4.2.1",
     "faker": "^5.5.3",
     "js-sha256": "^0.9.0",
+    "lucid-cardano": "0.10.1",
     "next": "^13.1.6",
     "next-themes": "^0.2.1",
     "react": "^18.2.0",
@@ -30,6 +30,7 @@
     "typescript": "^4.9.5"
   },
   "devDependencies": {
+    "@hyperionbt/helios-cli": "^0.13.22",
     "@types/node": "18.14.6",
     "@vitest/ui": "^0.29.8",
     "autoprefixer": "^10.4.7",
