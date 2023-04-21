@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useWalletContext } from "../components/WalletProvider";
 import * as raffleV2 from './Offchan/RaffleV2'
+import * as raffleV2Lucid from './Offchan/RaffleV2Lucid'
 import { toast } from 'react-hot-toast';
 import { network } from '../constants/blockfrost';
 import Spinner from '../components/Spinner'
@@ -125,7 +126,7 @@ const NftCard = ({
 
     const buyTicket = async () => {
         setShowSpinner(true)
-        return raffleV2.buyRaffleTickets(
+        return raffleV2Lucid.buyRaffleTickets(
             policyIdHex,
             assetNameHex,
             numTickets,

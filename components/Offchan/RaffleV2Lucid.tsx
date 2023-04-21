@@ -239,9 +239,13 @@ export const buyRaffleTicketsV2 = async (
 
           if (!utxo) throw new Error("Utxo not found")
 
+          console.log('assets before', utxo.assets)
+
           const pay = utxo.assets
 
           pay["lovelace"] = pay["lovelace"] + ticketsPrice.lovelace
+
+          console.log('assets after', utxo.assets)
 
           lucid
             .selectWallet(walletApi as unknown as WalletApi)
@@ -265,20 +269,20 @@ export const buyRaffleTicketsV2 = async (
 
 
 
-  const tx = new Tx();
-  tx.addInput(contractUtxo, valRedeemer)
-    .addInputs(walletUtxos[0])
-    .addOutput(new TxOutput(raffleAddress, targetValue, Datum.inline(newDatum)))
-    .validFrom(before)
-    .validTo(after)
-    .addSigner(walletBaseAddress.pubKeyHash)
+  // const tx = new Tx();
+  // tx.addInput(contractUtxo, valRedeemer)
+  //   .addInputs(walletUtxos[0])
+  //   .addOutput(new TxOutput(raffleAddress, targetValue, Datum.inline(newDatum)))
+  //   .validFrom(before)
+  //   .validTo(after)
+  //   .addSigner(walletBaseAddress.pubKeyHash)
 
-  await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
+  // await tx.finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1])
 
-  const signatures = await walletApi.signTx(tx);
-  tx.addSignatures(signatures);
+  // const signatures = await walletApi.signTx(tx);
+  // tx.addSignatures(signatures);
 
-  const txHash = await walletApi.submitTx(tx);
+  // const txHash = await walletApi.submitTx(tx);
 
 }
 
