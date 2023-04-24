@@ -1,5 +1,6 @@
 import {
     Address,
+    Cip30Wallet,
     StakeAddress,
     WalletHelper
 } from "@hyperionbt/helios";
@@ -15,7 +16,7 @@ import {
 
 export default function EstimateRewards() {
 
-    const [walletApi, setWalletApi] = useWalletContext()
+    const [walletHandle, setWalletHandle] = useWalletContext()
 
     const [baseAddress, setBaseAddress] = useState(null)
 
@@ -44,15 +45,15 @@ export default function EstimateRewards() {
 
     useEffect(() => {
         const getBaseAddress = async () => {
-            const baseAddress = (await new WalletHelper(walletApi).baseAddress).toBech32()
+            const baseAddress = (await new WalletHelper(new Cip30Wallet(walletHandle)).baseAddress).toBech32()
             setBaseAddress(baseAddress)
         }
-        if (walletApi) {
+        if (walletHandle) {
             getBaseAddress()
         } else {
             setBaseAddress(null)
         }
-    }, [walletApi])
+    }, [walletHandle])
 
     useEffect(() => {
         fetch('https://hilltop-api.mainnet.dandelion.blockwarelabs.io/epochs/current')

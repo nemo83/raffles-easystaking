@@ -7,7 +7,7 @@ import * as raffleV2 from "../components/Offchan/RaffleV2"
 import * as offchain from "../components/Offchan/CommonOffchain"
 import path, { basename } from 'path';
 import fs from 'fs';
-import { Program, Address, PubKeyHash, NetworkParams, WalletHelper, Tx, Assets, MintingPolicyHash, hexToBytes, Value, TxOutput, Datum, ConstrData, bytesToHex, ByteArray } from '@hyperionbt/helios';
+import { Program, Address, PubKeyHash, NetworkParams, WalletHelper, Tx, Assets, MintingPolicyHash, hexToBytes, Value, TxOutput, Datum, ConstrData, bytesToHex, ByteArray, Cip30Wallet } from '@hyperionbt/helios';
 import { getNetworkParam, network } from '../constants/blockfrost'
 import { lotteryApi, optimizeSmartContracts, useRaffleRefScript, raffleRefScriptAddress, raffleRefScriptHash, raffleRefScriptIndex } from '../constants/lottery'
 import toast from 'react-hot-toast'
@@ -61,7 +61,7 @@ const NftRaffles: NextPage = (props: any) => {
 
   const [mainImgUrl, setMainImgUrl] = useState('https://ipfs.io/ipfs/QmdHiHmWdt2gonmViGwJcvp4gfZiuVyrtub7H7iCc5QSmf');
 
-  const [walletApi, setWalletApi] = useWalletContext();
+  const [walletHandle, setWalletHandle] = useWalletContext();
 
   useEffect(() => {
     const nextSeed = raffleV2.rnd(seed)
@@ -114,7 +114,7 @@ const NftRaffles: NextPage = (props: any) => {
     return raffleV2
       .mintNftInWallet(
         "Hello world!",
-        walletApi
+        new Cip30Wallet(walletHandle)
       )
       .finally(() => setShowSpinner(false))
 
@@ -136,7 +136,7 @@ const NftRaffles: NextPage = (props: any) => {
       saltedSeed,
       raffleV2Script,
       vaultScript,
-      walletApi
+      new Cip30Wallet(walletHandle)
     ).then(async (createRaffle) => {
 
       const body = JSON.stringify({
@@ -181,7 +181,7 @@ const NftRaffles: NextPage = (props: any) => {
       policyId,
       Buffer.from(assetName).toString("hex"),
       raffleV2Script,
-      walletApi
+      new Cip30Wallet(walletHandle)
     )
   }
 
@@ -193,7 +193,7 @@ const NftRaffles: NextPage = (props: any) => {
       Buffer.from(assetName).toString("hex"),
       raffleV2Script,
       vaultScript,
-      walletApi
+      new Cip30Wallet(walletHandle)
     ).then(async (winner) => {
 
       const body = JSON.stringify({
@@ -327,7 +327,7 @@ const NftRaffles: NextPage = (props: any) => {
     // Extract the validator script address
     const raffleV2Address = Address.fromValidatorHash(uplcRaffleV2Program.validatorHash);
 
-    const walletHelper = new WalletHelper(walletApi);
+    const walletHelper = new WalletHelper(new Cip30Wallet(walletHandle));
     const walletBaseAddress = await walletHelper.baseAddress
 
     // Lock NFT Prize in contract TX
@@ -362,10 +362,10 @@ const NftRaffles: NextPage = (props: any) => {
       .attachScript(raffleUplcProgram)
       .finalize(networkParams, await walletHelper.changeAddress, walletUtxos[1]);
 
-    const signatures = await walletApi.signTx(tx);
+    const signatures = await new Cip30Wallet(walletHandle).signTx(tx);
     tx.addSignatures(signatures);
 
-    const txHash = await walletApi.submitTx(tx);
+    const txHash = await new Cip30Wallet(walletHandle).submitTx(tx);
 
   }
 
@@ -373,7 +373,7 @@ const NftRaffles: NextPage = (props: any) => {
     return offchain.createReferenceScript(
       raffleRefScriptAddress,
       raffleV2Script,
-      walletApi
+      new Cip30Wallet(walletHandle)
     )
   }
 
@@ -418,7 +418,7 @@ const NftRaffles: NextPage = (props: any) => {
       <button
         className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
         type="button"
-        onClick={() => raffleV2.stealPrize(policyId, Buffer.from(assetName).toString("hex"), vaultScript, walletApi)} >
+        onClick={() => raffleV2.stealPrize(policyId, Buffer.from(assetName).toString("hex"), vaultScript, new Cip30Wallet(walletHandle))} >
         Steal Prize
       </button>
       <button

@@ -50,7 +50,7 @@ const Nav: NextPage = (props: any) => {
     const [showWallets, setShowWallets] = useState(false)
 
     const [availableWallets, setAvailableWallets] = useState([])
-    const [walletApi, setWalletApi] = useWalletContext()
+    const [walletHandle, setWalletHandle] = useWalletContext()
     const [balance, setBalance] = useState('N/A')
     const [friendlyName, setFriendlyName] = useState('')
 
@@ -101,7 +101,7 @@ const Nav: NextPage = (props: any) => {
 
         setAvailableWallets(aWallets)
 
-        if (!walletApi) {
+        if (!walletHandle) {
             initCardanoDAppConnectorBridge(async (eternl) => {
 
                 console.log('init dapp called')
@@ -109,8 +109,7 @@ const Nav: NextPage = (props: any) => {
                 if (eternl.name === 'eternl') {
                     console.log('eternl!')
                     const handle: Cip30Handle = await eternl.enable();
-                    const walletApi = new Cip30Wallet(handle);
-                    setWalletApi(walletApi)
+                    setWalletHandle(handle)
 
                 } else {
                     console.log('not eternl!')
@@ -124,9 +123,9 @@ const Nav: NextPage = (props: any) => {
 
         (async () => {
 
-            if (walletApi) {
+            if (walletHandle) {
 
-                const walletHelper = new WalletHelper(walletApi)
+                const walletHelper = new WalletHelper(new Cip30Wallet(walletHandle))
                 const baseAddress = await walletHelper.baseAddress
                 setBaseAddress(baseAddress.toBech32())
 
@@ -137,7 +136,7 @@ const Nav: NextPage = (props: any) => {
         })()
 
 
-    }, [walletApi])
+    }, [walletHandle])
 
     useEffect(() => {
 
@@ -179,9 +178,8 @@ const Nav: NextPage = (props: any) => {
     async function connect(walletName: string) {
 
         const handle: Cip30Handle = await window.cardano[walletName].enable();
-        const walletApi = new Cip30Wallet(handle);
 
-        setWalletApi(walletApi)
+        setWalletHandle(handle)
 
         const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
         if (!isReconnect) {
@@ -193,12 +191,12 @@ const Nav: NextPage = (props: any) => {
 
     async function disconnect() {
         localStorage.removeItem(WALLET_NAME_KEY)
-        setWalletApi(null)
+        setWalletHandle(null)
     }
 
     async function participate() {
 
-        if (walletApi == null) return
+        if (walletHandle == null) return
 
         localStorage.setItem(FRIENDLY_NAME_KEY, friendlyName)
 
@@ -314,24 +312,24 @@ const Nav: NextPage = (props: any) => {
                                 />
                             </div>
 
-                            <div className={`relative flex p-1` + (walletApi ? ' border-2 border-solid rounded-md divide-x-2 divide-myblue border-myblue dark:divide-white' : '')}>
+                            <div className={`relative flex p-1` + (walletHandle ? ' border-2 border-solid rounded-md divide-x-2 divide-myblue border-myblue dark:divide-white' : '')}>
                                 {/* Connect */}
                                 <div className={`text-myblue dark:text-slate-50 px-2 font-semibold`}>
                                     <button
-                                        className={`px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50 ` + (walletApi ? 'hidden' : '')}
+                                        className={`px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50 ` + (walletHandle ? 'hidden' : '')}
                                         type="button"
                                         id="menu-button"
                                         aria-expanded="true"
                                         aria-haspopup="true"
                                         onClick={() => setShowWallets(!showWallets)}
                                     >Connect wallet</button>
-                                    <div className={walletApi ? ' ' : 'hidden'}>
+                                    <div className={walletHandle ? ' ' : 'hidden'}>
                                         {balance} ₳
                                     </div>
                                 </div>
 
                                 <div
-                                    className={`text-myblue dark:text-slate-50 font-semibold px-2 ` + (walletApi ? '' : 'hidden')}
+                                    className={`text-myblue dark:text-slate-50 font-semibold px-2 ` + (walletHandle ? '' : 'hidden')}
                                     onClick={() => setShowSubMenu(!showSubMenu)}>
                                     <FontAwesomeIcon
                                         icon={faWallet}
@@ -364,7 +362,7 @@ const Nav: NextPage = (props: any) => {
 
                             </div>
 
-                            {walletApi && showSubMenu ? (
+                            {walletHandle && showSubMenu ? (
                                 <div className="absolute top-0 right-0 z-30 min-w-full mt-12 overflow-auto bg-gray-200 rounded shadow-md">
                                     <ul >
                                         {(currentRoute == '/raffles') ? (

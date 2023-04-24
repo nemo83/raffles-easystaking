@@ -20,7 +20,8 @@ import {
   IntData,
   Program,
   WalletHelper,
-  Time
+  Time,
+  Cip30Wallet
 } from "@hyperionbt/helios"
 import path from 'path';
 import fs from 'fs';
@@ -63,15 +64,15 @@ const NftRaffles: NextPage = (props: any) => {
   const raffleV2Script = props.scripts.raffleV2Script
   const vaultScript = props.scripts.vaultScript
 
-  const [walletApi, setWalletApi] = useWalletContext();
+  const [walletHandle, setWalletHandle] = useWalletContext();
 
   const [walletPkh, setWalletPkh] = useState('');
 
   const [updating, setUpdating] = useState(false);
 
   const updatePkh = async () => {
-    if (walletApi) {
-      const walletPkh = await new WalletHelper(walletApi).baseAddress
+    if (walletHandle) {
+      const walletPkh = await new WalletHelper(new Cip30Wallet(walletHandle)).baseAddress
 
       setWalletPkh(walletPkh.pubKeyHash.hex)
     } else {
@@ -84,7 +85,7 @@ const NftRaffles: NextPage = (props: any) => {
       updatePkh()
       console.log('setting wallet PKH')
     })()
-  }, [walletApi])
+  }, [new Cip30Wallet(walletHandle)])
 
   const [raffles, setRaffles] = useState<Raffle[]>([])
 

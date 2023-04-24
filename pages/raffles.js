@@ -13,19 +13,19 @@ import { useState, useEffect } from 'react';
 export default function Raffles() {
 
   const [baseAddress, setBaseAddress] = useState(null);
-  const [walletApi, setWalletApi] = useWalletContext();
+  const [walletHandle, setWalletHandle] = useWalletContext();
 
   useEffect(() => {
     const getBaseAddress = async () => {
-      const baseAddress = (await new WalletHelper(walletApi).baseAddress).toBech32()
+      const baseAddress = (await new WalletHelper(new Cip30Wallet(walletHandle)).baseAddress).toBech32()
       setBaseAddress(baseAddress)
     }
-    if (walletApi) {
+    if (walletHandle) {
       getBaseAddress()
     } else {
       setBaseAddress(null)
     }
-  }, [walletApi])
+  }, [walletHandle])
 
 
   return (

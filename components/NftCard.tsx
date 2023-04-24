@@ -9,6 +9,7 @@ import * as raffleV2 from './Offchan/RaffleV2'
 import { toast } from 'react-hot-toast';
 import { network } from '../constants/blockfrost';
 import Spinner from '../components/Spinner'
+import { Cip30Wallet } from '@hyperionbt/helios';
 
 interface NftCard {
     policyIdHex: string,
@@ -46,7 +47,7 @@ const NftCard = ({
     callback
 }: NftCard) => {
 
-    const [walletApi, setWalletApi] = useWalletContext();
+    const [walletHandle, setWalletHandle] = useWalletContext();
 
     const [showModal, setShowModal] = useState(false)
 
@@ -130,7 +131,7 @@ const NftCard = ({
             assetNameHex,
             numTickets,
             raffleScript,
-            walletApi
+            new Cip30Wallet(walletHandle)
         ).then(() => {
             toast.success('Transaction successfully submited!')
             setShowModal(false)
@@ -142,7 +143,7 @@ const NftCard = ({
     }
 
     const collectNft = async () => {
-        raffleV2.collectPrize(policyIdHex, assetNameHex, vaultScript, walletApi)
+        raffleV2.collectPrize(policyIdHex, assetNameHex, vaultScript, new Cip30Wallet(walletHandle))
             .then(() => {
                 toast.success("Success!\nThe NFT it's on his way!")
             })
@@ -292,7 +293,7 @@ const NftCard = ({
                                 className={`w-full rounded ` + (numPurchasedTickets < maxParticipants && !expired ? 'bg-blue-500' : 'bg-gray-500')}
                                 disabled={numPurchasedTickets >= maxParticipants || expired}
                                 onClick={() => {
-                                    if (!walletApi) {
+                                    if (!new Cip30Wallet(walletHandle)) {
                                         toast.error("Wallet not connected")
                                     } else if (numWalletPurchasedTickets >= maxNumTicketsPerWallet) {
                                         toast.error("Max num tickets purchased")
