@@ -58,12 +58,12 @@ const Home: NextPage = (props: any) => {
   }, [walletHandle])
 
   const offerings = [{
-    title: 'Low Staking Fee',
-    description: 'Professionally configured Stakepool, running on Cloud powered by 100% Renewable Energy',
-    icon: faPiggyBank,
+    title: 'Airdrops',
+    description: 'Powered by Tosidrop.io, you can earn Extra Rewards every 5 days on top of your $ada rewards',
+    icon: faUmbrella,
     iconClassName: "fas fa-2x fa-fw",
-    linkValue: null,
-    linkText: null,
+    linkValue: '#distributions',
+    linkText: 'Find out more',
   }, {
     title: 'Raffles',
     description: 'We run raffles every 5 days. Free to join. Forever.',
@@ -72,12 +72,12 @@ const Home: NextPage = (props: any) => {
     linkValue: '/raffles',
     linkText: 'Find out more',
   }, {
-    title: 'Airdrops',
-    description: 'Powered by Tosidrop.io, you can earn Extra Rewards every 5 days on top of your $ada rewards',
-    icon: faUmbrella,
+    title: 'Low Staking Fee',
+    description: 'Professionally configured Stakepool, running on Cloud powered by 100% Renewable Energy',
+    icon: faPiggyBank,
     iconClassName: "fas fa-2x fa-fw",
-    linkValue: '#distributions',
-    linkText: 'Find out more',
+    linkValue: null,
+    linkText: null,
   }, {
     title: 'NFT Raffles',
     description: 'Buy tickets of our on chain raffles and good luck!',
