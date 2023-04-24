@@ -3,10 +3,11 @@ import { Distributions } from "../components/Distributions";
 import dynamic from 'next/dynamic';
 import { useWalletContext } from "../components/WalletProvider";
 import easy1staking from '../img/jpg/easy1staking-full.jpg'
+import easy1stakingBackground from '../img/png/easy1-website-background.png'
 import type { NextPage } from 'next'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faPiggyBank, faUmbrella, faDice
+  faPiggyBank, faUmbrella, faDice, faFileImage
 } from "@fortawesome/free-solid-svg-icons"
 import { useEffect, useState } from "react";
 import { Cip30Wallet, StakeAddress, WalletHelper } from "@hyperionbt/helios";
@@ -36,28 +37,23 @@ const Home: NextPage = (props: any) => {
         console.log('stakingAddress', stakingAddress.toBech32())
 
 
-        fetch('https://hilltop-api.mainnet.dandelion.blockwarelabs.io/delegations/' + stakingAddress.toBech32() + '/stakepool')
+        fetch('https://lottery.easystaking.online/delegator_details/' + stakingAddress.toBech32() + '/staking')
           .then((res) => res.json())
           .then((data) => {
             console.log('data', data)
-            if (data.delegations) {
-              let delegations = data.delegations
-              delegations.sort((a, b) => a.epoch - b.epoch)
-              let currentDelegation = delegations.slice(-1)[0]
-              console.log('currentDelegation: ' + JSON.stringify(currentDelegation))
-
-              if (currentDelegation.stakepool) {
-                if (currentDelegation.stakepool.id == easy1_stake_pool_id) {
-                  setIsEasy1Delegate(true)
-                } else {
-                  setIsEasy1Delegate(false)
-                }
+            if (data.stake_pool_id) {
+              if (data.stake_pool_id == easy1_stake_pool_id) {
+                setIsEasy1Delegate(true)
               } else {
-                setIsEasy1Delegate(null)
+                setIsEasy1Delegate(false)
               }
+            } else {
+              setIsEasy1Delegate(null)
             }
           })
       })()
+    } else {
+      setIsEasy1Delegate(null)
     }
   }, [walletHandle])
 
@@ -69,6 +65,13 @@ const Home: NextPage = (props: any) => {
     linkValue: null,
     linkText: null,
   }, {
+    title: 'Raffles',
+    description: 'We run raffles every 5 days. Free to join. Forever.',
+    icon: faDice,
+    iconClassName: "fas fa-2x fa-fw",
+    linkValue: '/raffles',
+    linkText: 'Find out more',
+  }, {
     title: 'Airdrops',
     description: 'Powered by Tosidrop.io, you can earn Extra Rewards every 5 days on top of your $ada rewards',
     icon: faUmbrella,
@@ -76,11 +79,11 @@ const Home: NextPage = (props: any) => {
     linkValue: '#distributions',
     linkText: 'Find out more',
   }, {
-    title: 'Raffles',
-    description: 'We run raffles every 5 days. Free to join. Forever.',
-    icon: faDice,
+    title: 'NFT Raffles',
+    description: 'Buy tickets of our on chain raffles and good luck!',
+    icon: faFileImage,
     iconClassName: "fas fa-2x fa-fw",
-    linkValue: '/raffles',
+    linkValue: '/nft-raffles',
     linkText: 'Find out more',
   }]
 
@@ -105,6 +108,8 @@ const Home: NextPage = (props: any) => {
         new Blockfrost(getBlockfrostUrl(network), getBlockfrostKey(network)),
         lucidNetwork,
       );
+
+      lucid.selectWallet(walletHandle)
 
       let delegation: Delegation = await lucid.wallet.getDelegation();
 
@@ -169,10 +174,42 @@ const Home: NextPage = (props: any) => {
           </div>
         </div>
       </div>
-      <section className="my-8 bg-white rounded-lg">
+
+      {isEasy1Delegate == true ? (
+        <section className="my-8 text-center bg-white rounded-lg">
+          <div className="px-6 py-12 md:px-12">
+            <h2 className="p-6 my-12 space-y-3 text-5xl font-bold tracking-tight text-gray-800 uppercase bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-white">
+              Hello Delegate! <br />
+              <span className="text-3xl normal-case text-myblue">Have you checked your perks yet?</span>
+            </h2>
+            <a className="inline-block py-3 mb-2 text-sm font-medium leading-snug text-white uppercase transition duration-150 ease-in-out rounded shadow-md bg-myblue px-7 hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg md:mr-2"
+              href="#offerings" role="button" data-mdb-ripple="true" data-mdb-ripple-color="light">Get started</a>
+          </div>
+        </section>
+      ) : null}
+
+      {isEasy1Delegate == false ? (
+        <section className="my-8 text-center bg-white rounded-lg">
+          <div className="px-6 py-12 md:px-12">
+            <h2 className="p-6 my-12 space-y-3 text-5xl font-bold tracking-tight text-gray-800 uppercase bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-white">
+              Start earning MORE! <br />
+              <span className="text-3xl normal-case text-myblue">Delegate to EASY1 and enjoy extra rewards</span>
+            </h2>
+            <button
+              className="inline-block py-3 mb-2 text-sm font-medium leading-snug text-white uppercase transition duration-150 ease-in-out rounded shadow-md bg-myblue px-7 hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg md:mr-2"
+              onClick={() => delegate()}>
+              Delegate
+            </button>
+            <a className="inline-block py-3 mb-2 text-sm font-medium leading-snug uppercase transition duration-150 ease-in-out bg-transparent rounded text-myblue px-7 hover:text-blue-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none focus:ring-0 active:bg-gray-200"
+              href="#offerings" role="button">Learn more</a>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="my-8 bg-white rounded-lg" id="offerings">
         <div className="container px-6 py-10 mx-auto">
           <h1 className="text-2xl font-semibold text-center text-black capitalize lg:text-3xl">
-            Explore our <span className="text-sky-600">Offerings</span>
+            Explore our <span className="font-bold text-sky-600">Incentives</span>
           </h1>
           <div className="grid grid-cols-1 gap-8 mt-8 xl:mt-12 xl:gap-16 md:grid-cols-2 xl:grid-cols-3">
 
@@ -193,7 +230,7 @@ const Home: NextPage = (props: any) => {
                 </p>
 
                 {offering.linkValue ? (
-                  <a href={offering.linkValue} className="flex items-center -mx-1 text-sm text-blue-500 capitalize transition-colors duration-300 transform dark:text-blue-400 hover:underline hover:text-blue-600 dark:hover:text-blue-500">
+                  <a href={offering.linkValue} className="flex items-center -mx-1 text-sm text-blue-500 capitalize transition-colors duration-300 transform dark:text-blue-400 hover:underline hover:text-myblue dark:hover:text-blue-500">
                     <span className="mx-1">{offering.linkText}</span>
                     <svg className="w-4 h-4 mx-1 rtl:-scale-x-100" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                       <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd">
@@ -207,40 +244,6 @@ const Home: NextPage = (props: any) => {
           </div>
         </div>
       </section>
-
-      {isEasy1Delegate ? (
-        <section className="my-8 bg-white rounded-lg">
-          <div className="container px-6 py-10 mx-auto">
-            <h1 className="text-2xl font-semibold text-center text-black capitalize lg:text-3xl">
-              Thanks for Staking w/ EASY1 Stake Pool
-            </h1>
-
-          </div>
-        </section>
-      ) : (
-        <section className="mb-32">
-          <div className="relative overflow-hidden bg-no-repeat bg-cover"
-          // style={{ height: 400 + 'px', backgroundImage: `url(${easy1staking.src})` }}>
-            style={`background-position: 50%; background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/006.webp'); height: 500px;`}>
-            <div className="absolute top-0 bottom-0 left-0 right-0 w-full h-full overflow-hidden bg-fixed"
-              style="background-color: rgba(0, 0, 0, 0.75)">
-              <div className="flex items-center justify-center h-full">
-                <div className="px-6 text-center text-white md:px-12">
-                  <h2 className="mb-12 text-5xl font-bold leading-tight tracking-tight">
-                    Are you ready <br /><span>for an adventure</span>
-                  </h2>
-                  <button type="button"
-                    className="inline-block py-3 text-sm font-medium leading-snug text-white uppercase transition duration-150 ease-in-out border-2 border-white rounded px-7 hover:bg-black hover:bg-opacity-5 focus:outline-none focus:ring-0"
-                    data-mdb-ripple="true" data-mdb-ripple-color="light">
-                    Get started
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
 
 
       <EstimateRewards />

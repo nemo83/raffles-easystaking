@@ -5,10 +5,10 @@ import toast, { Toaster } from 'react-hot-toast'
 import type { NextPage } from 'next'
 import {
     faHome, faDice, faQuestion, faHeartbeat, faFileImage, faWallet, faChevronDown, faChevronUp,
-    faSun, faMoon
+    faSun,
 } from "@fortawesome/free-solid-svg-icons"
 import {
-    faSun as farSun, faMoon as farMoon
+    faMoon as farMoon
 } from "@fortawesome/free-regular-svg-icons"
 import { useWalletContext } from "../components/WalletProvider";
 import Link from 'next/link';
