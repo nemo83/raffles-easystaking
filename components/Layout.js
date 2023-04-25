@@ -16,7 +16,7 @@ function Layout({ children }) {
     return (
         <>
             <Nav />
-            <div className="container w-11/12 pt-20 mx-auto lg:pt-24 md:w-4/6">
+            <div className="container w-11/12 mx-auto pt-28 md:pt-20 lg:pt-24 md:w-4/6">
                 {children}
             </div>
         </>
