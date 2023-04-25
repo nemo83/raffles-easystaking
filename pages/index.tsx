@@ -180,7 +180,7 @@ const Home: NextPage = (props: any) => {
           <div className="px-6 py-12 md:px-12">
             <h2 className="p-6 my-12 space-y-3 text-5xl font-bold tracking-tight text-gray-800 uppercase bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-white">
               Hello Delegate! <br />
-              <span className="text-3xl normal-case text-myblue">Have you checked your perks yet?</span>
+              <span className="text-3xl normal-case text-myblue">Have you checked our perks yet?</span>
             </h2>
             <a className="inline-block py-3 mb-2 text-sm font-medium leading-snug text-white uppercase transition duration-150 ease-in-out rounded shadow-md bg-myblue px-7 hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg md:mr-2"
               href="#offerings" role="button" data-mdb-ripple="true" data-mdb-ripple-color="light">Get started</a>

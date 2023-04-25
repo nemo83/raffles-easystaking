@@ -20,7 +20,7 @@ import {
     Cip30Wallet,
     WalletHelper
 } from "@hyperionbt/helios";
-import { getBlockfrostKey, getBlockfrostUrl, network, origin } from '../constants/blockfrost'
+import { getBlockfrostKey, getBlockfrostUrl, network } from '../constants/blockfrost'
 import { initCardanoDAppConnectorBridge } from '../components/Eternl/cardano-dapp-connector-bridge'
 import { useTheme } from "next-themes";
 

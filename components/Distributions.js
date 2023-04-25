@@ -27,26 +27,24 @@ export const Distributions = () => {
     }
 
     return (
-        <a name="distributions">
-            <div className="flex flex-wrap">
-                {distributions.map((distribution, i) =>
-                    <div className="w-full px-2 mt-3 lg:w-1/2" key={i}>
-                        <TokenCard
-                            name={distribution.title}
-                            imageUrl={distribution.token_image_url}
-                            description={trimLongDescription(distribution.description)}
-                            amount={distribution.amount / Math.pow(10, distribution.decimals)}
-                            symbol={distribution.symbol}
-                            distMode={distribution.distribution_model}
-                            minStakeAmount={distribution.min_stake_required}
-                        >
-                            <ReactMarkdown className="mb-4 text-sm text-gray-700">{trimLongDescription(distribution.description)}</ReactMarkdown>
-                        </TokenCard>
+        <div className="flex flex-wrap" id="distributions">
+            {distributions.map((distribution, i) =>
+                <div className="w-full my-3 xl:px-2 xl:w-1/2" key={i}>
+                    <TokenCard
+                        name={distribution.title}
+                        imageUrl={distribution.token_image_url}
+                        description={trimLongDescription(distribution.description)}
+                        amount={distribution.amount / Math.pow(10, distribution.decimals)}
+                        symbol={distribution.symbol}
+                        distMode={distribution.distribution_model}
+                        minStakeAmount={distribution.min_stake_required}
+                    >
+                        <ReactMarkdown className="mb-4 text-sm text-gray-700">{trimLongDescription(distribution.description)}</ReactMarkdown>
+                    </TokenCard>
 
-                    </div>
-                )}
-            </div>
-        </a>
+                </div>
+            )}
+        </div>
     )
 }
 
