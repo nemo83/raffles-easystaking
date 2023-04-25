@@ -7,7 +7,7 @@ export const Distributions = () => {
     const [distributionGroups, setDistributionGroups] = useState([])
 
     useEffect(() => {
-        fetch('https://lottery.easystaking.online/token_distributions')
+        fetch('https://lottery.easystaking.online/token_distributions?meme_last=true')
             .then((res) => res.json())
             .then((data) => {
                 console.log(data)
