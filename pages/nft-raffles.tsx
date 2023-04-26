@@ -94,8 +94,6 @@ const NftRaffles: NextPage = (props: any) => {
   const [myRaffles, setMyRaffles] = useState<Raffle[]>([])
   const [backendRaffles, setBackendRaffles] = useState([])
 
-  const [tableData, setTableData] = useState([])
-
   useEffect(() => {
     if (backendRaffles) {
 
@@ -107,7 +105,8 @@ const NftRaffles: NextPage = (props: any) => {
             ...onChainRaffle,
             collectionName: beRaffle.collection_name,
             nftName: beRaffle.nft_name,
-            mainImgUrl: beRaffle.main_img_url
+            mainImgUrl: beRaffle.main_img_url,
+            status: beRaffle.status
           }
           return raffle
         } else {
@@ -140,7 +139,8 @@ const NftRaffles: NextPage = (props: any) => {
             numParticipants: beRaffle.num_max_participants,
             participants: participants,
             numTickets: numTickets,
-            deadline: new Date(beRaffle.deadline)
+            deadline: new Date(beRaffle.deadline),
+            status: beRaffle.status
           }
           return raffle
         } else {
@@ -150,12 +150,6 @@ const NftRaffles: NextPage = (props: any) => {
 
       setRaffles(wonRaffles.concat(raffles))
 
-      const myTableData = backendRaffles
-        .slice()
-        .filter(raffle => raffle.status == 'closed')
-        .map(raffle => [raffle.main_img_url, raffle.nft_name, raffle.collection_name, raffle.winner_pkh])
-      setTableData(myTableData)
-
       const myRaffles = backendRaffles.filter(raffle => {
         if (raffle.participants) {
           return raffle.participants.slice().split(",").indexOf(walletPkh) != -1
@@ -163,10 +157,10 @@ const NftRaffles: NextPage = (props: any) => {
           return false
         }
       })
+      console.log('myRaffles', myRaffles)
       setMyRaffles(myRaffles)
     } else {
       setRaffles([])
-      setTableData([])
     }
 
   }, [onChainRaffles, backendRaffles, wonNfts, walletPkh])
@@ -193,7 +187,8 @@ const NftRaffles: NextPage = (props: any) => {
     numParticipants: number,
     participants: string[],
     numTickets: number | undefined,
-    deadline: Date | undefined
+    deadline: Date | undefined,
+    status: string
   }
 
   interface WonNft {
@@ -468,7 +463,7 @@ const NftRaffles: NextPage = (props: any) => {
       <div className="my-6 text-4xl font-bold text-slate-600">
         My Raffles
       </div>
-      {backendRaffles ? (
+      {myRaffles ? (
         <div className="flex flex-col my-6">
           <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
             <div className="inline-block min-w-full">
@@ -492,10 +487,10 @@ const NftRaffles: NextPage = (props: any) => {
                   </thead>
                   {/* .map(raffle => [raffle.main_img_url, raffle.nft_name, raffle.collection_name, raffle.winner_pkh]) */}
                   <tbody>
-                    {backendRaffles.filter(raffle => raffle.status == 'closed').map((raffle: any, i) =>
+                    {myRaffles.filter(raffle => raffle.status == 'closed').map((raffle: any, i) =>
                       <tr className="bg-white border-b" key={i}>
                         <td className="p-2 m-2 text-gray-900 whitespace-nowrap">
-                          <div className="relative h-24">
+                          <div className="relative w-24 h-24">
                             <Image
                               src={raffle.main_img_url}
                               fill={true}
@@ -564,7 +559,7 @@ const NftRaffles: NextPage = (props: any) => {
                     {backendRaffles.filter(raffle => raffle.status == 'closed').map((raffle: any, i) =>
                       <tr className="bg-white border-b" key={i}>
                         <td className="p-2 m-2 text-gray-900 whitespace-nowrap">
-                          <div className="relative h-24">
+                          <div className="relative w-24 h-24">
                             <Image
                               src={raffle.main_img_url}
                               fill={true}
