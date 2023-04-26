@@ -173,8 +173,8 @@ const NftCard = ({
                 (showModal ? ' flex ' : ' hidden ')} >
                 <div className="relative w-auto max-w-3xl mx-auto my-6">
                     <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none">
-                        <div className="flex items-start justify-between p-5 border-b border-gray-300 border-solid rounded-t ">
-                            <h3 className="text-3xl font=semibold capitalize">Buy Tickets</h3>
+                        <div className="flex items-start justify-between p-5 text-black border-b border-gray-300 border-solid rounded-t dark:text-white">
+                            <h3 className="text-3xl font-semibold capitalize">Buy Tickets</h3>
                             <button
                                 className="float-right text-black bg-transparent border-0"
                                 onClick={() => setShowModal(false)} >
