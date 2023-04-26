@@ -23,6 +23,7 @@ import {
 import { getBlockfrostKey, getBlockfrostUrl, network } from '../constants/blockfrost'
 import { initCardanoDAppConnectorBridge } from '../components/Eternl/cardano-dapp-connector-bridge'
 import { useTheme } from "next-themes";
+import { friendly_name_key, wallet_name_key } from '../constants/lottery'
 
 declare global {
     interface Window {
@@ -42,9 +43,6 @@ const Nav: NextPage = (props: any) => {
     const router = useRouter();
     const currentRoute = router.pathname;
 
-    const WALLET_NAME_KEY = "wallet-name"
-    const FRIENDLY_NAME_KEY = "friendly-name"
-
     const [showMenu, setShowMenu] = useState(false)
     const [showSubMenu, setShowSubMenu] = useState(false)
     const [showWallets, setShowWallets] = useState(false)
@@ -52,28 +50,17 @@ const Nav: NextPage = (props: any) => {
     const [availableWallets, setAvailableWallets] = useState([])
     const [walletHandle, setWalletHandle] = useWalletContext()
     const [balance, setBalance] = useState('N/A')
-    const [friendlyName, setFriendlyName] = useState('')
 
     const [baseAddress, setBaseAddress] = useState(null)
 
     const navSelected = 'text-myblue dark:text-slate-50 border-mypink dark:border-mypink'
     const navNotSelected = 'text-gray-300 border-gray-300 hover:border-mypink dark:hover:border-mypink hover:text-gray-600 hover:text-myblue dark:hover:text-slate-50'
 
-    // Modal
-    const [showModal, setShowModal] = useState(false);
-
-
     useEffect(() => {
-
-        // Friendly Name restore
-        const saveFriendlyName = localStorage.getItem(FRIENDLY_NAME_KEY)
-        if (saveFriendlyName != null) {
-            setFriendlyName(saveFriendlyName)
-        }
 
         const SUPPORTED_WALLETS = ["eternl", "flint", "nami", "yoroi"]
         const aWallets = []
-        const savedWalletName = localStorage.getItem(WALLET_NAME_KEY)
+        const savedWalletName = localStorage.getItem(wallet_name_key)
         SUPPORTED_WALLETS.map(walletName => {
             if (window.cardano && window.cardano[walletName]) {
                 const { apiVersion, icon } = window.cardano[walletName]
@@ -181,123 +168,23 @@ const Nav: NextPage = (props: any) => {
 
         setWalletHandle(handle)
 
-        const isReconnect = localStorage.getItem(WALLET_NAME_KEY) != null
+        const isReconnect = localStorage.getItem(wallet_name_key) != null
         if (!isReconnect) {
-            localStorage.setItem(WALLET_NAME_KEY, walletName)
+            localStorage.setItem(wallet_name_key, walletName)
             toast.success('Wallet correctly connected!')
         }
 
     }
 
     async function disconnect() {
-        localStorage.removeItem(WALLET_NAME_KEY)
+        localStorage.removeItem(wallet_name_key)
         setWalletHandle(null)
     }
 
-    async function participate() {
-
-        if (walletHandle == null) return
-
-        localStorage.setItem(FRIENDLY_NAME_KEY, friendlyName)
-
-        const body = JSON.stringify({ payment_address: baseAddress })
-
-        fetch('https://lottery.easystaking.online/raffles', {
-            method: 'POST',
-            body: body,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        }).then((response) => {
-            return new Promise((resolve) => response.json()
-                .then((json) => resolve({
-                    status: response.status,
-                    ok: response.ok,
-                    json
-                })))
-        }).then(({ status, ok, json }) => {
-
-            const message = json
-            switch (status) {
-                case 200:
-                    const numRaffles = json.length
-                    toast.success(`Congrats! You joined ${numRaffles} Raflles!`)
-                    break
-                default:
-                    console.error('Error:', message);
-                    toast.error(`Error: ${message}`)
-            }
-        })
-
-    }
     return (
         <nav id="header" className="fixed top-0 z-10 w-full bg-gray-100 shadow dark:bg-gray-600">
 
             <Toaster />
-
-            {showModal ? (
-                <>
-                    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
-                        <div className="relative w-auto max-w-3xl mx-auto my-6">
-                            <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none dark:bg-gray-600 focus:outline-none">
-                                <div className="flex items-start justify-between p-5 text-black border-b border-gray-300 border-solid rounded-t dark:text-white">
-                                    <h3 className="text-3xl font-semibold capitalize">Join Raffles</h3>
-                                    <button
-                                        className="float-right text-black bg-transparent border-0"
-                                        onClick={() => setShowModal(false)} >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            className="w-6 h-6">
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div className="relative flex-auto p-6">
-                                    <form className="w-full px-8 pt-6 pb-8 bg-gray-200 rounded shadow-md">
-                                        <label className="block mb-1 text-sm font-bold text-black">
-                                            Friendly Name
-                                        </label>
-                                        <input
-                                            className="w-full px-1 py-2 text-black border rounded shadow appearance-none"
-                                            onChange={(event) => setFriendlyName(event.target.value)}
-                                            value={friendlyName} />
-                                        <label className="block mb-1 text-sm font-bold text-black">
-                                            Address
-                                        </label>
-                                        <input
-                                            className="w-full px-1 py-2 text-black border rounded shadow appearance-none"
-                                            disabled
-                                            readOnly
-                                            value={`${baseAddress.slice(0, 12)} ... ${baseAddress.slice(baseAddress.length - 4)}`} />
-
-                                    </form>
-                                </div>
-                                <div className="flex items-center justify-end p-6 border-t border-solid rounded-b border-blueGray-200">
-                                    <button
-                                        className="px-6 py-2 mb-1 mr-1 text-sm font-bold text-black uppercase outline-none background-transparent focus:outline-none dark:text-white"
-                                        type="button"
-                                        onClick={() => setShowModal(false)} >
-                                        Close
-                                    </button>
-                                    <button
-                                        className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase bg-blue-400 rounded shadow outline-none hover:bg-blue-500 focus:outline-none"
-                                        type="button"
-                                        onClick={() => { participate(); setShowModal(false) }} >
-                                        Submit
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </>
-            ) : null}
 
             <div className="container flex flex-wrap items-center w-full pt-2 pb-3 mx-auto my-1 mt-0 lg:pb-0">
 
@@ -351,43 +238,11 @@ const Nav: NextPage = (props: any) => {
                                     />
                                 </div>
 
-                                {false ? (
-                                    <div className="absolute flex flex-col w-full mt-10 origin-top-right bg-gray-200 divide-y-2 divide-white rounded-md" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1} >
-                                        {(currentRoute == '/raffles') ? (
-                                            <div
-                                                onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}
-                                                className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
-                                                Participate
-                                            </div>
-                                        ) : null}
-
-                                        <div
-                                            onClick={() => { disconnect(); setShowSubMenu(!showSubMenu) }}
-                                            className="w-full m-0 text-xl text-center text-black opacity-95 hover:underline hover:cursor-pointer ">
-                                            Disconnect
-                                        </div>
-                                    </div>
-                                ) : null}
-
                             </div>
 
                             {walletHandle && showSubMenu ? (
                                 <div className="absolute top-0 right-0 z-30 min-w-full mt-12 overflow-auto bg-gray-200 rounded shadow-md">
                                     <ul >
-                                        {(currentRoute == '/raffles') ? (
-                                            <>
-                                                <li>
-                                                    <Link href="#"
-                                                        className="block px-4 py-2 no-underline text-myblue hover:bg-gray-800 hover:no-underline"
-                                                        onClick={() => { setShowModal(!showModal); setShowSubMenu(!showSubMenu) }}>
-                                                        Participate
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <hr className="mx-2 border-t border-gray-400" />
-                                                </li>
-                                            </>
-                                        ) : null}
                                         <li>
                                             <Link href="#"
                                                 className="block px-4 py-2 no-underline text-myblue hover:bg-gray-800 hover:no-underline"
