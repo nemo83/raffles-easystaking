@@ -66,11 +66,11 @@ const NftCard = ({
     const [showSpinner, setShowSpinner] = useState(false)
 
     useEffect(() => {
-        if (deadline) {
+        let now = new Date().getTime()
+        if (deadline && !userWon && now < deadline.getTime()) {
             const interval = setInterval(() => {
-                const now = new Date().getTime()
+                now = new Date().getTime()
                 if (now > deadline.getTime()) {
-                    console.log('expired')
                     setCDValue("Expired")
                     setExpired(true)
                     clearInterval(interval)
@@ -88,10 +88,9 @@ const NftCard = ({
                 }
             }, 1000);
 
-        } else if (userWon) {
+        } else {
             setCDValue("Expired")
             setExpired(true)
-
         }
     }, [deadline, userWon]);
 
@@ -287,7 +286,7 @@ const NftCard = ({
 
                         </div>
 
-                        <div className='w-full my-1'>
+                        <div className={`w-full my-1 ` + (userWon ? ' hidden' : '')}>
                             <button
                                 type='button'
                                 className={`w-full rounded ` + (numPurchasedTickets < maxParticipants && !expired ? 'bg-blue-500' : 'bg-gray-500')}

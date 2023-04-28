@@ -60,7 +60,6 @@ export async function getStaticProps() {
 
 const NftRaffles: NextPage = (props: any) => {
 
-  const raffleScript = props.scripts.raffleScript
   const raffleV2Script = props.scripts.raffleV2Script
   const vaultScript = props.scripts.vaultScript
 
@@ -148,7 +147,7 @@ const NftRaffles: NextPage = (props: any) => {
         }
       }).filter(raffle => raffle) // filters undefined out
 
-      setRaffles(wonRaffles.concat(raffles))
+      setRaffles(wonRaffles.slice().concat(raffles.slice()))
 
       const myRaffles = backendRaffles.filter(raffle => {
         if (raffle.participants) {
@@ -438,9 +437,9 @@ const NftRaffles: NextPage = (props: any) => {
       </div>
       <hr className="my-8 h-0.5 border-t-0 bg-neutral-100 opacity-100 dark:opacity-50" />
       <div className="flex flex-wrap md:justify-around">
-        {raffles.map((raffle, i) => (
+        {raffles.map(raffle => (
           <NftCard
-            key={i}
+            key={`${raffle.nftPolicyId}${raffle.nftAssetName}`}
             policyIdHex={raffle.nftPolicyId}
             assetNameHex={raffle.nftAssetName}
             collectionName={raffle.collectionName}
