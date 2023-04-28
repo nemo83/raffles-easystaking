@@ -130,6 +130,8 @@ const Nav: NextPage = (props: any) => {
         const getBalance = async () => {
             if (baseAddress) {
                 const isMainnet = 'mainnet' == network.toString()
+                console.log('isMainnet', isMainnet)
+                console.log('network', network)
                 const stakingAddress = StakeAddress.fromHash(!isMainnet, Address.fromBech32(baseAddress).stakingHash).toBech32()
                 let resp = await fetch(getBlockfrostUrl(network) + `/accounts/${stakingAddress}`, {
                     method: "GET",
