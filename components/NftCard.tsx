@@ -314,7 +314,7 @@ const NftCard = ({
                                 Collect prize
                             </button>
                         </div>) : null}
-                        <div className='w-full mt-1'>
+                        <div className='hidden w-full mt-1'>
                             <p className="text-xs text-center text-gray-600">
                                 1 ₳ participation fee for non-EASY1 delegates
                             </p>
