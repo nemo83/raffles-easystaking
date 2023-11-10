@@ -32,8 +32,6 @@ import {
 } from "../../constants/blockfrost"
 import { optimizeSmartContracts, useRaffleRefScript, raffleRefScriptAddress, raffleRefScriptHash, raffleRefScriptIndex } from "../../constants/lottery"
 import { sha256 } from 'js-sha256';
-import BitSet from "next/dist/shared/lib/bloom-filter/bit-set";
-import { faBitcoinSign } from "@fortawesome/free-solid-svg-icons";
 
 export const getKeyUtxo = async (scriptAddress: string, keyMPH: string, keyName: string) => {
 
