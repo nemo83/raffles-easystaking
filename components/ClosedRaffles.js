@@ -6,10 +6,8 @@ function ClosedRaffles() {
     const [data, setData] = useState([])
 
     useEffect(() => {
-        fetch('https://lottery.easystaking.online/raffles')
+        fetch('https://lottery.easystaking.online/raffles?is_closed=true&limit=10')
             .then((res) => res.json())
-            .then((data) => data.filter(raffle => raffle.is_closed))
-            .then((data) => data.slice(0, 10))
             .then((openRaffles) => openRaffles.map(raffle => {
                 let currency;
                 if (raffle.asset_name == null) {

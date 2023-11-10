@@ -6,9 +6,8 @@ function OpenRaffles() {
     const [data, setData] = useState([])
 
     useEffect(() => {
-        fetch('https://lottery.easystaking.online/raffles')
+        fetch('https://lottery.easystaking.online/raffles?is_closed=false')
             .then((res) => res.json())
-            .then((data) => data.filter(raffle => !raffle.is_closed))
             .then((openRaffles) => openRaffles.map(raffle => {
                 let currency;
                 if (raffle.asset_name == null) {

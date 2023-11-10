@@ -10,9 +10,8 @@ function RecentWinners() {
     }
 
     useEffect(() => {
-        fetch('https://lottery.easystaking.online/winners')
+        fetch('https://lottery.easystaking.online/winners?limit=10')
             .then((res) => res.json())
-            .then((data) => data.slice(0, 10))
             .then((recentWinners) => recentWinners.map(winner => [winner.epoch, winner.stake_id, winner.user_friendly_name, getWinningAmount(winner), winner.tx_id]))
             .then((data) => setData(data))
     }, [])
