@@ -1,6 +1,6 @@
 import Dashboard from '../components/Dashboard'
-import OpenRaffles from '../components/OpenRaffles';
-import MyRaffles from '../components/MyRaffles';
+import TsClosedRaffles from '../components/TsClosedRaffles';
+import TsOpenRaffles from '../components/TsOpenRaffles';
 import TsMyRaffles from '../components/TsMyRaffles';
 import ClosedRaffles from '../components/ClosedRaffles';
 import RecentWinners from '../components/RecentWinners';
@@ -134,14 +134,11 @@ export default function Raffles() {
       </section>
 
       {baseAddress ? (
-        <>
-        <MyRaffles baseAddress={baseAddress} />
         <TsMyRaffles baseAddress={baseAddress} />
-        </>
       ) : null}
-      <OpenRaffles />
+      <TsOpenRaffles />
       <RecentWinners />
-      <ClosedRaffles />
+      <TsClosedRaffles />
     </Layout>
   )
 }
