@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import toast, { Toaster } from 'react-hot-toast'
 import type { NextPage } from 'next'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faHome, faDice, faQuestion, faHeartbeat, faFileImage, faWallet, faChevronDown, faChevronUp,
     faSun,

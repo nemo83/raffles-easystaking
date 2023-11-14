@@ -1,9 +1,6 @@
 import Dashboard from '../components/Dashboard'
 import TsClosedRaffles from '../components/TsClosedRaffles';
 import TsOpenRaffles from '../components/TsOpenRaffles';
-import TsMyRaffles from '../components/TsMyRaffles';
-import ClosedRaffles from '../components/ClosedRaffles';
-import RecentWinners from '../components/RecentWinners';
 import Layout from '../components/Layout';
 import { useWalletContext } from "../components/WalletProvider";
 import {
@@ -133,11 +130,7 @@ export default function Raffles() {
         </div>
       </section>
 
-      {baseAddress ? (
-        <TsMyRaffles baseAddress={baseAddress} />
-      ) : null}
       <TsOpenRaffles />
-      <RecentWinners />
       <TsClosedRaffles />
     </Layout>
   )
