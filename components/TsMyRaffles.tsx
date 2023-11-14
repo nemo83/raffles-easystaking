@@ -27,10 +27,14 @@ const TsMyRaffles = ({baseAddress}:TsMyRafflesData  ) => {
                     prize: `${raffle.prize} ${currency}`,
                     min_stake: `${raffle.min_stake} ₳`,
                     num_participants: raffle.num_participants,
-                    is_closed: false,
+                    joined: raffle.is_joined,
                     prize_claim_expired: raffle.prize_claim_expired,
-                    tx_id: undefined,
-                    winner_stake_id: undefined
+                    tx_id: raffle.tx_id,
+                    winner_stake_id: raffle.winner_stake_id,
+                    friendly_name: raffle.friendly_name,
+                    won: null,
+                    tx_status: null,
+                    status: raffle.status
                 }
 
                 return entry
@@ -40,7 +44,7 @@ const TsMyRaffles = ({baseAddress}:TsMyRafflesData  ) => {
     }, [])
 
     return (
-        <TsTable entries={joinedRaffles} title="My Raffles" show_status={true} />
+        <TsTable entries={joinedRaffles} title="My Raffles" closed={false} />
     )
 }
 
