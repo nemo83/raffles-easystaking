@@ -76,7 +76,7 @@ const TsOpenRaffles = () => {
     }, [baseAddress])
 
     return (
-        <TsTable entries={openRaffles} title="Open Raffles" closed={false} />
+        <TsTable entries={openRaffles} title="Open Raffles" closed={false} base_address={baseAddress} />
     )
 }
 

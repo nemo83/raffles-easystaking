@@ -81,7 +81,7 @@ const TsClosedRaffles = () => {
     }, [baseAddress])
 
     return (
-        <TsTable entries={closedRaffles} title="Recent Closed Raffles" closed={true} />
+        <TsTable entries={closedRaffles} title="Recent Closed Raffles" closed={true} base_address={baseAddress} />
     )
 }
 
