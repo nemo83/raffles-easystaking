@@ -247,7 +247,9 @@ Find out more at easy1staking.com
                                         <>
                                         {/* either stake, friendly name or adahandle */}
                                         <td key={`r-winner-stake-id-${index}`}>
-                                            {row.winner_stake_id ? row.winner_stake_id.slice(0, 12) : ''}
+                                            <a href={`https://pool.pm/${row.winner_stake_id}`}>
+                                                {row.winner_stake_id ? row.winner_stake_id.slice(0, 12) : ''}
+                                            </a>
                                         </td>
                                         
                                         </>
