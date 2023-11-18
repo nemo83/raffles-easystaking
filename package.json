@@ -16,6 +16,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@hyperionbt/helios": "0.14.4",
     "@types/react": "^18.0.28",
+    "@hotjar/browser":"1.0.9",
     "chart.js": "^4.2.1",
     "faker": "^5.5.3",
     "js-sha256": "^0.9.0",

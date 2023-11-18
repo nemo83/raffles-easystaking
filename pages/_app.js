@@ -10,6 +10,12 @@ import { network } from "../constants/blockfrost"
 import { config as HeliosConfig } from "@hyperionbt/helios"
 HeliosConfig.IS_TESTNET = network.toString() != 'mainnet'
 
+import Hotjar from '@hotjar/browser';
+
+const siteId = 3741402;
+const hotjarVersion = 6;
+
+Hotjar.init(siteId, hotjarVersion);
 
 export default function MyApp({ Component, pageProps }) {
 
