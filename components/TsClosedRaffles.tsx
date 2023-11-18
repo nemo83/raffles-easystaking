@@ -11,10 +11,6 @@ const TsClosedRaffles = () => {
     const [baseAddress, setBaseAddress] = useState(null);
     const [walletHandle, setWalletHandle] = useWalletContext();
   
-    // Raffle Modal
-    const [friendlyName, setFriendlyName] = useState('')
-    const [showModal, setShowModal] = useState(false);
-  
     useEffect(() => {
   
       const getBaseAddress = async () => {

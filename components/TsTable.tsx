@@ -42,6 +42,8 @@ export const TsTable = ({entries, title, closed, base_address } : TsTableData) =
 
     const [txHash, setTxHash] = useState<undefined|string>(null);    
     const [prize, setPrize] = useState<undefined|string>(null);
+
+    const [raffles, setRaffles] = useState<RaffleEntry[]>(entries);
     
     const [walletHandle, setWalletHandle] = useWalletContext();
   
@@ -56,6 +58,10 @@ Delegate to EASY1 Stake Pool and enjoy:
 Find out more at easy1staking.com
 
 @CryptoJoe101`
+
+    useEffect(() => {
+        setRaffles(entries);
+    }, [entries])
 
     const collectPrize = async (raffle_id: number) => {
         console.log('raffle id: '+ raffle_id)
@@ -113,6 +119,12 @@ Find out more at easy1staking.com
                 
             }
 
+            const newRaffles = raffles.slice()
+            const index = newRaffles.findIndex(entry => entry.id == raffle_id)
+            entries[index].status = 'pending'
+            entries[index].tx_id = body.tx_id
+            setRaffles(newRaffles)
+
           } else {
             toast.error('Error while creating collection Prize Transaction.\nPlease contact an Admin')
           }
@@ -137,7 +149,7 @@ Find out more at easy1staking.com
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
-                                stroke-width="1.5"
+                                strokeWidth="1.5"
                                 stroke="currentColor"
                                 className="w-6 h-6">
                                 <path
@@ -233,7 +245,7 @@ Find out more at easy1staking.com
 
                         <tbody>
 
-                            {entries.map((row, index) => (
+                            {raffles.map((row, index) => (
 
 
                                     <tr key={`r${index}`} className="text-slate-50">
