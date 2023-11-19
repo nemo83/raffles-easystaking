@@ -114,6 +114,16 @@ export default function Raffles() {
       <section className="my-8 text-center bg-white rounded-lg">
         <div className="px-3 py-6 md:px-12">
           <h2 className="p-3 my-3 text-5xl tracking-tight text-gray-800 bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-white">
+            Attention Please! <br />
+            <span className="text-3xl text-myblue">Raffles V2 are currenlty under active development and will be release soon!</span>
+          </h2>
+        </div>
+      </section>
+
+
+      <section className="my-8 text-center bg-white rounded-lg hidden">
+        <div className="px-3 py-6 md:px-12">
+          <h2 className="p-3 my-3 text-5xl tracking-tight text-gray-800 bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-white">
             Hey There! <br />
             <span className="text-3xl text-myblue">Have you joined the Raffles?</span>
           </h2>
