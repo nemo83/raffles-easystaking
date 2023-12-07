@@ -53,8 +53,8 @@ const Nav: NextPage = (props: any) => {
 
     const [baseAddress, setBaseAddress] = useState(null)
 
-    const navSelected = 'text-myblue dark:text-slate-50 border-mypink dark:border-mypink'
-    const navNotSelected = 'text-gray-300 border-gray-300 hover:border-mypink dark:hover:border-mypink hover:text-gray-600 hover:text-myblue dark:hover:text-slate-50'
+    const navSelected = 'text-mypink dark:text-slate-50 border-mypink dark:border-mypink'
+    const navNotSelected = 'text-gray-300 border-gray-300 hover:border-mypink dark:hover:border-mypink hover:text-gray-600 hover:text-mypink dark:hover:text-slate-50 items-center'
 
     useEffect(() => {
 
@@ -182,20 +182,79 @@ const Nav: NextPage = (props: any) => {
     }
 
     return (
-        <nav id="header" className="fixed top-0 z-10 w-full bg-gray-100 shadow dark:bg-gray-600">
+        <nav id="header" className="fixed top-0 z-10 w-full bg-white shadow dark:bg-gray-600 py-3">
 
             <Toaster />
 
-            <div className="container flex flex-wrap items-center w-full pt-2 pb-3 mx-auto my-1 mt-0 lg:pb-0">
+            <div className="container flex items-center w-full pt-2 pb-3 mx-auto my-1 mt-0 lg:pb-2">
 
                 <div className="flex justify-center w-full pl-2 sm:block sm:w-1/3 md:w-1/2 md:pl-0">
-                    <a className="flex text-xl font-bold no-underline text-myblue dark:text-gray-100 xl:text-xl hover:no-underline text" href="#">
+                    <a className="flex text-xl font-bold no-underline text-mypink dark:text-gray-100 xl:text-xl hover:no-underline text" href="#">
                         <Image src="easy1staking-logo.svg" width={35} height={25} alt="EASY1 Staking" />
-                        <div className='ml-3'>EASY1 Staking</div>
+                        <div className='ml-3 text-lg'>EASY1 Staking</div>
                     </a>
                 </div>
+
+                <div className={`z-20 flex-grow w-full mt-2 bg-white dark:bg-gray-600 lg:flex md:w-1/2 lg:items-center  lg:block lg:mt-0 ` + (showMenu ? ' ' : ' hidden')} id="nav-content">
+
+                    <ul className="items-center flex-1 px-4 list-reset lg:flex md:px-0 justify-center ">
+                        <li className="my-2 mr-6 md:my-0">
+                            <Link href="/" className={`block py-1 pl-1 no-underline align-middle lg:flex items-center font-medium` +
+                                (currentRoute == '/' ? navSelected : navNotSelected)}>
+                                <FontAwesomeIcon
+                                    icon={faHome}
+                                    className="mr-3"
+                                />
+                                <span className="pb-1 text-base md:pb-0 uppercase font-medium">Home</span>
+                            </Link>
+                        </li>
+                        <li className="my-2 mr-6 md:my-0">
+                            <Link href="/raffles" className={`block py-1 pl-1 no-underline align-middle lg:flex items-center font-medium ` +
+                                (currentRoute == '/raffles' ? navSelected : navNotSelected)}>
+                                <FontAwesomeIcon
+                                    icon={faDice}
+                                    className="mr-3"
+                                />
+                                <span className="pb-1 text-base md:pb-0 uppercase font-medium">Raffles</span>
+                            </Link>
+                        </li>
+                        <li className="my-2 mr-6 md:my-0">
+                            <Link href="/nft-raffles" className={`block py-1 pl-1 no-underline align-middle  lg:flex items-center  hover:text-gray-100 font-medium ` + (currentRoute == '/nft-raffles' ? navSelected : navNotSelected)}>
+                                <FontAwesomeIcon
+                                    icon={faFileImage}
+                                    className="mr-3"
+                                />
+                                <span className="pb-1 text-base md:pb-0 uppercase font-medium">NFT Raffles</span>
+                            </Link>
+                        </li>
+                        {stakingAnalysis ? (
+                            <li className="my-2 mr-6 md:my-0">
+                                <Link href="/staking-analysis" className={`block py-1 pl-1  no-underline align-middle border-b-2 items-center  hover:text-gray-100 font-medium uppercase` + (currentRoute == '/staking-analysis' ? navSelected : navNotSelected)}>
+                                    <FontAwesomeIcon
+                                        icon={faHeartbeat}
+                                        className="mr-3"
+                                    />
+                                    <span className="pb-1 text-base md:pb-0 uppercase font-medium">Staking Analysis</span>
+                                </Link>
+                            </li>
+                        ) : null}
+                        {faq ? (
+                            <li className="my-2 mr-6 md:my-0">
+                                <Link href="/faw" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/faq' ? navSelected : navNotSelected)}>
+                                    <FontAwesomeIcon
+                                        icon={faQuestion}
+                                        className="mr-3"
+                                    />
+                                    <span className="pb-1 text-base md:pb-0 uppercase font-medium">F.A.Q.</span>
+                                </Link>
+                            </li>
+                        ) : null}
+
+                    </ul>
+
+                    </div>
                 <div className="w-full pr-0 sm:w-2/3 md:w-1/2">
-                    <div className="relative flex justify-between sm:float-right sm:justify-end">
+                    <div className="relative flex justify-between sm:float-right sm:justify-end items-center">
 
                         <div className="relative flex text-sm text-gray-100">
 
@@ -203,7 +262,7 @@ const Nav: NextPage = (props: any) => {
                                 <FontAwesomeIcon
                                     icon={theme == 'light' ? farMoon : faSun}
                                     onClick={() => theme == 'light' ? setTheme('dark') : setTheme('light')}
-                                    className={theme == 'light' ? 'text-myblue' : ''}
+                                    className={theme == 'light' ? 'text-mypink' : ''}
                                     size="xl"
                                 />
                             </div>
@@ -212,7 +271,7 @@ const Nav: NextPage = (props: any) => {
                                 {/* Connect */}
                                 <div className={`text-myblue dark:text-slate-50 px-2 font-semibold`}>
                                     <button
-                                        className={`px-3 py-2 text-sm bg-gray-300 rounded-md dropdown-toggle hover:bg-slate-50 ` + (walletHandle ? 'hidden' : '')}
+                                        className={`px-3 py-2 text-sm bg-mypink rounded-md dropdown-toggle hover:bg-mypink text-white ` + (walletHandle ? 'hidden' : '')}
                                         type="button"
                                         id="menu-button"
                                         aria-expanded="true"
@@ -285,7 +344,7 @@ const Nav: NextPage = (props: any) => {
                         </div>
 
 
-                        <div className="flex-grow order-first block px-4 sm:order-none lg:hidden">
+                        <div className="flex-grow order-last block px-4 sm:order-none lg:hidden align-middle">
                             <button id="nav-toggle"
                                 className="flex items-center px-3 py-2 text-gray-300 border border-gray-300 rounded appearance-none hover:text-slate-50 hover:border-slate-50 focus:outline-none"
                                 onClick={() => setShowMenu(!showMenu)}>
@@ -299,64 +358,7 @@ const Nav: NextPage = (props: any) => {
 
                 </div>
 
-                <div className={`z-20 flex-grow w-full mt-2 bg-gray-100 dark:bg-gray-600 lg:flex lg:items-center lg:w-auto lg:block lg:mt-0` + (showMenu ? ' ' : ' hidden')} id="nav-content">
-
-                    <ul className="items-center flex-1 px-4 list-reset lg:flex md:px-0">
-                        <li className="my-2 mr-6 md:my-0">
-                            <Link href="/" className={`block py-1 pl-1 no-underline align-middle border-b-2 ` +
-                                (currentRoute == '/' ? navSelected : navNotSelected)}>
-                                <FontAwesomeIcon
-                                    icon={faHome}
-                                    className="mr-3"
-                                />
-                                <span className="pb-1 text-lg md:pb-0">Home</span>
-                            </Link>
-                        </li>
-                        <li className="my-2 mr-6 md:my-0">
-                            <Link href="/raffles" className={`block py-1 pl-1  no-underline align-middle border-b-2 ` +
-                                (currentRoute == '/raffles' ? navSelected : navNotSelected)}>
-                                <FontAwesomeIcon
-                                    icon={faDice}
-                                    className="mr-3"
-                                />
-                                <span className="pb-1 text-lg md:pb-0">Raffles</span>
-                            </Link>
-                        </li>
-                        <li className="my-2 mr-6 md:my-0">
-                            <Link href="/nft-raffles" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/nft-raffles' ? navSelected : navNotSelected)}>
-                                <FontAwesomeIcon
-                                    icon={faFileImage}
-                                    className="mr-3"
-                                />
-                                <span className="pb-1 text-lg md:pb-0">NFT Raffles</span>
-                            </Link>
-                        </li>
-                        {stakingAnalysis ? (
-                            <li className="my-2 mr-6 md:my-0">
-                                <Link href="/staking-analysis" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/staking-analysis' ? navSelected : navNotSelected)}>
-                                    <FontAwesomeIcon
-                                        icon={faHeartbeat}
-                                        className="mr-3"
-                                    />
-                                    <span className="pb-1 text-lg md:pb-0">Staking Analysis</span>
-                                </Link>
-                            </li>
-                        ) : null}
-                        {faq ? (
-                            <li className="my-2 mr-6 md:my-0">
-                                <Link href="/faw" className={`block py-1 pl-1  no-underline align-middle border-b-2  hover:text-gray-100 ` + (currentRoute == '/faq' ? navSelected : navNotSelected)}>
-                                    <FontAwesomeIcon
-                                        icon={faQuestion}
-                                        className="mr-3"
-                                    />
-                                    <span className="pb-1 text-lg md:pb-0">F.A.Q.</span>
-                                </Link>
-                            </li>
-                        ) : null}
-
-                    </ul>
-
-                </div>
+              
 
             </div>
         </nav>

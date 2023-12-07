@@ -143,15 +143,15 @@ export default function EstimateRewards() {
     }
 
     return (
-        <div className="my-6">
-            <div className='flex'>
+        <div className="my-6 flex justify-center">
+            <div className='flex justify-center gap-3 md:w-[30%]'>
                 <input
-                    className="w-full text-black border rounded shadow appearance-none"
+                    className="w-full text-black border rounded shadow appearance-none px-3"
                     placeholder='Wallet Address'
                     disabled={(baseAddress != null)}
                     onChange={(event) => setManualAddress(event.target.value)}
                     value={baseAddress != null ? baseAddress : manualAddress} />
-                <button className={`px-4 py-2 font-bold text-white border-blue-700 rounded ` + (manualAddress || baseAddress ? "bg-blue-500 hover:bg-blue-700" : "bg-gray-300")}
+                <button className={`px-4 py-2 font-bold text-white border-blue-700 rounded ` + (manualAddress || baseAddress ? "bg-mypink hover:bg-pink-400" : "bg-gray-300")}
                     disabled={!(manualAddress || baseAddress)}
                     onClick={() => checkStaking()}>
                     Check
