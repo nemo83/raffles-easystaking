@@ -271,7 +271,7 @@ const Nav: NextPage = (props: any) => {
                                 {/* Connect */}
                                 <div className={`text-myblue dark:text-slate-50 px-2 font-semibold`}>
                                     <button
-                                        className={`px-3 py-2 text-sm bg-mypink rounded-md dropdown-toggle hover:bg-mypink text-white ` + (walletHandle ? 'hidden' : '')}
+                                        className={`px-3 py-2 text-sm bg-mypink rounded-md dropdown-toggle hover:bg-pink-400 text-white ` + (walletHandle ? 'hidden' : '')}
                                         type="button"
                                         id="menu-button"
                                         aria-expanded="true"
