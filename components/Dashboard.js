@@ -38,25 +38,25 @@ function Dashboard() {
             text: "jackpot",
             icon: faDollarSign,
             iconClassName: "fas fa-2x fa-fw fa-inverse",
-            iconBackground: "bg-blue-600"
+            iconBackground: "bg-mypink"
         }, {
             title: "Participants",
             text: "participants",
             icon: faUsers,
             iconClassName: "fas fa-2x fa-fw fa-inverse",
-            iconBackground: "bg-green-600"
+            iconBackground: "bg-mypink"
         }, {
             title: "Total Raffles",
             text: "totalRaffles",
             icon: faDice,
             iconClassName: "fas fa-2x",
-            iconBackground: "bg-red-600"
+            iconBackground: "bg-mypink text-white"
         }, {
             title: "Total Won",
             text: "totalWon",
             icon: faDollarSign,
             iconClassName: "fas fa-2x",
-            iconBackground: "bg-blue-600"
+            iconBackground: "bg-mypink text-white min-w-8"
         }
     ]
 

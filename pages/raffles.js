@@ -112,10 +112,10 @@ export default function Raffles() {
       <Dashboard />
 
       <section className="my-8 text-center bg-white rounded-lg">
-        <div className="px-3 py-6 md:px-12">
-          <h2 className="p-3 my-3 text-5xl tracking-tight text-gray-800 bg-gray-100 rounded-lg dark:bg-gray-800 dark:text-white">
+        <div className="px-3 py-6 md:px-12  md:text-left">
+          <h2 className="my-6 text-4xl font-bold text-slate-600">
             Attention Please! <br />
-            <span className="text-3xl text-myblue">Raffles V2 are currenlty under active development and will be release soon!</span>
+            <p className="text-base text-slate-400 mt-3 font-normal">Raffles V2 are currently under active development and will be released soon!</p>
           </h2>
         </div>
       </section>
