@@ -22,8 +22,6 @@ export default function EstimateRewards() {
 
     const [manualAddress, setManualAddress] = useState('')
 
-    const [currentEpoch, setCurrentEpoch] = useState(null)
-
     const [delegation, setDelegation] = useState({
         ticker: null,
         name: null,
@@ -54,12 +52,6 @@ export default function EstimateRewards() {
             setBaseAddress(null)
         }
     }, [walletHandle])
-
-    useEffect(() => {
-        fetch('https://hilltop-api.mainnet.dandelion.blockwarelabs.io/epochs/current')
-            .then((res) => res.json())
-            .then((data) => setCurrentEpoch(data.number))
-    }, [])
 
     useEffect(() => {
         if (!baseAddress) {
@@ -144,7 +136,7 @@ export default function EstimateRewards() {
 
     return (
         <div className="my-6 flex justify-center">
-            <div className='flex justify-center gap-3 md:w-[30%]'>
+            <div className='flex justify-center gap-3 md:w-[30%] hidden'>
                 <input
                     className="w-full text-black border rounded shadow appearance-none px-3"
                     placeholder='Wallet Address'
@@ -166,14 +158,7 @@ export default function EstimateRewards() {
                     iconClassName="fas fa-2x fa-fw fa-inverse"
                     iconBackground="bg-blue-600"
                 />
-                <Card
-                    key="stakepool-status"
-                    title="Stakepool Status"
-                    text={delegation.retiring_at_epoch ? (delegation.retiring_at_epoch < currentEpoch ? "Retired" : "Retiring") : "active"}
-                    icon={delegation.retiring_at_epoch ? faSkull : faHeartPulse}
-                    iconClassName="fas fa-2x fa-fw fa-inverse"
-                    iconBackground="bg-blue-600"
-                />
+               
             </div>
             {extraRewards.length > 0 ? (
                 <div className="flex flex-col my-6">

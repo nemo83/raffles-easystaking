@@ -38,21 +38,27 @@ const Home: NextPage = (props: any) => {
         setStakingAddress(stakingAddress)
         console.log('stakingAddress', stakingAddress.toBech32())
 
-
-        fetch('https://lottery.easystaking.online/delegator_details/' + stakingAddress.toBech32() + '/staking')
-          .then((res) => res.json())
-          .then((data) => {
-            console.log('data', data)
-            if (data.stake_pool_id) {
-              if (data.stake_pool_id == easy1_stake_pool_id) {
-                setIsEasy1Delegate(true)
-              } else {
-                setIsEasy1Delegate(false)
-              }
+        fetch(getBlockfrostUrl(network) + `/accounts/${stakingAddress.toBech32()}`, {
+            method: "GET",
+            headers: {
+                accept: "application/json",
+                project_id: getBlockfrostKey(network),
+            },
+        })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log('data', data)
+          if (data.pool_id) {
+            if (data.pool_id == easy1_stake_pool_bech32_id) {
+              setIsEasy1Delegate(true)
             } else {
-              setIsEasy1Delegate(null)
+              setIsEasy1Delegate(false)
             }
-          })
+          } else {
+            setIsEasy1Delegate(null)
+          }
+        })
+
       })()
     } else {
       setIsEasy1Delegate(null)
