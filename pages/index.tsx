@@ -59,6 +59,10 @@ const Home: NextPage = (props: any) => {
           }
         })
 
+        fetch('https://lottery.easystaking.online/delegator_details/' + stakingAddress.toBech32() + '/staking')
+          .then((res) => res.json())
+          .then((data) => console.log('data', data))
+
       })()
     } else {
       setIsEasy1Delegate(null)
