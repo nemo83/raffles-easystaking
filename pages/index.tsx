@@ -55,7 +55,7 @@ const Home: NextPage = (props: any) => {
               setIsEasy1Delegate(false)
             }
           } else {
-            setIsEasy1Delegate(null)
+            setIsEasy1Delegate(false)
           }
         })
 
