@@ -92,36 +92,36 @@ export default function EstimateRewards() {
                 return
             }
 
-            fetch('https://hilltop-api.mainnet.dandelion.blockwarelabs.io/rewards/' + stake)
-                .then((res) => res.json())
-                .then((data) => {
-                    data.sort((a, b) => a.epoch - b.epoch)
-                    let lastRewards = data.slice(-10)
-                    let epochs = lastRewards.map(r => r.epoch)
-                    let amounts = lastRewards.map(r => r.amount)
-                    setRewards({ epochs, amounts })
-                })
+            // fetch('https://hilltop-api.mainnet.dandelion.blockwarelabs.io/rewards/' + stake)
+            //     .then((res) => res.json())
+            //     .then((data) => {
+            //         data.sort((a, b) => a.epoch - b.epoch)
+            //         let lastRewards = data.slice(-10)
+            //         let epochs = lastRewards.map(r => r.epoch)
+            //         let amounts = lastRewards.map(r => r.amount)
+            //         setRewards({ epochs, amounts })
+            //     })
 
-            fetch('https://hilltop-api.mainnet.dandelion.blockwarelabs.io/delegations/' + stake + '/stakepool')
-                .then((res) => res.json())
-                .then((data) => {
-                    let delegations = data.delegations
-                    delegations.sort((a, b) => a.epoch - b.epoch)
-                    let currentDelegation = delegations.slice(-1)[0]
-                    setDelegation({
-                        ticker: currentDelegation.stakepool.metadata.ticker,
-                        name: currentDelegation.stakepool.metadata.name,
-                        description: currentDelegation.stakepool.metadata.description,
-                        homepage: currentDelegation.stakepool.metadata.homepage,
-                        cost: currentDelegation.stakepool.cost,
-                        margin: currentDelegation.stakepool.margin,
-                        pledge: currentDelegation.stakepool.pledge,
-                        saturation: currentDelegation.stakepool.saturation,
-                        retiring_at_epoch: currentDelegation.stakepool.retiring_at_epoch,
-                    })
-                })
+            // fetch('https://hilltop-api.mainnet.dandelion.blockwarelabs.io/delegations/' + stake + '/stakepool')
+            //     .then((res) => res.json())
+            //     .then((data) => {
+            //         let delegations = data.delegations
+            //         delegations.sort((a, b) => a.epoch - b.epoch)
+            //         let currentDelegation = delegations.slice(-1)[0]
+            //         setDelegation({
+            //             ticker: currentDelegation.stakepool.metadata.ticker,
+            //             name: currentDelegation.stakepool.metadata.name,
+            //             description: currentDelegation.stakepool.metadata.description,
+            //             homepage: currentDelegation.stakepool.metadata.homepage,
+            //             cost: currentDelegation.stakepool.cost,
+            //             margin: currentDelegation.stakepool.margin,
+            //             pledge: currentDelegation.stakepool.pledge,
+            //             saturation: currentDelegation.stakepool.saturation,
+            //             retiring_at_epoch: currentDelegation.stakepool.retiring_at_epoch,
+            //         })
+            //     })
 
-            fetch('https://lottery.easystaking.online/extra_rewards?staking_address=' + stake)
+            fetch('https://api.easy1staking.com/extra_rewards?stake_address=' + stake)
                 .then((res) => res.json())
                 .then((data) => {
                     if (data.length == 0) {
@@ -135,8 +135,9 @@ export default function EstimateRewards() {
     }
 
     return (
+        <>
         <div className="my-6 flex justify-center">
-            <div className='flex justify-center gap-3 md:w-[30%] hidden'>
+            <div className='flex justify-center gap-3 md:w-[30%]'>
                 <input
                     className="w-full text-black border rounded shadow appearance-none px-3"
                     placeholder='Wallet Address'
@@ -149,17 +150,8 @@ export default function EstimateRewards() {
                     Check
                 </button>
             </div>
-            <div hidden>
-                <Card
-                    key="stakepool"
-                    title="Stakepool"
-                    text={delegation.ticker ? delegation.ticker : 'N/A'}
-                    icon={faCoins}
-                    iconClassName="fas fa-2x fa-fw fa-inverse"
-                    iconBackground="bg-blue-600"
-                />
-               
             </div>
+            <div className="my-6 flex justify-center">
             {extraRewards.length > 0 ? (
                 <div className="flex flex-col my-6">
                     <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
@@ -174,9 +166,9 @@ export default function EstimateRewards() {
                                             <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
                                                 Amount (estimated)
                                             </th>
-                                            <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
+                                            {/* <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
                                                 ₳ value (estimated)
-                                            </th>
+                                            </th> */}
                                             <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
                                                 Min epoch
                                             </th>
@@ -195,9 +187,9 @@ export default function EstimateRewards() {
                                                 <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
                                                     {Number.isInteger(extraReward.amount) ? extraReward.amount : parseFloat(extraReward.amount).toFixed(2)} ${extraReward.symbol}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
+                                                {/* <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
                                                     {parseFloat(extraReward.estimated_value_in_ada).toFixed(2)} ₳
-                                                </td>
+                                                </td> */}
                                                 <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
                                                     {extraReward.min_age}
                                                 </td>
@@ -211,8 +203,8 @@ export default function EstimateRewards() {
                     </div>
                 </div>
             ) : null}
-
-        </div>
+</div>
+        </>
 
     )
 }
