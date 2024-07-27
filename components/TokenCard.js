@@ -37,10 +37,6 @@ export const TokenCard = ({ children, name, imageUrl, description, amount, symbo
                     </h5>
                     {children}
                     <p className="my-4">
-                        Here are the biggest enterprise technology acquisitions of 2021 so
-                        far, in reverse chronological order.
-                    </p>
-                    <p className="my-4">
                         <span className="font-bold text-mypink">
                             {" "}
                             {amount} ${symbol}

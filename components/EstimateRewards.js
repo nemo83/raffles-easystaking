@@ -137,7 +137,7 @@ export default function EstimateRewards() {
     return (
         <>
         <div className="my-6 flex justify-center">
-            <div className='flex justify-center gap-3 md:w-[30%]'>
+            <div className='flex justify-center gap-3 w-full'>
                 <input
                     className="w-full text-black border rounded shadow appearance-none px-3"
                     placeholder='Wallet Address'
