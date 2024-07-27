@@ -166,9 +166,9 @@ export default function EstimateRewards() {
                                             <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
                                                 Amount (estimated)
                                             </th>
-                                            {/* <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
-                                                ₳ value (estimated)
-                                            </th> */}
+                                            <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
+                                                $ value (estimated)
+                                            </th>
                                             <th scope="col" className="px-6 py-4 text-sm font-medium text-left text-gray-900">
                                                 Min epoch
                                             </th>
@@ -187,9 +187,9 @@ export default function EstimateRewards() {
                                                 <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
                                                     {Number.isInteger(extraReward.amount) ? extraReward.amount : parseFloat(extraReward.amount).toFixed(2)} ${extraReward.symbol}
                                                 </td>
-                                                {/* <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
-                                                    {parseFloat(extraReward.estimated_value_in_ada).toFixed(2)} ₳
-                                                </td> */}
+                                                <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
+                                                    {parseFloat(extraReward.dollar_value).toFixed(2)} $
+                                                </td>
                                                 <td className="px-6 py-4 text-sm font-light text-gray-900 whitespace-nowrap">
                                                     {extraReward.min_age}
                                                 </td>
