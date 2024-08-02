@@ -18,13 +18,23 @@ import { sha256 } from 'js-sha256';
 import Spinner from '../components/Spinner'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCopy } from "@fortawesome/free-solid-svg-icons"
+import { useSearchParams } from 'next/navigation'
 import {
   faMoon as farMoon
 } from "@fortawesome/free-regular-svg-icons"
 import { Blockfrost, Lucid, OutRef, Constr, Data, SpendingValidator, toHex, fromHex } from "lucid-cardano"; // NPM
 import { ad } from 'vitest/dist/types-94cfe4b4';
 import * as cbor from 'cbor';
+import { referral_code_key } from '../constants/lottery';
 export const origin = process.env.NEXT_PUBLIC_ORIGIN
+
+
+interface Bonus {
+  txBytes: string|undefined,
+  status: boolean,
+  amountAda: number,
+  errorCode: string|undefined,
+}
 
 const Incentives: NextPage = (props: any) => {
 
@@ -37,8 +47,36 @@ const Incentives: NextPage = (props: any) => {
 
   const [baseAddress, setBaseAddress] = useWalletContext()
 
+  // The USER referral code
   const [referralCode, setReferralCode] = useState(null)
 
+  // The code of a referrer
+  const [referrerCode, setReferrerCode] = useState(null)
+
+  const [referralUrl, setReferralUrl] = useState(null)
+
+  const [bonus, setBonus] = useState<Bonus>(null)
+
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const referrer = searchParams.get('referrer')
+    console.log('referrer: ' + referrer)
+    if (referrer) {
+      console.log('found referrer: ' + referrer)
+      localStorage.setItem(referral_code_key, referrer)
+      setReferrerCode(referrer)
+    } else {
+      const localReferrer = localStorage.getItem(referral_code_key)
+      console.log('localReferrer: ' + localReferrer)
+      if (localReferrer) {
+        console.log('setting localReferrer: ' + localReferrer)
+        setReferrerCode(localReferrer)
+      }
+    }
+  })
+
+  
   useEffect(() => {
     (async () => {
       if (walletHandle) {
@@ -51,9 +89,16 @@ const Incentives: NextPage = (props: any) => {
     })()
   }, [walletHandle])
 
+
+  useEffect(() => {
+    setReferralUrl(origin + `/incentives?referrer=` + referralCode)
+  }, [referralCode])
+
+
+
   useEffect(() => {
 
-    const body = JSON.stringify({address: baseAddress});
+    const body = JSON.stringify({ address: baseAddress });
 
     fetch('http://localhost:8080/referral_codes', {
       method: "POST",
@@ -70,6 +115,58 @@ const Incentives: NextPage = (props: any) => {
       });
 
   }, [baseAddress])
+
+
+  useEffect(() => {
+
+    const body = JSON.stringify({ address: baseAddress });
+
+    fetch('http://localhost:8080/incentives?' + new URLSearchParams({ payment_address: baseAddress, referral_code: referralCode }).toString())
+      .then((res) => res.json())
+      .then((data) => {
+        console.log('incentive: ' + JSON.stringify(data))
+        if (data.success) {
+          const bonus: Bonus = {
+            txBytes: data.txBytes,
+            status: true,
+            amountAda: data.amountAda,
+            errorCode: undefined,
+          }
+          setBonus(bonus)
+        } else {
+          const bonus: Bonus = {
+            txBytes: undefined,
+            status: false,
+            amountAda: data.amountAda,
+            errorCode: data.error,
+          }
+          setBonus(bonus)
+        }
+      });
+
+  }, [baseAddress])
+
+
+  const copyReferralUrlToClipboard = () => {
+    navigator.clipboard.writeText(referralUrl)
+  }
+
+  const claimBonus = async () => {
+
+    const lucid = await Lucid.new(
+      new Blockfrost(getBlockfrostUrl(network), getBlockfrostKey(network)),
+      "Mainnet",
+    );
+
+    lucid.selectWallet(walletHandle)
+
+    console.log(bonus.txBytes)
+
+    const tx = lucid.fromTx(bonus.txBytes)
+
+    const signedTx = await tx.sign().complete()
+    signedTx.submit()
+  }
 
   const delegate = async () => {
 
@@ -144,15 +241,39 @@ const Incentives: NextPage = (props: any) => {
         <div className="px-3 py-6 md:px-12  md:text-left">
           <h2 className="my-6 text-4xl font-bold text-slate-600">
             Referrals <br />
-            <p className={`text-base text-slate-400 mt-3 font-normal ` + (walletHandle ? 'hidden' : '')}>Connect your wallet to get your referral code!</p>
-            <FontAwesomeIcon
-              icon={faCopy}
-              className="mr-3"
-            />
-            <span className={`text-base text-slate-400 mt-3 font-normal ` + (walletHandle ? '' : 'hidden')}> {origin + `/incentives?referrer=` + referralCode} </span>
-
           </h2>
+          <p className={`text-base text-slate-400 mt-3 font-normal ` + (walletHandle ? 'hidden' : '')}>Connect your wallet to get your referral code!</p>
+            <span className={`text-base text-slate-400 mt-3 font-normal ` + (walletHandle ? '' : 'hidden')}> 
+              {referralUrl} &nbsp;
+              <FontAwesomeIcon
+                icon={faCopy}
+                onClick={() => copyReferralUrlToClipboard()}
+              />
+              </span>
         </div>
+        <div className="px-3 py-6 md:px-12  md:text-left">
+          <h2 className="my-6 text-4xl font-bold text-slate-600">
+            Staking Bonus <br />            
+          </h2>
+          <p className={`text-base text-slate-400 mt-3 font-normal ` + (walletHandle ? 'hidden' : '')}>Connect your wallet to check for welcome bonus eligibility</p>
+          { bonus && bonus.status ?(
+            <span className={`text-base text-slate-400 mt-3 font-normal `}> 
+            Congrats you're eligible for a Welcome bonus of ₳ {bonus.amountAda} 
+            <button
+            className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
+            type="button"
+            onClick={() => claimBonus()} >
+            Build Scripts
+          </button>
+            </span>            
+          ) : null }
+          
+          { bonus && !bonus.status ?(
+            <span className={`text-base text-slate-400 mt-3 font-normal `}> Sorry: {bonus.errorCode} </span>
+          ) : null }
+          
+        </div>
+
       </section>
 
       <div className="text-black">

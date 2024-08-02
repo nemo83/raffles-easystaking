@@ -14,3 +14,6 @@ export const easy1_stake_pool_bech32_id = 'pool1yr0cv3dtmhcfgqa6yetvmf769ngk89e6
 // Lottery
 export const wallet_name_key = "wallet-name"
 export const friendly_name_key = "friendly-name"
+
+// Referral
+export const referral_code_key = "referral-code-key"
