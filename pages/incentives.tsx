@@ -258,7 +258,7 @@ const Incentives: NextPage = (props: any) => {
           <p className={`text-base text-slate-400 mt-3 font-normal ` + (walletHandle ? 'hidden' : '')}>Connect your wallet to check for welcome bonus eligibility</p>
           { bonus && bonus.status ?(
             <span className={`text-base text-slate-400 mt-3 font-normal `}> 
-            Congrats you're eligible for a Welcome bonus of ₳ {bonus.amountAda} 
+            Congrats you are eligible for a Welcome bonus of ₳ {bonus.amountAda} 
             <button
             className="px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase rounded shadow outline-none bg-slate-300 hover:bg-slate-400 focus:outline-none"
             type="button"
