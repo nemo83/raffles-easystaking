@@ -164,8 +164,9 @@ const Incentives: NextPage = (props: any) => {
 
     const tx = lucid.fromTx(bonus.txBytes)
 
-    const signedTx = await tx.sign().complete()
-    signedTx.submit()
+    const witness = await tx.partialSign()
+    const foo = await tx.assemble([witness]).complete()
+    foo.submit()
   }
 
   const delegate = async () => {
