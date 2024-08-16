@@ -22,7 +22,7 @@ import { useSearchParams } from 'next/navigation'
 import {
   faMoon as farMoon
 } from "@fortawesome/free-regular-svg-icons"
-import { Blockfrost, Lucid, OutRef, Constr, Data, SpendingValidator, toHex, fromHex } from "lucid-cardano"; // NPM
+import { Blockfrost, Lucid, OutRef, Constr, Data, SpendingValidator, Delegation, toHex, fromHex } from "lucid-cardano"; // NPM
 import { ad } from 'vitest/dist/types-94cfe4b4';
 import * as cbor from 'cbor';
 import { referral_code_key } from '../constants/lottery';
@@ -45,7 +45,7 @@ const Incentives: NextPage = (props: any) => {
 
   const [walletHandle, setWalletHandle] = useWalletContext()
 
-  const [baseAddress, setBaseAddress] = useWalletContext()
+  const [baseAddress, setBaseAddress] = useState(null)
 
   // The USER referral code
   const [referralCode, setReferralCode] = useState(null)
@@ -119,9 +119,14 @@ const Incentives: NextPage = (props: any) => {
 
   useEffect(() => {
 
+    if (baseAddress == null) {
+      console.log('returning')
+      return;
+    }
+
     const body = JSON.stringify({ address: baseAddress });
 
-    fetch('http://localhost:8080/incentives?' + new URLSearchParams({ payment_address: baseAddress, referral_code: referralCode }).toString())
+    fetch('http://localhost:8080/incentives?' + new URLSearchParams({ payment_address: baseAddress, referral_code: referrerCode }).toString())
       .then((res) => res.json())
       .then((data) => {
         console.log('incentive: ' + JSON.stringify(data))
@@ -162,11 +167,10 @@ const Incentives: NextPage = (props: any) => {
 
     console.log(bonus.txBytes)
 
-    const tx = lucid.fromTx(bonus.txBytes)
+    const witness = await lucid.fromTx(bonus.txBytes).partialSign()
 
-    const witness = await tx.partialSign()
-    const foo = await tx.assemble([witness]).complete()
-    foo.submit()
+    const txSigned = await lucid.fromTx(bonus.txBytes).assemble([witness]).complete()
+    txSigned.submit()
   }
 
   const delegate = async () => {
